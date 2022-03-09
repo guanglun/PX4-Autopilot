@@ -265,6 +265,7 @@ px4fmu_firmware: \
 	check_px4_fmu-v4pro_default \
 	check_px4_fmu-v5_default \
 	check_px4_fmu-v5x_default \
+	check_px4_esp32_default \
 	sizes
 
 misc_qgc_extra_firmware: \
@@ -312,6 +313,7 @@ uorb_graphs:
 	@$(MAKE) --no-print-directory px4_fmu-v2_default uorb_graph
 	@$(MAKE) --no-print-directory px4_fmu-v4_default uorb_graph
 	@$(MAKE) --no-print-directory px4_fmu-v5_default uorb_graph
+	@$(MAKE) --no-print-directory px4_esp32_default uorb_graph
 	@$(MAKE) --no-print-directory px4_sitl_default uorb_graph
 
 px4io_update: px4_io-v2_default cubepilot_io-v2_default

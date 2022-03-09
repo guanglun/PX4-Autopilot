@@ -113,7 +113,7 @@ FLAGS = $(MAXOPTIMIZATION) -g2 \
 	-Wno-sign-compare \
 	-Wno-type-limits \
 	-Wno-unused-parameter \
-	-Wpointer-arith
+	-Wno-pointer-arith
 
 FLAGS += $(EXTRAFLAGS)
 
@@ -183,3 +183,9 @@ endef
 define ARCHIVE
     $(AR) $1 $(2)
 endef
+
+#ifneq ($(wildcard $(BOARD_DIR)$(DELIM)scripts$(DELIM)esp32.template.ld),)
+#	LDSCRIPT_TEMPLATE = $(BOARD_DIR)$(DELIM)scripts$(DELIM)esp32.template.ld
+#else
+#	LDSCRIPT_TEMPLATE = $(BOARD_COMMON_DIR)$(DELIM)scripts$(DELIM)esp32.template.ld
+#endif

@@ -246,3 +246,8 @@ CONFIG:
       buildType: MinSizeRel
       settings:
         CONFIG: raspberrypi_pico_default
+    px4_esp32_default:
+      short: px4_esp32
+      buildType: MinSizeRel
+      settings:
+        CONFIG: px4_esp32_default
