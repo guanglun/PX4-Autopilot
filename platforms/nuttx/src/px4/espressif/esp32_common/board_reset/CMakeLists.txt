@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2019 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,16 +31,13 @@
 #
 ############################################################################
 
-add_library(drivers_board
-	init.c
-	spi.cpp
+px4_add_library(arch_board_reset
+	board_reset.cpp
 )
 
-target_link_libraries(drivers_board
-	PRIVATE
-		arch_spi
-		drivers__led # drv_led_start
-		nuttx_arch # sdio
-		nuttx_drivers # sdio
-		px4_layer
-)
+# up_systemreset
+if (NOT DEFINED CONFIG_BUILD_FLAT)
+	target_link_libraries(arch_board_reset PRIVATE nuttx_karch)
+else()
+	target_link_libraries(arch_board_reset PRIVATE nuttx_arch)
+endif()

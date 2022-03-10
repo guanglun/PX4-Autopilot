@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2015-2019 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,16 +31,11 @@
 #
 ############################################################################
 
-add_library(drivers_board
-	init.c
-	spi.cpp
+px4_add_library(arch_hrt
+	hrt.c
 )
-
-target_link_libraries(drivers_board
+target_compile_options(arch_hrt
 	PRIVATE
-		arch_spi
-		drivers__led # drv_led_start
-		nuttx_arch # sdio
-		nuttx_drivers # sdio
-		px4_layer
+		${MAX_CUSTOM_OPT_LEVEL}
+		-Wno-cast-align # TODO: fix and enable
 )

@@ -152,7 +152,6 @@ if (NOT CONFIG_BUILD_FLAT)
 		-nodefaultlibs
 		-nostdlib
 		-nostdinc++
-
 		-fno-exceptions
 		-fno-rtti
 
@@ -211,6 +210,7 @@ if (NOT CONFIG_BUILD_FLAT)
 
 		-Wl,--start-group
 		${nuttx_userspace}
+
 		-Wl,--end-group
 
 		m
@@ -256,17 +256,25 @@ else()
 
 		-fno-exceptions
 		-fno-rtti
-		-Wl,--script=${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}script.ld
+		#-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}script.ld
+		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_out.ld
+		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.project.ld
+		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.rom.libgcc.ld
+		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.peripherals.ld
+		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.rom.ld
 		-Wl,-Map=${PX4_CONFIG}.map
 		-Wl,--warn-common
 		-Wl,--gc-sections
 
 		-Wl,--start-group
+		/home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/libgcc.a
+		/home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/../../../../xtensa-esp32-elf/lib/libm.a
 			${nuttx_libs}
+
 		-Wl,--end-group
 
-		m
-		gcc
+		# m
+		# gcc
 		)
 
 	if(NOT USE_LD_GOLD)

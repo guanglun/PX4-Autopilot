@@ -31,3 +31,8 @@
 #
 ############################################################################
 
+add_subdirectory(../esp32_common/board_reset board_reset)
+add_subdirectory(../esp32_common/version version)
+add_subdirectory(../esp32_common/hrt hrt)
+add_subdirectory(../esp32_common/spi spi)
+add_subdirectory(../esp32_common/board_critmon board_critmon)

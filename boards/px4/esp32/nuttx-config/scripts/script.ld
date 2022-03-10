@@ -20,221 +20,61 @@
 
 /* Default entry point: */
 
-ENTRY(__start);
 
-SECTIONS
+MEMORY
 {
-  /* Send .iram0 code to iram */
-
-  .iram0.vectors :
-  {
-    /* Vectors go to IRAM */
-
-    _init_start = ABSOLUTE(.);
-
-    /* Vectors according to builds/RF-2015.2-win32/esp108_v1_2_s5_512int_2/config.html */
-
-    . = 0x0;
-    KEEP (*(.window_vectors.text));
-    . = 0x180;
-    KEEP (*(.xtensa_level2_vector.text));
-    . = 0x1c0;
-    KEEP (*(.xtensa_level3_vector.text));
-    . = 0x200;
-    KEEP (*(.xtensa_level4_vector.text));
-    . = 0x240;
-    KEEP (*(.xtensa_level5_vector.text));
-    . = 0x280;
-    KEEP (*(.debug_exception_vector.text));
-    . = 0x2c0;
-    KEEP (*(.nmi_vector.text));
-    . = 0x300;
-    KEEP (*(.kernel_exception_vector.text));
-    . = 0x340;
-    KEEP (*(.user_exception_vector.text));
-    . = 0x3c0;
-    KEEP (*(.double_exception_vector.text));
-    . = 0x400;
-    *(.*_vector.literal)
-
-    . = ALIGN (16);
-    *(.entry.text)
-    *(.init.literal)
-    *(.init)
-    _init_end = ABSOLUTE(.);
-  } > iram0_0_seg
-
-  .iram0.text :
-  {
-    /* Code marked as running out of IRAM */
-
-    _iram_text_start = ABSOLUTE(.);
-    *(.iram1 .iram1.*)
-    *librtc.a:(.literal .text .literal.* .text.*)
-    *libarch.a:esp32_spiflash.*(.literal .text .literal.* .text.*)
-    *(.wifirxiram .wifirxiram.*)
-    *(.wifi0iram  .wifi0iram.*)
-    *(.wifislpiram .wifislpiram.*)
-    *(.wifislprxiram .wifislprxiram.*)
-    *(.phyiram .phyiram.*)
-    _iram_text_end = ABSOLUTE(.);
-
-    /* IRAM heap starts at the end of iram0_0_seg */
-
-    . = ALIGN (4);
-    _siramheap = ABSOLUTE(.);
-  } > iram0_0_seg
-
-  /* Shared RAM */
-
-  .dram0.bss (NOLOAD) :
-  {
-    /* .bss initialized on power-up */
-
-    . = ALIGN (8);
-    _sbss = ABSOLUTE(.);
-    *(.dynsbss)
-    *(.sbss)
-    *(.sbss.*)
-    *(.gnu.linkonce.sb.*)
-    *(.scommon)
-    *(.sbss2)
-    *(.sbss2.*)
-    *(.gnu.linkonce.sb2.*)
-    *(.dynbss)
-    KEEP (*(.bss))
-    *(.bss.*)
-    *(.share.mem)
-    *(.gnu.linkonce.b.*)
-    *(COMMON)
-    *libarch.a:esp32_spiflash.*(.bss  .bss.*  COMMON)
-    . = ALIGN(8);
-    _ebss = ABSOLUTE(.);
-  } >dram0_0_seg
-
-  .noinit (NOLOAD):
-  {
-    /* This section contains data that is not initialized during load,
-     * or during the application's initialization sequence.
-     */
-
-    *(.noinit)
-  } >dram0_0_seg
-
-  .dram0.data :
-  {
-    /* .data initialized on power-up in ROMed configurations. */
-
-    _sdata = ABSOLUTE(.);
-    KEEP (*(.data))
-    KEEP (*(.data.*))
-    KEEP (*(.gnu.linkonce.d.*))
-    KEEP (*(.data1))
-    KEEP (*(.sdata))
-    KEEP (*(.sdata.*))
-    KEEP (*(.gnu.linkonce.s.*))
-    KEEP (*(.sdata2))
-    KEEP (*(.sdata2.*))
-    KEEP (*(.gnu.linkonce.s2.*))
-    KEEP (*(.jcr))
-    *(.dram1 .dram1.*)
-    *libphy.a:(.rodata  .rodata.*)
-    *libarch.a:esp32_spiflash.*(.rodata  .rodata.*)
-    . = ALIGN(4);
-    _edata = ABSOLUTE(.);
-
-    /* Heap starts at the end of .data */
-
-    _sheap = ABSOLUTE(.);
-  } >dram0_0_seg
-
-  /* External memory bss, from any global variable with EXT_RAM_ATTR attribute */
-
-  .extmem.bss (NOLOAD) :
-  {
-    _sbss_extmem = ABSOLUTE(.);
-    *(.extmem.bss .extmem.bss.*)
-    . = ALIGN(4);
-    _ebss_extmem = ABSOLUTE(.);
-  } > extmem_seg
-
-  .flash.rodata :
-  {
-    _srodata = ABSOLUTE(.);
-    *(.rodata)
-    *(.rodata.*)
-    *(.irom1.text) /* catch stray ICACHE_RODATA_ATTR */
-    *(.gnu.linkonce.r.*)
-    *(.rodata1)
-    __XT_EXCEPTION_TABLE_ = ABSOLUTE(.);
-    *(.xt_except_table)
-    *(.gcc_except_table)
-    *(.gcc_except_table.*)
-    *(.gnu.linkonce.e.*)
-    *(.gnu.version_r)
-    *(.eh_frame)
-
-    . = (. + 3) & ~ 3;
-
-    /* C++ constructor and destructor tables, properly ordered: */
-
-    _sinit = ABSOLUTE(.);
-    KEEP (*crtbegin.o(.ctors))
-    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-    KEEP (*(SORT(.ctors.*)))
-    KEEP (*(.ctors))
-    _einit = ABSOLUTE(.);
-    KEEP (*crtbegin.o(.dtors))
-    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-    KEEP (*(SORT(.dtors.*)))
-    KEEP (*(.dtors))
-
-    /* C++ exception handlers table: */
-
-    __XT_EXCEPTION_DESCS_ = ABSOLUTE(.);
-    *(.xt_except_desc)
-    *(.gnu.linkonce.h.*)
-    __XT_EXCEPTION_DESCS_END__ = ABSOLUTE(.);
-    *(.xt_except_desc_end)
-    *(.dynamic)
-    *(.gnu.version_d)
-    _erodata = ABSOLUTE(.);
-    /* Literals are also RO data. */
-    _lit4_start = ABSOLUTE(.);
-    *(*.lit4)
-    *(.lit4.*)
-    *(.gnu.linkonce.lit4.*)
-    _lit4_end = ABSOLUTE(.);
-    . = ALIGN(4);
-  } >default_rodata_seg
-
-  .flash.text :
-  {
-    _stext = .;
-    _text_start = ABSOLUTE(.);
-    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
-    *(.irom0.text) /* catch stray ICACHE_RODATA_ATTR */
-    *(.fini.literal)
-    *(.fini)
-    *(.gnu.version)
-    _text_end = ABSOLUTE(.);
-    _etext = .;
-  } >default_code_seg
-
-  .rtc.text :
-  {
-    . = ALIGN(4);
-    *(.rtc.literal .rtc.text)
-  } >rtc_iram_seg
-
-  .rtc.data :
-  {
-    *(.rtc.data)
-    *(.rtc.rodata)
-
-   /* Whatever is left from the RTC memory is used as a special heap. */
-
-    . = ALIGN (4);
-    _srtcheap = ABSOLUTE(.);
-  } > rtc_slow_seg
+  /* Below values assume the flash cache is on, and have the blocks this
+   * uses subtracted from the length of the various regions. The 'data access
+   * port' dram/drom regions map to the same iram/irom regions but are
+   * connected to the data port of the CPU and e.g. allow bytewise access.
+   */
+  /* IRAM for PRO cpu. Not sure if happy with this, this is MMU area... */
+  iram0_0_seg (RX) : org = 0x40080000, len = 0x20000
+  /* Flash mapped instruction data. */
+  /* The 0x20 offset is a convenience for the app binary image generation.
+   * Flash cache has 64KB pages. The .bin file which is flashed to the chip
+   * has a 0x18 byte file header, and each segment has a 0x08 byte segment
+   * header. Setting this offset makes it simple to meet the flash cache MMU's
+   * constraint that (paddr % 64KB == vaddr % 64KB).
+   */
+  irom0_0_seg (RX) : org = 0x400d0020, len = 0x330000 - 0x20
+  /* Shared data RAM, excluding memory reserved for ROM bss/data/stack.
+   * Enabling Bluetooth & Trace Memory features in menuconfig will decrease
+   * the amount of RAM available.
+   *
+   * Note: The length of this section should be 0x50000, and this extra
+   * DRAM is available in heap at runtime. However due to static ROM memory
+   * usage at this 176KB mark, the additional static memory temporarily cannot
+   * be used.
+   */
+  dram0_0_seg (RW) : org = 0x3ffb0000 + 0,
+                         len = 0x2c200 - 0 - 0
+  /* Flash mapped constant data */
+  /* The 0x20 offset is a convenience for the app binary image generation.
+   * Flash cache has 64KB pages. The .bin file which is flashed to the chip
+   * has a 0x18 byte file header, and each segment has a 0x08 byte segment
+   * header. Setting this offset makes it simple to meet the flash cache MMU's
+   * constraint that (paddr % 64KB == vaddr % 64KB).
+   */
+  drom0_0_seg (R) : org = 0x3f400020, len = 0x400000 - 0x20
+  /* RTC fast memory (executable). Persists over deep sleep. */
+  rtc_iram_seg (RWX) : org = 0x400c0000, len = 0x2000
+  /* RTC slow memory (data accessible). Persists over deep sleep.
+   * Start of RTC slow memory is reserved for ULP co-processor code + data,
+   * if enabled.
+   */
+  rtc_slow_seg (RW) : org = 0x50000000 + 0,
+                         len = 0x1000 - 0
+  /* External memory, including data and text */
+  extmem_seg (RWX) : org = 0x3f800000, len = 0x400000
 }
+  REGION_ALIAS("default_rodata_seg", drom0_0_seg);
+  REGION_ALIAS("default_code_seg", irom0_0_seg);
+/* Heap ends at top of dram0_0_seg */
+_eheap = 0x40000000 - 0;
+/* IRAM heap ends at top of dram0_0_seg */
+_eiramheap = 0x400a0000;
+/* Mark the end of the RTC heap (top of the RTC region) */
+_ertcheap = 0x50001fff;
+
+

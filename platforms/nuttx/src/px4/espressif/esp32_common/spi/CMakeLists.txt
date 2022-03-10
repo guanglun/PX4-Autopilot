@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2020 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,16 +31,9 @@
 #
 ############################################################################
 
-add_library(drivers_board
-	init.c
+px4_add_library(arch_spi
 	spi.cpp
 )
+target_compile_options(arch_spi PRIVATE ${MAX_CUSTOM_OPT_LEVEL})
 
-target_link_libraries(drivers_board
-	PRIVATE
-		arch_spi
-		drivers__led # drv_led_start
-		nuttx_arch # sdio
-		nuttx_drivers # sdio
-		px4_layer
-)
+target_link_libraries (arch_spi PRIVATE drivers_board) # px4_spi_buses
