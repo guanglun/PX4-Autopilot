@@ -242,6 +242,7 @@ else()
 			arch_board_reset
 	)
 
+	target_link_libraries(nuttx_c INTERFACE /home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/libgcc.a)
 	target_link_libraries(nuttx_c INTERFACE nuttx_drivers)
 	target_link_libraries(nuttx_drivers INTERFACE nuttx_c)
 	target_link_libraries(nuttx_xx INTERFACE nuttx_c)
@@ -251,17 +252,17 @@ else()
 
 		-nostartfiles
 		-nodefaultlibs
-		-nostdlib
+		#-nostdlib
 		-nostdinc++
-
+		-mlongcalls
 		-fno-exceptions
 		-fno-rtti
 		#-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}script.ld
-		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_out.ld
-		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.project.ld
-		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.rom.libgcc.ld
-		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.peripherals.ld
-		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.rom.ld
+		-Wl,-cref,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_out.ld
+		-Wl,-cref,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.project.ld
+		-Wl,-cref,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.rom.libgcc.ld
+		-Wl,-cref,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.peripherals.ld
+		-Wl,-cref,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.rom.ld
 		-Wl,-Map=${PX4_CONFIG}.map
 		-Wl,--warn-common
 		-Wl,--gc-sections
@@ -273,8 +274,8 @@ else()
 
 		-Wl,--end-group
 
-		# m
-		# gcc
+		m
+		c
 		)
 
 	if(NOT USE_LD_GOLD)
