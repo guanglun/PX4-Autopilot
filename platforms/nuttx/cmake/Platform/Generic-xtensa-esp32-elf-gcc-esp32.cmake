@@ -1,5 +1,5 @@
 
-set(cpu_flags "-fno-strict-aliasing -fno-strength-reduce -fomit-frame-pointer -mlongcalls")
+set(cpu_flags "-mlongcalls")
 
 set(CMAKE_C_FLAGS "${cpu_flags}" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${cpu_flags}" CACHE STRING "" FORCE)

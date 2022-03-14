@@ -62,3 +62,113 @@
 #include <board_config.h>
 #include <drivers/drv_hrt.h>
 
+
+#ifdef CONFIG_DEBUG_HRT
+#  define hrtinfo _info
+#else
+#  define hrtinfo(x...)
+#endif
+
+#if !defined(CONFIG_BUILD_FLAT)
+#include <px4_platform_common/defines.h>
+#include <px4_platform/board_ctrl.h>
+#include <px4_platform_common/sem.h>
+
+void hrt_usr_call(void *arg)
+{
+
+}
+
+#endif
+
+/**
+ * Fetch a never-wrapping absolute time value in microseconds from
+ * some arbitrary epoch shortly after system start.
+ */
+hrt_abstime
+hrt_absolute_time(void)
+{
+
+
+	return 0;
+}
+
+/**
+ * Store the absolute time in an interrupt-safe fashion
+ */
+void
+hrt_store_absolute_time(volatile hrt_abstime *t)
+{
+
+}
+
+/**
+ * Initialise the high-resolution timing module.
+ */
+void
+hrt_init(void)
+{
+
+}
+
+/**
+ * Call callout(arg) after interval has elapsed.
+ */
+void
+hrt_call_after(struct hrt_call *entry, hrt_abstime delay, hrt_callout callout, void *arg)
+{
+
+}
+
+/**
+ * Call callout(arg) at calltime.
+ */
+void
+hrt_call_at(struct hrt_call *entry, hrt_abstime calltime, hrt_callout callout, void *arg)
+{
+
+}
+
+/**
+ * Call callout(arg) every period.
+ */
+void
+hrt_call_every(struct hrt_call *entry, hrt_abstime delay, hrt_abstime interval, hrt_callout callout, void *arg)
+{
+
+}
+
+
+/**
+ * If this returns true, the call has been invoked and removed from the callout list.
+ *
+ * Always returns false for repeating callouts.
+ */
+bool
+hrt_called(struct hrt_call *entry)
+{
+	return false;
+}
+
+/**
+ * Remove the entry from the callout list.
+ */
+void
+hrt_cancel(struct hrt_call *entry)
+{
+
+}
+
+
+void
+hrt_call_init(struct hrt_call *entry)
+{
+
+}
+
+void
+hrt_call_delay(struct hrt_call *entry, hrt_abstime delay)
+{
+
+}
+

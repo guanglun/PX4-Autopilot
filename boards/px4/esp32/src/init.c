@@ -143,7 +143,7 @@ __EXPORT void board_on_reset(int status)
  ************************************************************************************/
 
 __EXPORT void
-stm32_boardinitialize(void)
+esp32_board_initialize(void)
 {
 	// Reset all PWM to Low outputs.
 	board_on_reset(-1);
