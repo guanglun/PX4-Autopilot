@@ -269,12 +269,13 @@ else()
 
 		-Wl,--start-group
 			${nuttx_libs}
+
 			# /home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/libgcc.a
 			# /home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/../../../../xtensa-esp32-elf/lib/libm.a
 		-Wl,--end-group
 
-		# m
-		# c
+		#m
+		#c
 		)
 
 	if(NOT USE_LD_GOLD)
@@ -283,10 +284,10 @@ else()
 
 	target_link_libraries(px4 PRIVATE ${module_libraries})
 
-	if(config_romfs_root)
-		add_subdirectory(${PX4_SOURCE_DIR}/ROMFS ${PX4_BINARY_DIR}/ROMFS)
-		target_link_libraries(px4 PRIVATE romfs)
-	endif()
+	#if(config_romfs_root)
+	#	add_subdirectory(${PX4_SOURCE_DIR}/ROMFS ${PX4_BINARY_DIR}/ROMFS)
+	#	target_link_libraries(px4 PRIVATE romfs)
+	#endif()
 
 	add_custom_command(OUTPUT ${PX4_BINARY_OUTPUT}
 		#COMMAND ${CMAKE_OBJCOPY} -O binary ${PX4_BINARY_DIR_REL}/${FW_NAME} ${PX4_BINARY_OUTPUT}
