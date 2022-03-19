@@ -233,6 +233,27 @@ if (NOT CONFIG_BUILD_FLAT)
 
 else()
 
+	set(PX4_STARTUP_DIR ${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/nuttx/arch/xtensa/src)
+	set(NUTTX_STARTUP_OBJS
+
+	${PX4_STARTUP_DIR}/xtensa_vectors.o
+	${PX4_STARTUP_DIR}/xtensa_window_vector.o
+	${PX4_STARTUP_DIR}/xtensa_windowspill.o
+	${PX4_STARTUP_DIR}/xtensa_int_handlers.o
+	${PX4_STARTUP_DIR}/xtensa_user_handler.o
+	${PX4_STARTUP_DIR}/esp32_start.o
+
+	)
+
+	execute_process(COMMAND touch ${NUTTX_STARTUP_OBJS}
+	WORKING_DIRECTORY ${PX4_SOURCE_DIR})
+
+	set_source_files_properties(
+		${NUTTX_STARTUP_OBJS}
+		PROPERTIES
+		EXTERNAL_OBJECT true
+		GENERATED true)
+
 	target_link_libraries(nuttx_c INTERFACE nuttx_sched) # nxsched_get_streams
 
 	target_link_libraries(nuttx_arch
@@ -249,7 +270,6 @@ else()
 	target_link_libraries(nuttx_fs INTERFACE nuttx_c)
 
 	target_link_libraries(px4 PRIVATE
-		--entry=__start
 		-nostartfiles
 		-nodefaultlibs
 		-nostdlib
@@ -264,14 +284,13 @@ else()
 		-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.ld
 		-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_rom.ld
 		-Wl,-Map=${PX4_CONFIG}.map
-		-Wl,--warn-common
+		# -Wl,--warn-common
 		-Wl,--gc-sections
 
 		-Wl,--start-group
 			${nuttx_libs}
+			${NUTTX_STARTUP_OBJS}
 
-			# /home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/libgcc.a
-			# /home/guanglun/esp32/crosstool-NG/builds/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/../../../../xtensa-esp32-elf/lib/libm.a
 		-Wl,--end-group
 
 		#m
