@@ -16,5 +16,5 @@ int px4_esp32_configgpio(uint32_t pinset)
 
 int px4_esp32_unconfiggpio(uint32_t pinset)
 {
-	return OK;
+	return px4_esp32_configgpio((pinset & GPIO_NUM_MASK) | GPIO_INPUT | GPIO_OPEN_DRAIN);
 }
