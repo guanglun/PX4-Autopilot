@@ -47,6 +47,19 @@
 #include <nuttx/compiler.h>
 #include <stdint.h>
 
+#include <esp32_gpio.h>
+
+/* PX4FMU GPIOs ***********************************************************************************/
+/* LEDs */
+#define GPIO_LED1                    (GPIO_OUTPUT|GPIO_PULLUP|2)
+#define GPIO_LED2                    (GPIO_OUTPUT|GPIO_PULLUP|16)
+#define GPIO_LED3                    (GPIO_OUTPUT|GPIO_PULLUP|17)
+
+
+#define GPIO_LED_RED                 GPIO_LED1
+#define GPIO_LED_GREEN               GPIO_LED2
+#define GPIO_LED_BLUE                GPIO_LED3
+#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PULLUP|5)
 
 __BEGIN_DECLS
 
@@ -72,9 +85,7 @@ __BEGIN_DECLS
  *
  ****************************************************************************************************/
 
-extern void stm32_spiinitialize(void);
-
-extern void stm32_usbinitialize(void);
+extern void esp32_spiinitialize(void);
 
 extern void board_peripheral_reset(int ms);
 

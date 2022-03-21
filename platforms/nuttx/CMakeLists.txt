@@ -284,7 +284,7 @@ else()
 		-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.ld
 		-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_rom.ld
 		-Wl,-Map=${PX4_CONFIG}.map
-		# -Wl,--warn-common
+		-Wl,--warn-common
 		-Wl,--gc-sections
 
 		-Wl,--start-group

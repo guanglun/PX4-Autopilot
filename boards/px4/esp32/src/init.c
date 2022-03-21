@@ -148,10 +148,12 @@ esp32_board_initialize(void)
 	// Reset all PWM to Low outputs.
 	board_on_reset(-1);
 
+	syslog(LOG_ERR, "\nesp32 board initialize\n");
+
 	// Configure LEDs.
 	board_autoled_initialize();
 
-
+	esp32_spiinitialize();
 
 }
 
@@ -185,10 +187,15 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	px4_platform_init();
 
 	// Configure the DMA allocator.
-	if (board_dma_alloc_init() < 0) {
-		syslog(LOG_ERR, "DMA alloc FAILED\n");
-	}
+	// if (board_dma_alloc_init() < 0) {
+	// 	syslog(LOG_ERR, "DMA alloc FAILED\n");
+	// }
 
+	// Initial LED state.
+	drv_led_start();
+	led_off(LED_RED);
+	led_off(LED_GREEN);
+	led_off(LED_BLUE);
 
 	px4_platform_configure();
 
