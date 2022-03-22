@@ -6,6 +6,7 @@
 #include <px4_arch/micro_hal.h>
 #include <errno.h>
 #include <stdio.h>
+
 int px4_esp32_configgpio(uint32_t pinset)
 {
 	if ((pinset & GPIO_NUM_MASK) >= ESP32_NGPIOS) {

@@ -39,3 +39,7 @@ target_compile_options(arch_hrt
 		${MAX_CUSTOM_OPT_LEVEL}
 		-Wno-cast-align # TODO: fix and enable
 )
+target_link_libraries(arch_hrt
+INTERFACE
+	nuttx_arch
+)

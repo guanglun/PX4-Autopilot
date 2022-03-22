@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,17 +30,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#include <px4_arch/spi_hw_description.h>
-#include <drivers/drv_sensor.h>
-#include <nuttx/spi/spi.h>
+#pragma once
 
-constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
-	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{17}, SPI::DRDY{-1}),
-	}, {-1}),
-	initSPIBus(SPI::Bus::SPI3, {
-		initSPIDevice(DRV_ACC_DEVTYPE_MPU6050, SPI::CS{16}, SPI::DRDY{-1}),
-	}, {-1}),
-};
+#include "../../../esp32_common/include/px4_arch/spi_hw_description.h"
 
-static constexpr bool unused = validateSPIConfig(px4_spi_buses);
+#if defined(CONFIG_SPI)
+
+constexpr bool validateSPIConfig(const px4_spi_bus_t spi_busses_conf[SPI_BUS_MAX_BUS_ITEMS])
+{
+	const bool nuttx_enabled_spi_buses[] = {
+#ifdef CONFIG_ESP32_SPI2
+		true,
+#else
+		false,
+#endif
+#ifdef CONFIG_ESP32_SPI3
+		true,
+#else
+		false,
+#endif
+	};
+
+	for (unsigned i = 0; i < sizeof(nuttx_enabled_spi_buses) / sizeof(nuttx_enabled_spi_buses[0]); ++i) {
+		bool found_bus = false;
+
+		for (int j = 0; j < SPI_BUS_MAX_BUS_ITEMS; ++j) {
+			if (spi_busses_conf[j].bus == (int)i + 1) {
+				found_bus = true;
+			}
+		}
+
+		// Either the bus is enabled in NuttX and configured in spi_busses_conf, or disabled and not configured
+		constexpr_assert(found_bus == nuttx_enabled_spi_buses[i], "SPI bus config mismatch (CONFIG_ESP32_SPIx)");
+	}
+
+	return false;
+}
+
+#endif // CONFIG_SPI

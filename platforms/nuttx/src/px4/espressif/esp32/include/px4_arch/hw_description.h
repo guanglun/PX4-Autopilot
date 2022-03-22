@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (C) 2021 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,17 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#include <px4_arch/spi_hw_description.h>
-#include <drivers/drv_sensor.h>
-#include <nuttx/spi/spi.h>
+#pragma once
 
-constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
-	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{17}, SPI::DRDY{-1}),
-	}, {-1}),
-	initSPIBus(SPI::Bus::SPI3, {
-		initSPIDevice(DRV_ACC_DEVTYPE_MPU6050, SPI::CS{16}, SPI::DRDY{-1}),
-	}, {-1}),
-};
 
-static constexpr bool unused = validateSPIConfig(px4_spi_buses);
+#include "../../../esp32_common/include/px4_arch/hw_description.h"

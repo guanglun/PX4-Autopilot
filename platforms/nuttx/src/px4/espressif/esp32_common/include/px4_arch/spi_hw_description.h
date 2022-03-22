@@ -35,6 +35,7 @@
 
 #include <px4_arch/hw_description.h>
 #include <px4_platform_common/spi.h>
+#include <px4_arch/micro_hal.h>
 
 #if defined(CONFIG_SPI)
 
@@ -43,11 +44,18 @@
 static inline constexpr px4_spi_bus_device_t initSPIDevice(uint32_t devid, SPI::CS cs_gpio, SPI::DRDY drdy_gpio = {})
 {
 	px4_spi_bus_device_t ret{};
-	ret.cs_gpio = getGPIOPort(cs_gpio.port) | getGPIOPin(cs_gpio.pin) | (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz |
-			GPIO_OUTPUT_SET);
+	if(cs_gpio.pin == -1)
+	{
+		ret.cs_gpio = 0;
+	}else{
+		ret.cs_gpio = (cs_gpio.pin | GPIO_OUTPUT | GPIO_PULLUP);
+	}
 
-	if (drdy_gpio.port != GPIO::PortInvalid) {
-		ret.drdy_gpio = getGPIOPort(drdy_gpio.port) | getGPIOPin(drdy_gpio.pin) | (GPIO_INPUT | GPIO_FLOAT | GPIO_EXTI);
+	if(drdy_gpio.pin == -1)
+	{
+		ret.drdy_gpio = 0;
+	}else{
+		ret.drdy_gpio = (drdy_gpio.pin | GPIO_INPUT | GPIO_PULLUP);
 	}
 
 	if (PX4_SPIDEVID_TYPE(devid) == 0) { // it's a PX4 device (internal or external)
@@ -94,10 +102,13 @@ static inline constexpr px4_spi_bus_t initSPIBus(SPI::Bus bus, const px4_spi_bus
 	ret.bus = (int)bus;
 	ret.is_external = false;
 
-	if (power_enable.port != GPIO::PortInvalid) {
-		ret.power_enable_gpio = getGPIOPort(power_enable.port) | getGPIOPin(power_enable.pin) |
-					(GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz | GPIO_OUTPUT_CLEAR);
+	if(power_enable.pin == -1)
+	{
+		ret.power_enable_gpio = 0;
+	}else{
+		ret.power_enable_gpio = (power_enable.pin | GPIO_OUTPUT | GPIO_PULLUP);
 	}
+
 
 	return ret;
 }
@@ -112,7 +123,7 @@ static inline constexpr px4_spi_bus_t initSPIBusExternal(SPI::Bus bus, const bus
 	px4_spi_bus_t ret{};
 
 	for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
-		if (devices.devices[i].cs_gpio.port == GPIO::PortInvalid) {
+		if (devices.devices[i].cs_gpio.pin == -1) {
 			break;
 		}
 

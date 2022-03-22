@@ -49,7 +49,7 @@ namespace GPIO
 {
 
 struct GPIOPin {
-	int pin;
+	int pin = -1;
 };
 
 }
