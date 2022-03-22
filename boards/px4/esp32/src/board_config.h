@@ -63,6 +63,8 @@
 
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
+#define BOARD_SPI_BUS_MAX_BUS_ITEMS 2
+
 __BEGIN_DECLS
 
 /****************************************************************************************************

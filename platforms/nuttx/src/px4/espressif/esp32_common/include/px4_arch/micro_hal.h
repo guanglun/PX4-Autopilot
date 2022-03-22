@@ -101,7 +101,7 @@ int px4_esp32_unconfiggpio(uint32_t pinset);
 #define px4_arch_unconfiggpio(pinset)			px4_esp32_unconfiggpio(pinset)
 #define px4_arch_gpioread(pinset)			esp32_gpioread(pinset & GPIO_NUM_MASK)
 #define px4_arch_gpiowrite(pinset, value)		esp32_gpiowrite(pinset & GPIO_NUM_MASK, value)
-#define px4_arch_gpiosetevent(pinset,r,f,e,fp,a)	esp32_gpiosetevent(pinset & GPIO_NUM_MASK,r,f,e,fp,a)
+#define px4_arch_gpiosetevent(pinset,r,f,e,fp,a)	true
 
 
 #define px4_spibus_initialize(bus_num_1based)   esp32_spibus_initialize(bus_num_1based)

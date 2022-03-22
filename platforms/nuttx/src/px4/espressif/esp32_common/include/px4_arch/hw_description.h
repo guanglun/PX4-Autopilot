@@ -57,7 +57,8 @@ namespace SPI
 {
 
 enum class Bus {
-	SPI2 = 1,
+	SPI1 = 1,
+	SPI2,
 	SPI3,
 };
 

@@ -148,8 +148,6 @@ esp32_board_initialize(void)
 	// Reset all PWM to Low outputs.
 	board_on_reset(-1);
 
-	syslog(LOG_ERR, "\nesp32 board initialize\n");
-
 	// Configure LEDs.
 	board_autoled_initialize();
 
@@ -181,6 +179,8 @@ esp32_board_initialize(void)
  *   any failure to indicate the nature of the failure.
  *
  ****************************************************************************/
+static struct spi_dev_s *spi1;
+static struct spi_dev_s *spi2;
 
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
@@ -196,6 +196,39 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	led_off(LED_RED);
 	led_off(LED_GREEN);
 	led_off(LED_BLUE);
+
+	// Configure SPI-based devices.
+	spi1 = esp32_spibus_initialize(2);
+
+	if (!spi1) {
+		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 2\n");
+		led_on(LED_RED);
+	}
+
+
+	// Default SPI1 to 1MHz
+	SPI_SETFREQUENCY(spi1, 10000000);
+	SPI_SETBITS(spi1, 8);
+	SPI_SETMODE(spi1, SPIDEV_MODE3);
+	up_udelay(20);
+
+	// Get the SPI port for the FRAM.
+	spi2 = esp32_spibus_initialize(3);
+
+	if (!spi2) {
+		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 3\n");
+		led_on(LED_RED);
+	}
+
+	/**
+	 * Default SPI2 to 12MHz and de-assert the known chip selects.
+	 * MS5611 has max SPI clock speed of 20MHz.
+	 */
+
+	// XXX start with 10.4 MHz and go up to 20 once validated.
+	SPI_SETFREQUENCY(spi2, 20 * 1000 * 1000);
+	SPI_SETBITS(spi2, 8);
+	SPI_SETMODE(spi2, SPIDEV_MODE3);
 
 	px4_platform_configure();
 

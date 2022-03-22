@@ -152,6 +152,7 @@ if (NOT CONFIG_BUILD_FLAT)
 		-nodefaultlibs
 		-nostdlib
 		-nostdinc++
+
 		-fno-exceptions
 		-fno-rtti
 
@@ -210,7 +211,6 @@ if (NOT CONFIG_BUILD_FLAT)
 
 		-Wl,--start-group
 		${nuttx_userspace}
-
 		-Wl,--end-group
 
 		m
@@ -263,7 +263,6 @@ else()
 			arch_board_reset
 	)
 
-
 	target_link_libraries(nuttx_c INTERFACE nuttx_drivers)
 	target_link_libraries(nuttx_drivers INTERFACE nuttx_c)
 	target_link_libraries(nuttx_xx INTERFACE nuttx_c)
@@ -275,8 +274,8 @@ else()
 		-nostdlib
 		-nostdinc++
 		-mlongcalls
-		# -fno-exceptions
-		# -fno-rtti
+		-fno-exceptions
+		-fno-rtti
 		-Wl,--cref
 
 		#-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}script.ld
@@ -303,10 +302,10 @@ else()
 
 	target_link_libraries(px4 PRIVATE ${module_libraries})
 
-	#if(config_romfs_root)
-	#	add_subdirectory(${PX4_SOURCE_DIR}/ROMFS ${PX4_BINARY_DIR}/ROMFS)
-	#	target_link_libraries(px4 PRIVATE romfs)
-	#endif()
+	if(config_romfs_root)
+		add_subdirectory(${PX4_SOURCE_DIR}/ROMFS ${PX4_BINARY_DIR}/ROMFS)
+		target_link_libraries(px4 PRIVATE romfs)
+	endif()
 
 	add_custom_command(OUTPUT ${PX4_BINARY_OUTPUT}
 		#COMMAND ${CMAKE_OBJCOPY} -O binary ${PX4_BINARY_DIR_REL}/${FW_NAME} ${PX4_BINARY_OUTPUT}

@@ -732,7 +732,7 @@ param_autosave()
 	}
 
 	autosave_scheduled.store(true);
-	//work_queue(LPWORK, &autosave_work, (worker_t)&autosave_worker, nullptr, USEC2TICK(delay));
+	work_queue(LPWORK, &autosave_work, (worker_t)&autosave_worker, nullptr, USEC2TICK(delay));
 }
 
 void

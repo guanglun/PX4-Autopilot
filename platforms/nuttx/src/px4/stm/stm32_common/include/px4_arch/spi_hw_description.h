@@ -43,7 +43,7 @@
 static inline constexpr px4_spi_bus_device_t initSPIDevice(uint32_t devid, SPI::CS cs_gpio, SPI::DRDY drdy_gpio = {})
 {
 	px4_spi_bus_device_t ret{};
-	ret.cs_gpio = cs_gpio.pin | (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz |
+	ret.cs_gpio = getGPIOPort(cs_gpio.port) | getGPIOPin(cs_gpio.pin) | (GPIO_OUTPUT | GPIO_PUSHPULL | GPIO_SPEED_2MHz |
 			GPIO_OUTPUT_SET);
 
 	if (drdy_gpio.port != GPIO::PortInvalid) {

@@ -65,7 +65,7 @@
 #include <px4_platform_common/log.h>
 
 #include "hardware/esp32_soc.h"
-#include "esp32_tim.h"
+#include "hardware/esp32_tim.h"
 
 #ifdef CONFIG_DEBUG_HRT
 #  define hrtinfo _info
@@ -107,22 +107,22 @@ void hrt_usr_call(void *arg)
 #define ESP32_HRT_TIMER_PRESCALER (APB_CLK_FREQ / (1000 * 1000))
 /* HRT configuration */
 #if   HRT_TIMER == 0
-# define HRT_TIMER_BASE		TIMG_T0CONFIG_REG(0)
+# define HRT_TIMER_BASE		0x3FF5F000
 # if CONFIG_ESP32_TIM1
 #  error must not set CONFIG_ESP32_TIM0=y and HRT_TIMER=0
 # endif
 #elif HRT_TIMER == 1
-# define HRT_TIMER_BASE		TIMG_T1CONFIG_REG(0)
+# define HRT_TIMER_BASE		0x3FF5F024
 # if CONFIG_ESP32_TIM2
 #  error must not set CONFIG_ESP32_TIM1=y and HRT_TIMER=1
 # endif
 #elif HRT_TIMER == 2
-# define HRT_TIMER_BASE		TIMG_T0CONFIG_REG(1)
+# define HRT_TIMER_BASE		0x3FF60000
 # if CONFIG_ESP32_TIM2
 #  error must not set CONFIG_ESP32_TIM2=y and HRT_TIMER=2
 # endif
 #elif HRT_TIMER == 3
-# define HRT_TIMER_BASE		TIMG_T1CONFIG_REG(1)
+# define HRT_TIMER_BASE		0x3FF60024
 # if CONFIG_ESP32_TIM3
 #  error must not set CONFIG_ESP32_TIM3=y and HRT_TIMER=3
 # endif
@@ -135,8 +135,11 @@ void hrt_usr_call(void *arg)
 #define REG(_reg)	(*(volatile uint32_t *)(HRT_TIMER_BASE + _reg))
 
 
-#define rLO REG(TIM_LO_OFFSET)
-#define rHI REG(TIM_HI_OFFSET)
+#define rLO 		REG(TIM_LO_OFFSET)
+#define rHI 		REG(TIM_HI_OFFSET)
+#define rUPDATE 	REG(TIM_UPDATE_OFFSET)
+#define rALARMLO 	REG(TIMG_ALARM_LO_OFFSET)
+#define rALARMHI 	REG(TIMG_ALARM_HI_OFFSET)
 
 /**
  * Minimum/maximum deadlines.
@@ -181,7 +184,7 @@ static struct sq_queue_s	callout_queue;
 static uint16_t			latency_baseline;
 
 /* timer count at interrupt (for latency purposes) */
-static uint64_t			latency_actual;
+static uint16_t			latency_actual;
 
 /* latency histogram */
 const uint16_t latency_bucket_count = LATENCY_BUCKET_COUNT;
@@ -245,26 +248,22 @@ hrt_tim_init(void)
 static int
 hrt_tim_isr(int irq, void *context, void *arg)
 {
-	// uint64_t value = 0;
-	// ESP32_TIM_GETCTR(tim,&value);
-	// printf("%02lld\n",value);
 
+	rUPDATE = 1;
 	latency_actual = (uint16_t)rLO;
-	printf("%d\n",latency_actual);
-
+	// printf("%d\n",latency_actual);
 
 	ESP32_TIM_ACKINT(tim);
         ESP32_TIM_SETALRM(tim, true);			//enable alarm
 
+	/* do latency calculations */
+	hrt_latency_update();
 
-		/* do latency calculations */
-		hrt_latency_update();
+	/* run any callouts that have met their deadline */
+	hrt_call_invoke();
 
-		/* run any callouts that have met their deadline */
-		hrt_call_invoke();
-
-		/* and schedule the next interrupt */
-		hrt_call_reschedule();
+	/* and schedule the next interrupt */
+	hrt_call_reschedule();
 
 	return OK;
 }
@@ -293,6 +292,7 @@ hrt_absolute_time(void)
 	flags = px4_enter_critical_section();
 
 	/* get the current counter value */
+	rUPDATE = 1;
 	count = rLO;
 
 	/*
@@ -525,40 +525,40 @@ hrt_call_invoke(void)
 static void
 hrt_call_reschedule()
 {
-	// hrt_abstime	now = hrt_absolute_time();
-	// struct hrt_call	*next = (struct hrt_call *)sq_peek(&callout_queue);
-	// hrt_abstime	deadline = now + HRT_INTERVAL_MAX;
+	hrt_abstime	now = hrt_absolute_time();
+	struct hrt_call	*next = (struct hrt_call *)sq_peek(&callout_queue);
+	hrt_abstime	deadline = now + HRT_INTERVAL_MAX;
 
-	// /*
-	//  * Determine what the next deadline will be.
-	//  *
-	//  * Note that we ensure that this will be within the counter
-	//  * period, so that when we truncate all but the low 16 bits
-	//  * the next time the compare matches it will be the deadline
-	//  * we want.
-	//  *
-	//  * It is important for accurate timekeeping that the compare
-	//  * interrupt fires sufficiently often that the base_time update in
-	//  * hrt_absolute_time runs at least once per timer period.
-	//  */
-	// if (next != NULL) {
-	// 	hrtinfo("entry in queue\n");
+	/*
+	 * Determine what the next deadline will be.
+	 *
+	 * Note that we ensure that this will be within the counter
+	 * period, so that when we truncate all but the low 16 bits
+	 * the next time the compare matches it will be the deadline
+	 * we want.
+	 *
+	 * It is important for accurate timekeeping that the compare
+	 * interrupt fires sufficiently often that the base_time update in
+	 * hrt_absolute_time runs at least once per timer period.
+	 */
+	if (next != NULL) {
+		hrtinfo("entry in queue\n");
 
-	// 	if (next->deadline <= (now + HRT_INTERVAL_MIN)) {
-	// 		hrtinfo("pre-expired\n");
-	// 		/* set a minimal deadline so that we call ASAP */
-	// 		deadline = now + HRT_INTERVAL_MIN;
+		if (next->deadline <= (now + HRT_INTERVAL_MIN)) {
+			hrtinfo("pre-expired\n");
+			/* set a minimal deadline so that we call ASAP */
+			deadline = now + HRT_INTERVAL_MIN;
 
-	// 	} else if (next->deadline < deadline) {
-	// 		hrtinfo("due soon\n");
-	// 		deadline = next->deadline;
-	// 	}
-	// }
+		} else if (next->deadline < deadline) {
+			hrtinfo("due soon\n");
+			deadline = next->deadline;
+		}
+	}
 
-	// hrtinfo("schedule for %u at %u\n", (unsigned)(deadline & 0xffffffff), (unsigned)(now & 0xffffffff));
+	hrtinfo("schedule for %u at %u\n", (unsigned)(deadline & 0xffffffff), (unsigned)(now & 0xffffffff));
 
-	// /* set the new compare value and remember it for latency tracking */
-	// rCCR_HRT = latency_baseline = deadline & 0xffff;
+	/* set the new compare value and remember it for latency tracking */
+	rALARMLO = latency_baseline = deadline & 0xffff;
 }
 
 static void
