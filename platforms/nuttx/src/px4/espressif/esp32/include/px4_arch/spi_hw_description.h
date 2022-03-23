@@ -39,11 +39,7 @@
 constexpr bool validateSPIConfig(const px4_spi_bus_t spi_busses_conf[SPI_BUS_MAX_BUS_ITEMS])
 {
 	const bool nuttx_enabled_spi_buses[] = {
-#ifdef CONFIG_ESP32_SPI1
-		true,
-#else
 		false,
-#endif
 #ifdef CONFIG_ESP32_SPI2
 		true,
 #else
@@ -54,6 +50,9 @@ constexpr bool validateSPIConfig(const px4_spi_bus_t spi_busses_conf[SPI_BUS_MAX
 #else
 		false,
 #endif
+		false,
+		false,
+		false,
 	};
 
 	for (unsigned i = 0; i < sizeof(nuttx_enabled_spi_buses) / sizeof(nuttx_enabled_spi_buses[0]); ++i) {

@@ -292,8 +292,8 @@ else()
 
 		-Wl,--end-group
 
-		#m
-		#c
+		m
+		gcc
 		)
 
 	if(NOT USE_LD_GOLD)

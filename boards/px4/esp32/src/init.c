@@ -179,8 +179,8 @@ esp32_board_initialize(void)
  *   any failure to indicate the nature of the failure.
  *
  ****************************************************************************/
-static struct spi_dev_s *spi1;
 static struct spi_dev_s *spi2;
+static struct spi_dev_s *spi3;
 
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
@@ -198,24 +198,24 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	led_off(LED_BLUE);
 
 	// Configure SPI-based devices.
-	spi1 = esp32_spibus_initialize(2);
+	spi2 = esp32_spibus_initialize(2);
 
-	if (!spi1) {
+	if (!spi2) {
 		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 2\n");
 		led_on(LED_RED);
 	}
 
 
 	// Default SPI1 to 1MHz
-	SPI_SETFREQUENCY(spi1, 10000000);
-	SPI_SETBITS(spi1, 8);
-	SPI_SETMODE(spi1, SPIDEV_MODE3);
+	SPI_SETFREQUENCY(spi2, 10000000);
+	SPI_SETBITS(spi2, 8);
+	SPI_SETMODE(spi2, SPIDEV_MODE3);
 	up_udelay(20);
 
 	// Get the SPI port for the FRAM.
-	spi2 = esp32_spibus_initialize(3);
+	spi3 = esp32_spibus_initialize(3);
 
-	if (!spi2) {
+	if (!spi3) {
 		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 3\n");
 		led_on(LED_RED);
 	}
@@ -226,9 +226,9 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	 */
 
 	// XXX start with 10.4 MHz and go up to 20 once validated.
-	SPI_SETFREQUENCY(spi2, 20 * 1000 * 1000);
-	SPI_SETBITS(spi2, 8);
-	SPI_SETMODE(spi2, SPIDEV_MODE3);
+	SPI_SETFREQUENCY(spi3, 20 * 1000 * 1000);
+	SPI_SETBITS(spi3, 8);
+	SPI_SETMODE(spi3, SPIDEV_MODE3);
 
 	px4_platform_configure();
 

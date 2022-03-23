@@ -1,5 +1,5 @@
 
-set(cpu_flags "-mlongcalls -Wno-unused-function -Wno-format")
+set(cpu_flags "-mlongcalls -Wno-unused-function -Wno-format -DDEBUG_BUILD")
 
 set(CMAKE_C_FLAGS "${cpu_flags}" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${cpu_flags}" CACHE STRING "" FORCE)

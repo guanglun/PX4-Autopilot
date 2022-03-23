@@ -71,6 +71,7 @@ __EXPORT void esp32_spiinitialize()
 	ASSERT(_spi_bus2);
 
 	if (board_has_bus(BOARD_SPI_BUS, 2)) {
+		syslog(LOG_DEBUG, "spi bus configgpio cs %i\n", _spi_bus2->bus);
 		spi_bus_configgpio_cs(_spi_bus2);
 	}
 
@@ -80,6 +81,7 @@ __EXPORT void esp32_spiinitialize()
 	ASSERT(_spi_bus3);
 
 	if (board_has_bus(BOARD_SPI_BUS, 3)) {
+		syslog(LOG_DEBUG, "spi bus configgpio cs %i\n", _spi_bus3->bus);
 		spi_bus_configgpio_cs(_spi_bus3);
 	}
 
@@ -89,6 +91,8 @@ __EXPORT void esp32_spiinitialize()
 
 static inline void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *dev, uint32_t devid, bool selected)
 {
+	syslog(LOG_DEBUG, "esp32 spixselect %i\n", bus->bus);
+
 	for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
 		if (bus->devices[i].cs_gpio == 0) {
 			break;
@@ -96,6 +100,7 @@ static inline void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *
 
 		if (devid == bus->devices[i].devid) {
 			// SPI select is active low, so write !selected to select the device
+
 			esp32_gpiowrite(bus->devices[i].cs_gpio, !selected);
 		}
 	}
