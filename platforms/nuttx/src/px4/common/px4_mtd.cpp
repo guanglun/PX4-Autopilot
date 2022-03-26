@@ -195,7 +195,12 @@ int px4_mtd_get_geometry(const mtd_instance_s *instance, unsigned long *blocksiz
 	 */
 
 	*blkpererase = geo.erasesize / geo.blocksize;
-	*nblocks     = (geo.neraseblocks / instance->n_partitions_current) * *blkpererase;
+
+	if(instance->n_partitions_current == 0)
+		*nblocks = 0;
+	else
+		*nblocks = (geo.neraseblocks / instance->n_partitions_current) * *blkpererase;
+
 	*partsize    = *nblocks * geo.blocksize;
 
 	return ret;

@@ -71,7 +71,7 @@ __EXPORT void esp32_spiinitialize()
 	ASSERT(_spi_bus2);
 
 	if (board_has_bus(BOARD_SPI_BUS, 2)) {
-		syslog(LOG_DEBUG, "spi bus configgpio cs %i\n", _spi_bus2->bus);
+		//syslog(LOG_DEBUG, "spi bus configgpio cs %i\n", _spi_bus2->bus);
 		spi_bus_configgpio_cs(_spi_bus2);
 	}
 
@@ -81,7 +81,7 @@ __EXPORT void esp32_spiinitialize()
 	ASSERT(_spi_bus3);
 
 	if (board_has_bus(BOARD_SPI_BUS, 3)) {
-		syslog(LOG_DEBUG, "spi bus configgpio cs %i\n", _spi_bus3->bus);
+		//syslog(LOG_DEBUG, "spi bus configgpio cs %i\n", _spi_bus3->bus);
 		spi_bus_configgpio_cs(_spi_bus3);
 	}
 
@@ -91,7 +91,7 @@ __EXPORT void esp32_spiinitialize()
 
 static inline void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *dev, uint32_t devid, bool selected)
 {
-	syslog(LOG_DEBUG, "esp32 spixselect %i\n", bus->bus);
+	//syslog(LOG_DEBUG, "esp32 spixselect %i\n", bus->bus);
 
 	for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
 		if (bus->devices[i].cs_gpio == 0) {
@@ -100,8 +100,8 @@ static inline void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *
 
 		if (devid == bus->devices[i].devid) {
 			// SPI select is active low, so write !selected to select the device
-
-			esp32_gpiowrite(bus->devices[i].cs_gpio, !selected);
+			//syslog(LOG_DEBUG, "esp32_gpiowrite %i\n", bus->bus);
+			px4_arch_gpiowrite(bus->devices[i].cs_gpio, !selected);
 		}
 	}
 }
@@ -205,115 +205,116 @@ void board_control_spi_sensors_power_configgpio()
 
 __EXPORT void board_spi_reset(int ms, int bus_mask)
 {
-	bool has_power_enable = false;
 
-	// disable SPI bus
-	for (int bus = 0; bus < SPI_BUS_MAX_BUS_ITEMS; ++bus) {
-		if (px4_spi_buses[bus].bus == -1) {
-			break;
-		}
+// 	bool has_power_enable = false;
 
-		const bool bus_requested = bus_mask & (1 << (px4_spi_buses[bus].bus - 1));
+// 	// disable SPI bus
+// 	for (int bus = 0; bus < SPI_BUS_MAX_BUS_ITEMS; ++bus) {
+// 		if (px4_spi_buses[bus].bus == -1) {
+// 			break;
+// 		}
 
-		if (px4_spi_buses[bus].power_enable_gpio == 0 ||
-		    !board_has_bus(BOARD_SPI_BUS, px4_spi_buses[bus].bus) ||
-		    !bus_requested) {
-			continue;
-		}
+// 		const bool bus_requested = bus_mask & (1 << (px4_spi_buses[bus].bus - 1));
 
-		has_power_enable = true;
+// 		if (px4_spi_buses[bus].power_enable_gpio == 0 ||
+// 		    !board_has_bus(BOARD_SPI_BUS, px4_spi_buses[bus].bus) ||
+// 		    !bus_requested) {
+// 			continue;
+// 		}
 
-		for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
-			if (px4_spi_buses[bus].devices[i].cs_gpio != 0) {
-				px4_arch_configgpio(_PIN_OFF(px4_spi_buses[bus].devices[i].cs_gpio));
-			}
+// 		has_power_enable = true;
 
-			if (px4_spi_buses[bus].devices[i].drdy_gpio != 0) {
-				px4_arch_configgpio(_PIN_OFF(px4_spi_buses[bus].devices[i].drdy_gpio));
-			}
-		}
+// 		for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
+// 			if (px4_spi_buses[bus].devices[i].cs_gpio != 0) {
+// 				px4_arch_configgpio(_PIN_OFF(px4_spi_buses[bus].devices[i].cs_gpio));
+// 			}
 
-#if defined(CONFIG_ESP32_SPI2)
+// 			if (px4_spi_buses[bus].devices[i].drdy_gpio != 0) {
+// 				px4_arch_configgpio(_PIN_OFF(px4_spi_buses[bus].devices[i].drdy_gpio));
+// 			}
+// 		}
 
-		if (px4_spi_buses[bus].bus == 2) {
-			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI2_SCK));
-			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI2_MISO));
-			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI2_MOSI));
-		}
+// #if defined(CONFIG_ESP32_SPI2)
 
-#endif
-#if defined(CONFIG_ESP32_SPI3)
+// 		if (px4_spi_buses[bus].bus == 2) {
+// 			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI2_SCK));
+// 			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI2_MISO));
+// 			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI2_MOSI));
+// 		}
 
-		if (px4_spi_buses[bus].bus == 3) {
-			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI3_SCK));
-			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI3_MISO));
-			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI3_MOSI));
-		}
+// #endif
+// #if defined(CONFIG_ESP32_SPI3)
 
-#endif
-	}
+// 		if (px4_spi_buses[bus].bus == 3) {
+// 			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI3_SCK));
+// 			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI3_MISO));
+// 			// px4_arch_configgpio(_PIN_OFF(GPIO_SPI3_MOSI));
+// 		}
 
-	if (!has_power_enable) {
-		// board does not have power control over any of the sensor buses
-		return;
-	}
+// #endif
+// 	}
 
-	// set the sensor rail(s) off
-	board_control_spi_sensors_power(false, bus_mask);
+// 	if (!has_power_enable) {
+// 		// board does not have power control over any of the sensor buses
+// 		return;
+// 	}
 
-	// wait for the sensor rail to reach GND
-	usleep(ms * 1000);
-	syslog(LOG_DEBUG, "reset done, %d ms\n", ms);
+// 	// set the sensor rail(s) off
+// 	board_control_spi_sensors_power(false, bus_mask);
 
-	/* re-enable power */
+// 	// wait for the sensor rail to reach GND
+// 	usleep(ms * 1000);
+// 	syslog(LOG_DEBUG, "reset done, %d ms\n", ms);
 
-	// switch the sensor rail back on
-	board_control_spi_sensors_power(true, bus_mask);
+// 	/* re-enable power */
 
-	/* wait a bit before starting SPI, different times didn't influence results */
-	usleep(100);
+// 	// switch the sensor rail back on
+// 	board_control_spi_sensors_power(true, bus_mask);
 
-	/* reconfigure the SPI pins */
-	for (int bus = 0; bus < SPI_BUS_MAX_BUS_ITEMS; ++bus) {
-		if (px4_spi_buses[bus].bus == -1) {
-			break;
-		}
+// 	/* wait a bit before starting SPI, different times didn't influence results */
+// 	usleep(100);
 
-		const bool bus_requested = bus_mask & (1 << (px4_spi_buses[bus].bus - 1));
+// 	/* reconfigure the SPI pins */
+// 	for (int bus = 0; bus < SPI_BUS_MAX_BUS_ITEMS; ++bus) {
+// 		if (px4_spi_buses[bus].bus == -1) {
+// 			break;
+// 		}
 
-		if (px4_spi_buses[bus].power_enable_gpio == 0 ||
-		    !board_has_bus(BOARD_SPI_BUS, px4_spi_buses[bus].bus) ||
-		    !bus_requested) {
-			continue;
-		}
+// 		const bool bus_requested = bus_mask & (1 << (px4_spi_buses[bus].bus - 1));
 
-		for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
-			if (px4_spi_buses[bus].devices[i].cs_gpio != 0) {
-				px4_arch_configgpio(px4_spi_buses[bus].devices[i].cs_gpio);
-			}
+// 		if (px4_spi_buses[bus].power_enable_gpio == 0 ||
+// 		    !board_has_bus(BOARD_SPI_BUS, px4_spi_buses[bus].bus) ||
+// 		    !bus_requested) {
+// 			continue;
+// 		}
 
-			if (px4_spi_buses[bus].devices[i].drdy_gpio != 0) {
-				px4_arch_configgpio(px4_spi_buses[bus].devices[i].drdy_gpio);
-			}
-		}
+// 		for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
+// 			if (px4_spi_buses[bus].devices[i].cs_gpio != 0) {
+// 				px4_arch_configgpio(px4_spi_buses[bus].devices[i].cs_gpio);
+// 			}
 
-#if defined(CONFIG_ESP32_SPI2)
+// 			if (px4_spi_buses[bus].devices[i].drdy_gpio != 0) {
+// 				px4_arch_configgpio(px4_spi_buses[bus].devices[i].drdy_gpio);
+// 			}
+// 		}
 
-		if (px4_spi_buses[bus].bus == 2) {
-			// px4_arch_configgpio(GPIO_SPI2_SCK);
-			// px4_arch_configgpio(GPIO_SPI2_MISO);
-			// px4_arch_configgpio(GPIO_SPI2_MOSI);
-		}
+// #if defined(CONFIG_ESP32_SPI2)
 
-#endif
-#if defined(CONFIG_ESP32_SPI3)
+// 		if (px4_spi_buses[bus].bus == 2) {
+// 			// px4_arch_configgpio(GPIO_SPI2_SCK);
+// 			// px4_arch_configgpio(GPIO_SPI2_MISO);
+// 			// px4_arch_configgpio(GPIO_SPI2_MOSI);
+// 		}
 
-		if (px4_spi_buses[bus].bus == 3) {
-			// px4_arch_configgpio(GPIO_SPI3_SCK);
-			// px4_arch_configgpio(GPIO_SPI3_MISO);
-			// px4_arch_configgpio(GPIO_SPI3_MOSI);
-		}
+// #endif
+// #if defined(CONFIG_ESP32_SPI3)
 
-#endif
-	}
+// 		if (px4_spi_buses[bus].bus == 3) {
+// 			// px4_arch_configgpio(GPIO_SPI3_SCK);
+// 			// px4_arch_configgpio(GPIO_SPI3_MISO);
+// 			// px4_arch_configgpio(GPIO_SPI3_MOSI);
+// 		}
+
+// #endif
+	// }
 }
