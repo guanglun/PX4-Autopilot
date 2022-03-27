@@ -7,14 +7,14 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *	notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
+ *	notice, this list of conditions and the following disclaimer in
+ *	the documentation and/or other materials provided with the
+ *	distribution.
  * 3. Neither the name PX4 nor the names of its contributors may be
- *    used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ *	used to endorse or promote products derived from this software
+ *	without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,19 +30,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#include <px4_arch/spi_hw_description.h>
-#include <drivers/drv_sensor.h>
-#include <nuttx/spi/spi.h>
 
-constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
-	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{16}),
-	}),
-	initSPIBus(SPI::Bus::SPI3, {
-		//initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{17}, SPI::DRDY{-1}),
-		initSPIDevice(DRV_IMU_DEVTYPE_ICM20689, SPI::CS{17}, SPI::DRDY{-1}),
-		// initSPIDevice(DRV_ACC_DEVTYPE_MPU6050, SPI::CS{15}, SPI::DRDY{-1}),
-	}),
-};
+#pragma once
 
-static constexpr bool unused = validateSPIConfig(px4_spi_buses);
+#include <px4_arch/hw_description.h>
+#include <px4_platform_common/i2c.h>
+
+#if defined(CONFIG_I2C)
+
+static inline constexpr px4_i2c_bus_t initI2CBusInternal(int bus)
+{
+	px4_i2c_bus_t ret{};
+	ret.bus = bus;
+	ret.is_external = false;
+	return ret;
+}
+
+static inline constexpr px4_i2c_bus_t initI2CBusExternal(int bus)
+{
+	px4_i2c_bus_t ret{};
+	ret.bus = bus;
+	ret.is_external = true;
+	return ret;
+}
+#endif // CONFIG_I2C

@@ -61,6 +61,12 @@
  ****************************************************************************/
 
 
+int board_configure_reset(reset_mode_e mode, uint32_t arg)
+{
+
+	return OK;
+}
+
 /****************************************************************************
  * Name: board_reset
  *
@@ -83,29 +89,9 @@
 
 int board_reset(int status)
 {
-
+	up_systemreset();
 	return 0;
 }
 
 #endif /* CONFIG_BOARDCTL_RESET */
 
-#if defined(SUPPORT_ALT_CAN_BOOTLOADER)
-/****************************************************************************
- * Name: board_booted_by_px4
- *
- * Description:
- *   Determines if the the boot loader was PX4
- *
- * Input Parameters:
- *   none
- *
- * Returned Value:
- *   true if booted byt a PX4 bootloader.
- *
- ****************************************************************************/
-bool board_booted_by_px4(void)
-{
-
-	return 1;
-}
-#endif

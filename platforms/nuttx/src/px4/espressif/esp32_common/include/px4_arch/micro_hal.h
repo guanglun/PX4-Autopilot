@@ -97,6 +97,9 @@ __BEGIN_DECLS
 int px4_esp32_configgpio(uint32_t pinset);
 int px4_esp32_unconfiggpio(uint32_t pinset);
 
+#define px4_i2cbus_initialize(bus_num_1based)   	esp32_i2cbus_initialize(bus_num_1based)
+#define px4_i2cbus_uninitialize(pdev)           	esp32_i2cbus_uninitialize(pdev)
+
 #define px4_arch_configgpio(pinset)			px4_esp32_configgpio(pinset)
 #define px4_arch_unconfiggpio(pinset)			px4_esp32_unconfiggpio(pinset)
 #define px4_arch_gpioread(pinset)			esp32_gpioread(pinset & GPIO_NUM_MASK)

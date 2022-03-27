@@ -230,7 +230,10 @@ hrt_tim_init(void)
 	ESP32_TIM_SETCTR(tim, 0); //set counter value
 	ESP32_TIM_RLD_NOW(tim);//reload value now
 
-	ESP32_TIM_SETALRVL(tim, 1000);	//alarm value
+	rALARMHI=0;
+	rALARMLO=0xFFFF;
+
+	//ESP32_TIM_SETALRVL(tim, 0xFFFF);	//alarm value
         ESP32_TIM_SETALRM(tim, true);			//enable alarm
 
 	ESP32_TIM_SETARLD(tim, true);		//auto reload
@@ -238,6 +241,13 @@ hrt_tim_init(void)
 	ESP32_TIM_SETISR(tim, hrt_tim_isr, NULL);
 	ESP32_TIM_ENABLEINT(tim);
 	ESP32_TIM_START(tim);
+
+	PX4_INFO("====>>> %08X %08X",*((uint32_t *)0x3FF60024),*((uint32_t *)0x3FF60034));
+
+	// while(1)
+	// {
+	// 	PX4_INFO("%lld",hrt_absolute_time()/1000/1000);
+	// }
 
 }
 
@@ -251,7 +261,7 @@ hrt_tim_isr(int irq, void *context, void *arg)
 
 	rUPDATE = 1;
 	latency_actual = (uint16_t)rLO;
-	// printf("%d\n",latency_actual);
+	//printf("%d\n",latency_actual);
 
 	ESP32_TIM_ACKINT(tim);
         ESP32_TIM_SETALRM(tim, true);			//enable alarm

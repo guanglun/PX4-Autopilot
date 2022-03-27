@@ -51,9 +51,9 @@
 
 /* PX4FMU GPIOs ***********************************************************************************/
 /* LEDs */
-#define GPIO_LED1                    (GPIO_OUTPUT|GPIO_PULLUP|2)
-#define GPIO_LED2                    (GPIO_OUTPUT|GPIO_PULLUP|16)
-#define GPIO_LED3                    (GPIO_OUTPUT|GPIO_PULLUP|17)
+#define GPIO_LED1                    (GPIO_OUTPUT|32)
+#define GPIO_LED2                    (GPIO_OUTPUT|32)
+#define GPIO_LED3                    (GPIO_OUTPUT|32)
 
 
 #define GPIO_LED_RED                 GPIO_LED1
@@ -64,6 +64,9 @@
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
 #define BOARD_SPI_BUS_MAX_BUS_ITEMS 2
+
+#define GPIO_TONE_ALARM_IDLE	(GPIO_OUTPUT|GPIO_PULLUP|2)
+#define GPIO_TONE_ALARM_GPIO 	(GPIO_OUTPUT|GPIO_PULLUP|2)
 
 __BEGIN_DECLS
 

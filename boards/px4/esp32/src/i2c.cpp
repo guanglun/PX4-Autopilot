@@ -30,19 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#include <px4_arch/spi_hw_description.h>
-#include <drivers/drv_sensor.h>
-#include <nuttx/spi/spi.h>
 
-constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
-	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{16}),
-	}),
-	initSPIBus(SPI::Bus::SPI3, {
-		//initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{17}, SPI::DRDY{-1}),
-		initSPIDevice(DRV_IMU_DEVTYPE_ICM20689, SPI::CS{17}, SPI::DRDY{-1}),
-		// initSPIDevice(DRV_ACC_DEVTYPE_MPU6050, SPI::CS{15}, SPI::DRDY{-1}),
-	}),
+#include <px4_arch/i2c_hw_description.h>
+
+constexpr px4_i2c_bus_t px4_i2c_buses[I2C_BUS_MAX_BUS_ITEMS] = {
+	initI2CBusInternal(0),
 };
-
-static constexpr bool unused = validateSPIConfig(px4_spi_buses);
