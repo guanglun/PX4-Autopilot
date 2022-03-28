@@ -259,8 +259,8 @@ static int
 hrt_tim_isr(int irq, void *context, void *arg)
 {
 
-	rUPDATE = 1;
-	latency_actual = (uint16_t)rLO;
+	//rUPDATE = 1;
+	//latency_actual = (uint16_t)rLO;
 	//printf("%d\n",latency_actual);
 
 	ESP32_TIM_ACKINT(tim);

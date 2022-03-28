@@ -143,7 +143,7 @@ int ICM20689::probe()
 
 void ICM20689::RunImpl()
 {
-
+	(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
 	const hrt_abstime now = hrt_absolute_time();
 	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));
 	switch (_state) {
@@ -316,6 +316,7 @@ void ICM20689::RunImpl()
 
 		break;
 	}
+	(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 }
 
 void ICM20689::ConfigureAccel()

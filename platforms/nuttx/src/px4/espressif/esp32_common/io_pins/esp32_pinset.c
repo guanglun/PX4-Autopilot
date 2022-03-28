@@ -44,18 +44,17 @@ int esp32_gpiosetevent(uint32_t pinset, bool risingedge, bool fallingedge,
                        bool event, xcpt_t func, void *arg)
 {
 	uint32_t pin = pinset & GPIO_NUM_MASK;
-
 	int irq = ESP32_PIN2IRQ(pin);
-
-      	int ret = irq_attach(irq, func, arg);
-      	if (ret < 0)
-        {
-          syslog(LOG_ERR, "ERROR: irq_attach() failed: %d\n", ret);
-          return ret;
-        }
 
 	if(event == true)
 	{
+		int ret = irq_attach(irq, func, arg);
+		if (ret < 0)
+		{
+		syslog(LOG_ERR, "ERROR: irq_attach() failed: %d\n", ret);
+		return ret;
+		}
+
 		if(risingedge == true && fallingedge == true)
 			esp32_gpioirqenable(irq, CHANGE);
 		else if(risingedge == true && fallingedge == false)

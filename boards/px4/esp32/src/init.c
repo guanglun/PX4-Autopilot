@@ -184,8 +184,16 @@ static struct spi_dev_s *spi3;
 
 // void test_poll(void)
 // {
-// 	hrt_abstime time = hrt_absolute_time();
-// 	syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
+	// static uint8_t cnt = 0;
+	// if(cnt%2==0)
+	// {
+	// 	(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
+	// }else{
+	// 	(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
+	// }
+	// cnt++;
+	//hrt_abstime time = hrt_absolute_time();
+	//syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
 // }
 
 __EXPORT int board_app_initialize(uintptr_t arg)

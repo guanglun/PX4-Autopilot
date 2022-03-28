@@ -59,7 +59,7 @@
 #define GPIO_LED_RED                 GPIO_LED1
 #define GPIO_LED_GREEN               GPIO_LED2
 #define GPIO_LED_BLUE                GPIO_LED3
-#define GPIO_LED_SAFETY              (GPIO_OUTPUT|32)
+#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PULLUP|5)
 
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
