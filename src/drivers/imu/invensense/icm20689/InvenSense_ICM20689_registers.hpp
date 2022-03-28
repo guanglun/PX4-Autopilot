@@ -100,7 +100,7 @@ enum class Register : uint8_t {
 enum CONFIG_BIT : uint8_t {
 	FIFO_MODE = Bit6, // when the FIFO is full, additional writes will not be written to FIFO
 
-	DLPF_CFG_BYPASS_DLPF_8KHZ = 7, // Rate 8 kHz [2:0]
+	DLPF_CFG_BYPASS_DLPF_8KHZ = 1, // Rate 8 kHz [2:0]
 };
 
 // GYRO_CONFIG

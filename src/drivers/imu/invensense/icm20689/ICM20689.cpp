@@ -143,8 +143,9 @@ int ICM20689::probe()
 
 void ICM20689::RunImpl()
 {
-	const hrt_abstime now = hrt_absolute_time();
 
+	const hrt_abstime now = hrt_absolute_time();
+	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));
 	switch (_state) {
 	case STATE::RESET:
 		// PWR_MGMT_1: Device Reset
@@ -408,7 +409,12 @@ bool ICM20689::Configure()
 
 int ICM20689::DataReadyInterruptCallback(int irq, void *context, void *arg)
 {
+	//PX4_INFO(".");
+	(*(volatile uint32_t *)(0x3FF44008) = (1<<2));
+
 	static_cast<ICM20689 *>(arg)->DataReady();
+
+	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));
 	return 0;
 }
 

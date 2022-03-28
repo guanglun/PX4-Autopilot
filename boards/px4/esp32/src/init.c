@@ -203,6 +203,9 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	led_off(LED_GREEN);
 	led_off(LED_BLUE);
 
+	px4_esp32_configgpio(GPIO_OUTPUT|2);
+	esp32_gpiowrite(2,true);
+
 	// Configure SPI-based devices.
 	spi2 = esp32_spibus_initialize(2);
 	if (!spi2) {

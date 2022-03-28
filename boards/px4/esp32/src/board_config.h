@@ -59,14 +59,14 @@
 #define GPIO_LED_RED                 GPIO_LED1
 #define GPIO_LED_GREEN               GPIO_LED2
 #define GPIO_LED_BLUE                GPIO_LED3
-#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PULLUP|5)
+#define GPIO_LED_SAFETY              (GPIO_OUTPUT|32)
 
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
 #define BOARD_SPI_BUS_MAX_BUS_ITEMS 2
 
-#define GPIO_TONE_ALARM_IDLE	(GPIO_OUTPUT|GPIO_PULLUP|2)
-#define GPIO_TONE_ALARM_GPIO 	(GPIO_OUTPUT|GPIO_PULLUP|2)
+#define GPIO_TONE_ALARM_IDLE	(GPIO_OUTPUT|GPIO_PULLUP|32)
+#define GPIO_TONE_ALARM_GPIO 	(GPIO_OUTPUT|GPIO_PULLUP|32)
 
 __BEGIN_DECLS
 

@@ -446,6 +446,7 @@ bool ICM20602::Configure()
 
 int ICM20602::DataReadyInterruptCallback(int irq, void *context, void *arg)
 {
+	//PX4_INFO(".");
 	static_cast<ICM20602 *>(arg)->DataReady();
 	return 0;
 }
