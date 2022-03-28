@@ -228,25 +228,25 @@ hrt_tim_init(void)
 	ESP32_TIM_CLEAR(tim);
 
 	ESP32_TIM_SETCTR(tim, 0); //set counter value
-	ESP32_TIM_RLD_NOW(tim);//reload value now
+	ESP32_TIM_RLD_NOW(tim);   //reload value now
 
-	rALARMHI=0;
-	rALARMLO=0xFFFF;
+	//rALARMHI=0;
+	//rALARMLO=0xFFFF;
 
-	//ESP32_TIM_SETALRVL(tim, 0xFFFF);	//alarm value
-        ESP32_TIM_SETALRM(tim, true);			//enable alarm
-
-	ESP32_TIM_SETARLD(tim, true);		//auto reload
+	ESP32_TIM_SETALRVL(tim, 1000);		//alarm value
+        ESP32_TIM_SETALRM(tim, true);		//enable alarm
+	ESP32_TIM_SETARLD(tim, false);		//auto reload
 
 	ESP32_TIM_SETISR(tim, hrt_tim_isr, NULL);
 	ESP32_TIM_ENABLEINT(tim);
 	ESP32_TIM_START(tim);
 
-	PX4_INFO("====>>> %08X %08X",*((uint32_t *)0x3FF60024),*((uint32_t *)0x3FF60034));
+	//PX4_INFO("====>>> %08X %08X",*((uint32_t *)0x3FF60024),*((uint32_t *)0x3FF60034));
 
 	// while(1)
 	// {
-	// 	PX4_INFO("%lld",hrt_absolute_time()/1000/1000);
+	// 	hrt_abstime time = hrt_absolute_time();
+	// 	PX4_INFO("%lld %lld",time,time/1000/1000);
 	// }
 
 }
@@ -267,7 +267,7 @@ hrt_tim_isr(int irq, void *context, void *arg)
         ESP32_TIM_SETALRM(tim, true);			//enable alarm
 
 	/* do latency calculations */
-	hrt_latency_update();
+	//hrt_latency_update();
 
 	/* run any callouts that have met their deadline */
 	hrt_call_invoke();
@@ -286,7 +286,7 @@ hrt_abstime
 hrt_absolute_time(void)
 {
 	hrt_abstime	abstime;
-	uint32_t	count;
+	//uint32_t	count;
 	irqstate_t	flags;
 
 	/*
@@ -295,15 +295,18 @@ hrt_absolute_time(void)
 	 * pair.  Discourage the compiler from moving loads/stores
 	 * to these outside of the protected range.
 	 */
-	static volatile hrt_abstime base_time;
-	static volatile uint32_t last_count;
+	//static volatile hrt_abstime base_time;
+	//static volatile uint32_t last_count;
 
 	/* prevent re-entry */
 	flags = px4_enter_critical_section();
 
-	/* get the current counter value */
 	rUPDATE = 1;
-	count = rLO;
+	abstime = (hrt_abstime)(((uint64_t)rHI << 32) | (uint64_t)rLO);
+
+	/* get the current counter value */
+	// rUPDATE = 1;
+	// count = rLO;
 
 	/*
 	 * Determine whether the counter has wrapped since the
@@ -312,15 +315,15 @@ hrt_absolute_time(void)
 	 * This simple test is sufficient due to the guarantee that
 	 * we are always called at least once per counter period.
 	 */
-	if (count < last_count) {
-		base_time += HRT_COUNTER_PERIOD;
-	}
+	// if (count < last_count) {
+	// 	base_time += HRT_COUNTER_PERIOD;
+	// }
 
-	/* save the count for next time */
-	last_count = count;
+	// /* save the count for next time */
+	// last_count = count;
 
-	/* compute the current time */
-	abstime = HRT_COUNTER_SCALE(base_time + count);
+	// /* compute the current time */
+	// abstime = HRT_COUNTER_SCALE(base_time + count);
 
 	px4_leave_critical_section(flags);
 
@@ -568,7 +571,9 @@ hrt_call_reschedule()
 	hrtinfo("schedule for %u at %u\n", (unsigned)(deadline & 0xffffffff), (unsigned)(now & 0xffffffff));
 
 	/* set the new compare value and remember it for latency tracking */
-	rALARMLO = latency_baseline = deadline & 0xffff;
+	//rALARMLO = latency_baseline = deadline & 0xffff;
+	rALARMLO = (uint32_t)(deadline & 0xffffffff);
+	rALARMHI = (uint32_t)((deadline >> 32) & 0xffffffff);
 }
 
 static void

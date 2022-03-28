@@ -182,6 +182,12 @@ esp32_board_initialize(void)
 static struct spi_dev_s *spi2;
 static struct spi_dev_s *spi3;
 
+// void test_poll(void)
+// {
+// 	hrt_abstime time = hrt_absolute_time();
+// 	syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
+// }
+
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
 	px4_platform_init();
@@ -199,38 +205,33 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	// Configure SPI-based devices.
 	spi2 = esp32_spibus_initialize(2);
-
 	if (!spi2) {
 		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 2\n");
 		led_on(LED_RED);
 	}
-
-
-	// Default SPI1 to 1MHz
+	// Default SPI1 to 10MHz
 	SPI_SETFREQUENCY(spi2, 10000000);
 	SPI_SETBITS(spi2, 8);
 	SPI_SETMODE(spi2, SPIDEV_MODE3);
 	up_udelay(20);
 
-	// Get the SPI port for the FRAM.
-	spi3 = esp32_spibus_initialize(3);
 
+
+	spi3 = esp32_spibus_initialize(3);
 	if (!spi3) {
 		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 3\n");
 		led_on(LED_RED);
 	}
-
-	/**
-	 * Default SPI2 to 12MHz and de-assert the known chip selects.
-	 * MS5611 has max SPI clock speed of 20MHz.
-	 */
-
-	// XXX start with 10.4 MHz and go up to 20 once validated.
-	SPI_SETFREQUENCY(spi3, 20 * 1000 * 1000);
+	SPI_SETFREQUENCY(spi3, 8 * 1000 * 1000);
 	SPI_SETBITS(spi3, 8);
 	SPI_SETMODE(spi3, SPIDEV_MODE3);
 
 	px4_platform_configure();
+
+
+
+	// static struct hrt_call test_call;
+	// hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
 
 	return OK;
 }
