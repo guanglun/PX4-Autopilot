@@ -273,6 +273,8 @@ bool VehicleAngularVelocity::SensorSelectionUpdate(const hrt_abstime &time_now_u
 
 					if (sensor_gyro_fifo_sub.get().device_id == device_id) {
 						if (_sensor_fifo_sub.ChangeInstance(i) && _sensor_fifo_sub.registerCallback()) {
+
+
 							// make sure non-FIFO sub is unregistered
 							_sensor_sub.unregisterCallback();
 
@@ -723,6 +725,7 @@ float VehicleAngularVelocity::FilterAngularAcceleration(int axis, float inverse_
 
 void VehicleAngularVelocity::Run()
 {
+
 	perf_begin(_cycle_perf);
 
 	// backup schedule
@@ -762,8 +765,12 @@ void VehicleAngularVelocity::Run()
 	if (_fifo_available) {
 		// process all outstanding fifo messages
 		sensor_gyro_fifo_s sensor_fifo_data;
-
+		(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
+		(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 		while (_sensor_fifo_sub.update(&sensor_fifo_data)) {
+
+
+
 			const float inverse_dt_s = 1e6f / sensor_fifo_data.dt;
 			const int N = sensor_fifo_data.samples;
 			static constexpr int FIFO_SIZE_MAX = sizeof(sensor_fifo_data.x) / sizeof(sensor_fifo_data.x[0]);
@@ -797,6 +804,7 @@ void VehicleAngularVelocity::Run()
 					}
 				}
 			}
+
 		}
 
 	} else {
