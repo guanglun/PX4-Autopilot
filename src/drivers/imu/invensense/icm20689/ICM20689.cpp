@@ -143,7 +143,7 @@ int ICM20689::probe()
 
 void ICM20689::RunImpl()
 {
-	(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
+
 	const hrt_abstime now = hrt_absolute_time();
 	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));
 	switch (_state) {
@@ -229,6 +229,7 @@ void ICM20689::RunImpl()
 		break;
 
 	case STATE::FIFO_READ: {
+
 			hrt_abstime timestamp_sample = now;
 
 			if (_data_ready_interrupt_enabled) {
@@ -273,6 +274,7 @@ void ICM20689::RunImpl()
 					perf_count(_fifo_overflow_perf);
 
 				} else if (samples >= SAMPLES_PER_TRANSFER) {
+					//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
 					if (FIFORead(timestamp_sample, samples)) {
 						success = true;
 
@@ -280,8 +282,11 @@ void ICM20689::RunImpl()
 							_failure_count--;
 						}
 					}
+					//(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 				}
 			}
+
+
 
 			if (!success) {
 				_failure_count++;
@@ -312,11 +317,12 @@ void ICM20689::RunImpl()
 					_temperature_update_timestamp = now;
 				}
 			}
+
 		}
 
 		break;
 	}
-	(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
+
 }
 
 void ICM20689::ConfigureAccel()
@@ -411,7 +417,7 @@ bool ICM20689::Configure()
 int ICM20689::DataReadyInterruptCallback(int irq, void *context, void *arg)
 {
 	//PX4_INFO(".");
-	(*(volatile uint32_t *)(0x3FF44008) = (1<<2));
+	//(*(volatile uint32_t *)(0x3FF44008) = (1<<2));
 
 	static_cast<ICM20689 *>(arg)->DataReady();
 
@@ -518,6 +524,7 @@ bool ICM20689::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
 
 
 	ProcessGyro(timestamp_sample, buffer.f, samples);
+
 	return ProcessAccel(timestamp_sample, buffer.f, samples);
 }
 

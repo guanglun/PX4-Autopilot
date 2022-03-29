@@ -68,6 +68,10 @@
 #define GPIO_TONE_ALARM_IDLE	(GPIO_OUTPUT|GPIO_PULLUP|32)
 #define GPIO_TONE_ALARM_GPIO 	(GPIO_OUTPUT|GPIO_PULLUP|32)
 
+#define ADC_BATTERY_VOLTAGE_CHANNEL    1
+#define ADC_BATTERY_CURRENT_CHANNEL    2
+#define BOARD_ADC_BRICK_VALID          3
+
 __BEGIN_DECLS
 
 /****************************************************************************************************

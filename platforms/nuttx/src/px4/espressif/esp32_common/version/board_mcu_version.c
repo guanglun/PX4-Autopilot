@@ -49,26 +49,3 @@ int board_mcu_version(char *rev, const char **revstr, const char **errata)
 	return 0x1000;
 }
 
-int board_get_px4_guid_formated(char *format_buffer, int size)
-{
-	px4_guid_t px4_guid;
-	//board_get_px4_guid(px4_guid);
-
-	for(int i=0;i<PX4_GUID_BYTE_LENGTH;i++)
-	{
-		px4_guid[i] = i;
-	}
-	int offset  = 0;
-
-	/* size should be 2 per byte + 1 for termination
-	 * So it needs to be odd
-	 */
-	size = size & 1 ? size : size - 1;
-
-	/* Discard from MSD */
-	for (unsigned i = PX4_GUID_BYTE_LENGTH - size / 2; offset < size && i < PX4_GUID_BYTE_LENGTH; i++) {
-		offset += snprintf(&format_buffer[offset], size - offset, "%02x", px4_guid[i]);
-	}
-
-	return offset;
-}
