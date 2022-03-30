@@ -143,7 +143,7 @@ int ICM20689::probe()
 
 void ICM20689::RunImpl()
 {
-
+	(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
 	const hrt_abstime now = hrt_absolute_time();
 	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));
 	switch (_state) {
@@ -323,6 +323,7 @@ void ICM20689::RunImpl()
 		break;
 	}
 
+	(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 }
 
 void ICM20689::ConfigureAccel()
@@ -503,12 +504,12 @@ uint16_t ICM20689::FIFOReadCount()
 	// read FIFO count
 	uint8_t fifo_count_buf[3] {};
 	fifo_count_buf[0] = static_cast<uint8_t>(Register::FIFO_COUNTH) | DIR_READ;
-
+(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
 	if (transfer(fifo_count_buf, fifo_count_buf, sizeof(fifo_count_buf)) != PX4_OK) {
 		perf_count(_bad_transfer_perf);
 		return 0;
 	}
-
+(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	return combine(fifo_count_buf[1], fifo_count_buf[2]);
 }
 
@@ -516,12 +517,12 @@ bool ICM20689::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
 {
 	FIFOTransferBuffer buffer{};
 	const size_t transfer_size = math::min(samples * sizeof(FIFO::DATA) + 1, FIFO::SIZE);
-
+(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
 	if (transfer((uint8_t *)&buffer, (uint8_t *)&buffer, transfer_size) != PX4_OK) {
 		perf_count(_bad_transfer_perf);
 		return false;
 	}
-
+(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 
 	ProcessGyro(timestamp_sample, buffer.f, samples);
 

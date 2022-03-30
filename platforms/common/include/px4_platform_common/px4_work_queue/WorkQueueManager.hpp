@@ -48,7 +48,7 @@ struct wq_config_t {
 
 namespace wq_configurations
 {
-static constexpr wq_config_t rate_ctrl{"wq:rate_ctrl", 3150, 0}; // PX4 inner loop highest priority
+static constexpr wq_config_t rate_ctrl{"wq:rate_ctrl", 4096, 0}; // PX4 inner loop highest priority
 
 static constexpr wq_config_t SPI0{"wq:SPI0", 2336, -1};
 static constexpr wq_config_t SPI1{"wq:SPI1", 2336, -2};
@@ -76,20 +76,20 @@ static constexpr wq_config_t hp_default{"wq:hp_default", 1900, -18};
 
 static constexpr wq_config_t uavcan{"wq:uavcan", 3624, -19};
 
-static constexpr wq_config_t ttyS0{"wq:ttyS0", 1632, -21};
-static constexpr wq_config_t ttyS1{"wq:ttyS1", 1632, -22};
-static constexpr wq_config_t ttyS2{"wq:ttyS2", 1632, -23};
-static constexpr wq_config_t ttyS3{"wq:ttyS3", 1632, -24};
-static constexpr wq_config_t ttyS4{"wq:ttyS4", 1632, -25};
-static constexpr wq_config_t ttyS5{"wq:ttyS5", 1632, -26};
-static constexpr wq_config_t ttyS6{"wq:ttyS6", 1632, -27};
-static constexpr wq_config_t ttyS7{"wq:ttyS7", 1632, -28};
-static constexpr wq_config_t ttyS8{"wq:ttyS8", 1632, -29};
-static constexpr wq_config_t ttyS9{"wq:ttyS9", 1632, -30};
-static constexpr wq_config_t ttyACM0{"wq:ttyACM0", 1632, -31};
-static constexpr wq_config_t ttyUnknown{"wq:ttyUnknown", 1632, -32};
+static constexpr wq_config_t ttyS0{"wq:ttyS0", 2048, -21};
+static constexpr wq_config_t ttyS1{"wq:ttyS1", 2048, -22};
+static constexpr wq_config_t ttyS2{"wq:ttyS2", 2048, -23};
+static constexpr wq_config_t ttyS3{"wq:ttyS3", 2048, -24};
+static constexpr wq_config_t ttyS4{"wq:ttyS4", 2048, -25};
+static constexpr wq_config_t ttyS5{"wq:ttyS5", 2048, -26};
+static constexpr wq_config_t ttyS6{"wq:ttyS6", 2048, -27};
+static constexpr wq_config_t ttyS7{"wq:ttyS7", 2048, -28};
+static constexpr wq_config_t ttyS8{"wq:ttyS8", 2048, -29};
+static constexpr wq_config_t ttyS9{"wq:ttyS9", 2048, -30};
+static constexpr wq_config_t ttyACM0{"wq:ttyACM0", 2048, -31};
+static constexpr wq_config_t ttyUnknown{"wq:ttyUnknown", 2048, -32};
 
-static constexpr wq_config_t lp_default{"wq:lp_default", 1920, -50};
+static constexpr wq_config_t lp_default{"wq:lp_default", 2048, -50};
 
 static constexpr wq_config_t test1{"wq:test1", 2000, 0};
 static constexpr wq_config_t test2{"wq:test2", 2000, 0};

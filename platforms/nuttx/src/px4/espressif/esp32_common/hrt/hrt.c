@@ -255,7 +255,7 @@ hrt_tim_init(void)
  * Handle the compare interrupt by calling the callout dispatcher
  * and then re-scheduling the next deadline.
  */
-static int
+static int IRAM_ATTR
 hrt_tim_isr(int irq, void *context, void *arg)
 {
 
@@ -282,7 +282,7 @@ hrt_tim_isr(int irq, void *context, void *arg)
  * Fetch a never-wrapping absolute time value in microseconds from
  * some arbitrary epoch shortly after system start.
  */
-hrt_abstime
+hrt_abstime IRAM_ATTR
 hrt_absolute_time(void)
 {
 	hrt_abstime	abstime;
@@ -481,7 +481,7 @@ hrt_call_enter(struct hrt_call *entry)
 	hrtinfo("scheduled\n");
 }
 
-static void
+static void IRAM_ATTR
 hrt_call_invoke(void)
 {
 	struct hrt_call	*call;
@@ -535,7 +535,7 @@ hrt_call_invoke(void)
  *
  * This routine must be called with interrupts disabled.
  */
-static void
+static void IRAM_ATTR
 hrt_call_reschedule()
 {
 	hrt_abstime	now = hrt_absolute_time();

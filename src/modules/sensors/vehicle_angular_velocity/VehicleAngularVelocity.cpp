@@ -765,8 +765,8 @@ void VehicleAngularVelocity::Run()
 	if (_fifo_available) {
 		// process all outstanding fifo messages
 		sensor_gyro_fifo_s sensor_fifo_data;
-		(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
-		(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
+		//(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
+
 		while (_sensor_fifo_sub.update(&sensor_fifo_data)) {
 
 
@@ -793,13 +793,15 @@ void VehicleAngularVelocity::Run()
 					angular_velocity_uncalibrated(axis) = FilterAngularVelocity(axis, data, N);
 					angular_acceleration_uncalibrated(axis) = FilterAngularAcceleration(axis, inverse_dt_s, data, N);
 				}
-
+// (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
+// (*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
 				// Publish
 				if (!_sensor_fifo_sub.updated()) {
 					if (CalibrateAndPublish(sensor_fifo_data.timestamp_sample,
 								angular_velocity_uncalibrated, angular_acceleration_uncalibrated)) {
 
 						perf_end(_cycle_perf);
+						//(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 						return;
 					}
 				}
