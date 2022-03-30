@@ -169,8 +169,8 @@ SPI::_transfer(uint8_t *send, uint8_t *recv, unsigned len)
 
 (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	SPI_SETFREQUENCY(_dev, _frequency);
-	// SPI_SETMODE(_dev, _mode);
-	// SPI_SETBITS(_dev, 8);
+	SPI_SETMODE(_dev, _mode);
+	SPI_SETBITS(_dev, 8);
 (*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 	//SPI_SELECT(_dev, _device, true);
 	(*(volatile uint32_t *)(0x3FF4400C) = (1<<17));//LOW

@@ -6,4 +6,4 @@
 # board_adc start
 
 icm20689 -s -R 8 start
-#icm20602 -s -R 8 start
+icm20602 -s -R 8 start

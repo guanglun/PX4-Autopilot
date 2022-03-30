@@ -39,7 +39,7 @@ constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
 		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{16}),
 	}),
 	initSPIBus(SPI::Bus::SPI3, {
-		//initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{17}, SPI::DRDY{-1}),
+		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{17}, SPI::DRDY{-1}),
 		initSPIDevice(DRV_IMU_DEVTYPE_ICM20689, SPI::CS{17}, SPI::DRDY{-1}),
 		// initSPIDevice(DRV_ACC_DEVTYPE_MPU6050, SPI::CS{15}, SPI::DRDY{-1}),
 	}),
