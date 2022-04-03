@@ -46,8 +46,7 @@
 # include <stdint.h>
 #endif
 
-#define BOARD_CLOCK_FREQUENCY 80000000
-
+#include <arch/board/esp32_board.h>
 
 #define LED_STARTED       0  /* LED2 */
 #define LED_HEAPALLOCATE  1  /* LED3 */

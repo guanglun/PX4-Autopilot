@@ -23,7 +23,7 @@ while getopts ':p:b:m:f:t:h:' OPT; do
     esac
 done
 
-if [ $FLASH_BOOT_FILE = "true" ]; then    qio>qout>dout>dio
+if [ $FLASH_BOOT_FILE = "true" ]; then
 esptool --chip esp32 -p ${PORT} -b ${BAUD} --before=default_reset --after=hard_reset write_flash -z --flash_mode "qout" --flash_freq "80m" --flash_size "4MB" 0x1000 ${BIN_BOOTLOADER_FILE} 0x8000 ${BIN_PARTITIONS_FILE} 0x10000 ${BIN_FIRMWARE_FILE}
 else
 esptool --chip esp32 -p ${PORT} -b ${BAUD} --before=default_reset --after=hard_reset write_flash -z --flash_mode "qout" --flash_freq "80m" --flash_size "4MB" 0x10000 ${BIN_FIRMWARE_FILE}
@@ -32,5 +32,5 @@ fi
 
 
 if [ $MINICOM = "true" ]; then
-minicom -D ${PORT} -b 921600
+minicom -D ${PORT} -b 115200
 fi

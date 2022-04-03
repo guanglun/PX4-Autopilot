@@ -230,9 +230,6 @@ hrt_tim_init(void)
 	ESP32_TIM_SETCTR(tim, 0); //set counter value
 	ESP32_TIM_RLD_NOW(tim);   //reload value now
 
-	//rALARMHI=0;
-	//rALARMLO=0xFFFF;
-
 	ESP32_TIM_SETALRVL(tim, 1000);		//alarm value
         ESP32_TIM_SETALRM(tim, true);		//enable alarm
 	ESP32_TIM_SETARLD(tim, false);		//auto reload
