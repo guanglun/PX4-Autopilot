@@ -74,8 +74,8 @@ function(px4_add_common_flags)
 		-Wcast-align
 		-Wdisabled-optimization
 		-Wdouble-promotion
-		-Wno-fatal-errors
-		-Wno-float-equal
+		-Wfatal-errors
+		# -Wfloat-equal
 		-Wformat-security
 		-Winit-self
 		-Wlogical-op
@@ -89,7 +89,7 @@ function(px4_add_common_flags)
 		-Wno-missing-field-initializers
 		-Wno-missing-include-dirs # TODO: fix and enable
 		-Wno-unused-parameter
-
+		-Wno-double-promotion
 		)
 
 	# compiler specific flags

@@ -41,6 +41,8 @@ __BEGIN_DECLS
 #include <esp32_spi.h>
 #include <esp32_i2c.h>
 
+#include <esp32_gpio.h>
+
 # define PX4_CPU_UUID_WORD32_UNIQUE_H            2 /* Most significant digits change the least */
 # define PX4_CPU_UUID_WORD32_UNIQUE_M            1 /* Middle significant digits */
 # define PX4_CPU_UUID_WORD32_UNIQUE_L            0 /* Least significant digits change the most */
@@ -116,5 +118,8 @@ int esp32_gpiosetevent(uint32_t pinset, bool risingedge, bool fallingedge,bool e
 
 #define px4_i2cbus_initialize(bus_num_1based)   esp32_i2cbus_initialize(bus_num_1based)
 #define px4_i2cbus_uninitialize(pdev)           esp32_i2cbus_uninitialize(pdev)
+
+
+#undef DISABLED
 
 __END_DECLS

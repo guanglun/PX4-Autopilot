@@ -47,8 +47,6 @@
 #include <nuttx/compiler.h>
 #include <stdint.h>
 
-#include <esp32_gpio.h>
-
 /* PX4FMU GPIOs ***********************************************************************************/
 /* LEDs */
 #define GPIO_LED1                    (GPIO_OUTPUT|32)

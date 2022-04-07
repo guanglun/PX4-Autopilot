@@ -9,7 +9,7 @@ set VEHICLE_TYPE mc
 
 if param compare IMU_GYRO_RATEMAX 400
 then
-	param set-default IMU_GYRO_RATEMAX 800
+	param set-default IMU_GYRO_RATEMAX 400
 fi
 
 param set-default NAV_ACC_RAD 2

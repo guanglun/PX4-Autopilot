@@ -113,7 +113,7 @@ FLAGS = $(MAXOPTIMIZATION) -g2 \
 	-Wno-sign-compare \
 	-Wno-type-limits \
 	-Wno-unused-parameter \
-	-Wno-pointer-arith
+	-Wpointer-arith
 
 FLAGS += $(EXTRAFLAGS)
 

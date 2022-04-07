@@ -173,7 +173,7 @@ else
 	# ekf2 start
 	# # gyro_calibration start
 	# navigator start
-	# #mavlink start -d /dev/ttyS0 -b 921600
+	# # mavlink start -d /dev/ttyS0 -b 57600
 
 	if [ $SDCARD_AVAILABLE = yes ]
 	then
@@ -546,7 +546,7 @@ else
 	#
 	# Start the logger.
 	#
-	. ${R}etc/init.d/rc.logging
+	#. ${R}etc/init.d/rc.logging
 
 	#
 	# Set additional parameters and env variables for selected AUTOSTART.

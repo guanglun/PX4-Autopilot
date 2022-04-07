@@ -181,10 +181,10 @@ void hrt_usr_call(void *arg)
 static struct sq_queue_s	callout_queue;
 
 /* latency baseline (last compare value applied) */
-static uint16_t			latency_baseline;
+// static uint16_t			latency_baseline;
 
 /* timer count at interrupt (for latency purposes) */
-static uint16_t			latency_actual;
+// static uint16_t			latency_actual;
 
 /* latency histogram */
 const uint16_t latency_bucket_count = LATENCY_BUCKET_COUNT;
@@ -194,7 +194,7 @@ __EXPORT uint32_t latency_counters[LATENCY_BUCKET_COUNT + 1];
 /* timer-specific functions */
 static void		hrt_tim_init(void);
 static int		hrt_tim_isr(int irq, void *context, void *arg);
-static void		hrt_latency_update(void);
+// static void		hrt_latency_update(void);
 
 /* callout list manipulation */
 static void		hrt_call_internal(struct hrt_call *entry,
@@ -255,7 +255,7 @@ hrt_tim_init(void)
 static int IRAM_ATTR
 hrt_tim_isr(int irq, void *context, void *arg)
 {
-
+// (*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
 	//rUPDATE = 1;
 	//latency_actual = (uint16_t)rLO;
 	//printf("%d\n",latency_actual);
@@ -271,7 +271,7 @@ hrt_tim_isr(int irq, void *context, void *arg)
 
 	/* and schedule the next interrupt */
 	hrt_call_reschedule();
-
+// (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	return OK;
 }
 
@@ -573,23 +573,23 @@ hrt_call_reschedule()
 	rALARMHI = (uint32_t)((deadline >> 32) & 0xffffffff);
 }
 
-static void
-hrt_latency_update(void)
-{
-	uint16_t latency = latency_actual - latency_baseline;
-	unsigned	index;
+// static void
+// hrt_latency_update(void)
+// {
+// 	uint16_t latency = latency_actual - latency_baseline;
+// 	unsigned	index;
 
-	/* bounded buckets */
-	for (index = 0; index < LATENCY_BUCKET_COUNT; index++) {
-		if (latency <= latency_buckets[index]) {
-			latency_counters[index]++;
-			return;
-		}
-	}
+// 	/* bounded buckets */
+// 	for (index = 0; index < LATENCY_BUCKET_COUNT; index++) {
+// 		if (latency <= latency_buckets[index]) {
+// 			latency_counters[index]++;
+// 			return;
+// 		}
+// 	}
 
-	/* catch-all at the end */
-	latency_counters[index]++;
-}
+// 	/* catch-all at the end */
+// 	latency_counters[index]++;
+// }
 
 void
 hrt_call_init(struct hrt_call *entry)
