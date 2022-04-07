@@ -125,12 +125,7 @@ void PX4Gyroscope::updateFIFO(sensor_gyro_fifo_s &sample)
 	sample.device_id = _device_id;
 	sample.scale = _scale;
 	sample.timestamp = hrt_absolute_time();
-
-	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
-
-
 	_sensor_fifo_pub.publish(sample);
-
 
 
 	// publish
@@ -154,6 +149,4 @@ void PX4Gyroscope::updateFIFO(sensor_gyro_fifo_s &sample)
 	report.timestamp = hrt_absolute_time();
 
 	_sensor_pub.publish(report);
-
-	//(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 }
