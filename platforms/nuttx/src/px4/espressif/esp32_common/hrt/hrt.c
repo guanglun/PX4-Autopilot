@@ -255,13 +255,15 @@ hrt_tim_init(void)
 static int IRAM_ATTR
 hrt_tim_isr(int irq, void *context, void *arg)
 {
-// (*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
+(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
 	//rUPDATE = 1;
 	//latency_actual = (uint16_t)rLO;
 	//printf("%d\n",latency_actual);
 
-	ESP32_TIM_ACKINT(tim);
-        ESP32_TIM_SETALRM(tim, true);			//enable alarm
+// up_irq_enable();
+// up_irq_disable();
+
+
 
 	/* do latency calculations */
 	//hrt_latency_update();
@@ -269,9 +271,18 @@ hrt_tim_isr(int irq, void *context, void *arg)
 	/* run any callouts that have met their deadline */
 	hrt_call_invoke();
 
-	/* and schedule the next interrupt */
+	// /* and schedule the next interrupt */
 	hrt_call_reschedule();
-// (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
+
+	// hrt_abstime set = hrt_absolute_time() + 100;
+
+	// rALARMLO = (uint32_t)(set & 0xffffffff);
+	// rALARMHI = (uint32_t)((set >> 32) & 0xffffffff);
+
+	ESP32_TIM_ACKINT(tim);
+        ESP32_TIM_SETALRM(tim, true);			//enable alarm
+
+(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	return OK;
 }
 
@@ -416,7 +427,6 @@ hrt_call_internal(struct hrt_call *entry, hrt_abstime deadline, hrt_abstime inte
 	entry->arg = arg;
 
 	hrt_call_enter(entry);
-
 	px4_leave_critical_section(flags);
 }
 
@@ -510,6 +520,9 @@ hrt_call_invoke(void)
 		/* invoke the callout (if there is one) */
 		if (call->callout) {
 			hrtinfo("call %p: %p(%p)\n", call, call->callout, call->arg);
+
+(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
+(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 			call->callout(call->arg);
 		}
 

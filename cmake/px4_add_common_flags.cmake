@@ -91,6 +91,7 @@ function(px4_add_common_flags)
 		-Wno-unused-parameter
 		-Wno-double-promotion
 		-Wno-stringop-truncation
+		-Wno-unused-function
 		)
 
 	# compiler specific flags
