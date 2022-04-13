@@ -242,6 +242,7 @@ else()
 	${PX4_STARTUP_DIR}/xtensa_int_handlers.o
 	${PX4_STARTUP_DIR}/xtensa_user_handler.o
 	${PX4_STARTUP_DIR}/esp32_start.o
+	${PX4_STARTUP_DIR}/esp32_wdt.o
 
 	)
 
