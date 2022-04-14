@@ -171,16 +171,14 @@ else
 	param set SENS_IMU_MODE 1
 	param set-default EKF2_PREDICT_US 20000
 	icm20602 -s start
-	# icm20689 -s start
-	# ms5611 -s start
 	hmc5883 -T -I -R 12 start
 	ms5611 -I start
 	sensors start
-	# commander start
+	commander start
 	ekf2 start
 	# gyro_calibration start
-	# navigator start
-	# # # mavlink start -d /dev/ttyS0 -b 57600
+	navigator start
+	# mavlink start -d /dev/ttyS0 -b 57600
 
 	# if [ $SDCARD_AVAILABLE = yes ]
 	# then
@@ -451,7 +449,7 @@ else
 	# # Start UART/Serial device drivers.
 	# # Note: rc.serial is auto-generated from Tools/serial/generate_config.py
 	# #
-	# # . ${R}etc/init.d/rc.serial
+	# . ${R}etc/init.d/rc.serial
 
 	# if [ $IO_PRESENT = no ]
 	# then
@@ -553,7 +551,7 @@ else
 	# #
 	# # Start the logger.
 	# #
-	# #. ${R}etc/init.d/rc.logging
+	# . ${R}etc/init.d/rc.logging
 
 	# #
 	# # Set additional parameters and env variables for selected AUTOSTART.

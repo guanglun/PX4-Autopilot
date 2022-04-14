@@ -35,7 +35,7 @@ px4_add_module(
 	MAIN local_position_estimator
 	COMPILE_FLAGS
 	STACK_MAIN 5700
-	STACK_MAX 4000
+	STACK_MAX 3700
 	SRCS
 		BlockLocalPositionEstimator.cpp
 		sensors/flow.cpp
