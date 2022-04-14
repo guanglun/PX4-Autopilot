@@ -79,7 +79,7 @@ function(px4_add_common_flags)
 		-Wformat-security
 		-Winit-self
 		-Wlogical-op
-		-Wpointer-arith
+		-Wno-pointer-arith
 		-Wshadow
 		-Wuninitialized
 		-Wunknown-pragmas

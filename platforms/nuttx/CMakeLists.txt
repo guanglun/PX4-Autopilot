@@ -243,7 +243,7 @@ else()
 	${PX4_STARTUP_DIR}/xtensa_user_handler.o
 	${PX4_STARTUP_DIR}/esp32_start.o
 	${PX4_STARTUP_DIR}/esp32_wdt.o
-
+	# ${PX4_STARTUP_DIR}/xtensa_cpupause.o
 	)
 
 	execute_process(COMMAND touch ${NUTTX_STARTUP_OBJS}
@@ -265,7 +265,7 @@ else()
 	)
 
 	target_link_libraries(nuttx_c INTERFACE nuttx_drivers)
-	target_link_libraries(nuttx_drivers INTERFACE nuttx_c)
+	target_link_libraries(nuttx_drivers INTERFACE nuttx_c nuttx_fs)
 	target_link_libraries(nuttx_xx INTERFACE nuttx_c)
 	target_link_libraries(nuttx_fs INTERFACE nuttx_c)
 
