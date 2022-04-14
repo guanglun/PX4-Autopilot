@@ -521,8 +521,8 @@ hrt_call_invoke(void)
 		if (call->callout) {
 			hrtinfo("call %p: %p(%p)\n", call, call->callout, call->arg);
 
-(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
-(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
+// (*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
+// (*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
 			call->callout(call->arg);
 		}
 
