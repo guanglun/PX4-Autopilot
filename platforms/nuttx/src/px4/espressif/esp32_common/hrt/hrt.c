@@ -187,9 +187,9 @@ static struct sq_queue_s	callout_queue;
 // static uint16_t			latency_actual;
 
 /* latency histogram */
-const uint16_t latency_bucket_count = LATENCY_BUCKET_COUNT;
-const uint16_t latency_buckets[LATENCY_BUCKET_COUNT] = { 1, 2, 5, 10, 20, 50, 100, 1000 };
-__EXPORT uint32_t latency_counters[LATENCY_BUCKET_COUNT + 1];
+// const uint16_t latency_bucket_count = LATENCY_BUCKET_COUNT;
+// const uint16_t latency_buckets[LATENCY_BUCKET_COUNT] = { 1, 2, 5, 10, 20, 50, 100, 1000 };
+// __EXPORT uint32_t latency_counters[LATENCY_BUCKET_COUNT + 1];
 
 /* timer-specific functions */
 static void		hrt_tim_init(void);

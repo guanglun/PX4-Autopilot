@@ -65,6 +65,8 @@
 
 #include "board_config.h"
 
+#include "esp32_rtc.h"
+
 #include <arch/board/board.h>
 
 #include <drivers/drv_hrt.h>
@@ -198,6 +200,8 @@ void test_poll(void)
 
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
+	syslog(LOG_INFO, "\n[boot] CPU SPEED %d\n",esp_rtc_clk_get_cpu_freq());
+
 	px4_platform_init();
 
 	// Configure the DMA allocator.
@@ -244,6 +248,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	static struct hrt_call test_call;
 	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
+
+
 
 	return OK;
 }
