@@ -232,16 +232,16 @@ else
 	# Waypoint storage.
 	# REBOOTWORK this needs to start in parallel.
 	#
-	if param compare SYS_DM_BACKEND 1
-	then
-		dataman start -r
-	else
-		if param compare SYS_DM_BACKEND 0
-		then
-			# dataman start default
-			dataman start
-		fi
-	fi
+	# if param compare SYS_DM_BACKEND 1
+	# then
+	# 	dataman start -r
+	# else
+	# 	if param compare SYS_DM_BACKEND 0
+	# 	then
+	# 		# dataman start default
+	# 		dataman start
+	# 	fi
+	# fi
 
 	#
 	# Start the socket communication send_event handler.
@@ -256,8 +256,8 @@ else
 	#
 	# Start system state indicator.
 	#
-	rgbled start -X -q
-	rgbled_ncp5623c start -X -q
+	# rgbled start -X -q
+	# rgbled_ncp5623c start -X -q
 
 	#
 	# Set parameters and env variables for selected AUTOSTART.
@@ -449,7 +449,7 @@ else
 	# Start UART/Serial device drivers.
 	# Note: rc.serial is auto-generated from Tools/serial/generate_config.py
 	#
-	# . ${R}etc/init.d/rc.serial
+	. ${R}etc/init.d/rc.serial
 
 	if [ $IO_PRESENT = no ]
 	then
@@ -542,16 +542,16 @@ else
 	#
 	# Start any custom addons from the sdcard.
 	#
-	if [ -f $FEXTRAS ]
-	then
-		echo "Addons script: ${FEXTRAS}"
-		. $FEXTRAS
-	fi
+	# if [ -f $FEXTRAS ]
+	# then
+	# 	echo "Addons script: ${FEXTRAS}"
+	# 	. $FEXTRAS
+	# fi
 
 	#
 	# Start the logger.
 	#
-	. ${R}etc/init.d/rc.logging
+	# . ${R}etc/init.d/rc.logging
 
 	#
 	# Set additional parameters and env variables for selected AUTOSTART.

@@ -255,7 +255,7 @@ hrt_tim_init(void)
 static int IRAM_ATTR
 hrt_tim_isr(int irq, void *context, void *arg)
 {
-(*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
+// (*(volatile uint32_t *)(0x3FF4400C) = (1<<4));//LOW
 	//rUPDATE = 1;
 	//latency_actual = (uint16_t)rLO;
 	//printf("%d\n",latency_actual);
@@ -282,7 +282,7 @@ hrt_tim_isr(int irq, void *context, void *arg)
 	ESP32_TIM_ACKINT(tim);
         ESP32_TIM_SETALRM(tim, true);			//enable alarm
 
-(*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
+// (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	return OK;
 }
 

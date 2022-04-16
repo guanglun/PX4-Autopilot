@@ -70,6 +70,12 @@
 #define ADC_BATTERY_CURRENT_CHANNEL    2
 #define BOARD_ADC_BRICK_VALID          3
 
+#define RC_SERIAL_PORT		"/dev/ttyS1"
+
+/* AUX PWMs
+ */
+#define DIRECT_PWM_OUTPUT_CHANNELS	4
+
 __BEGIN_DECLS
 
 /****************************************************************************************************

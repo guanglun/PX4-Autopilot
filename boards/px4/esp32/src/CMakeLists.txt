@@ -36,6 +36,7 @@ add_library(drivers_board
 	led.c
 	i2c.cpp
 	spi.cpp
+	timer_config.cpp
 )
 
 target_link_libraries(drivers_board

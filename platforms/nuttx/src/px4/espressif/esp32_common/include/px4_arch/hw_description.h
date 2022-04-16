@@ -42,6 +42,25 @@
 #include <px4_platform_common/constexpr_util.h>
 
 /*
+ * Timers
+ */
+
+namespace Timer
+{
+enum Timer {
+	Timer0 = 1,
+	Timer1,
+	Timer2,
+	Timer3,
+};
+
+struct TimerChannel {
+	Timer timer;
+	int channel;
+};
+}
+
+/*
  * GPIO
  */
 

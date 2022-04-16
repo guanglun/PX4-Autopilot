@@ -67,6 +67,7 @@
 
 #include "esp32_rtc.h"
 
+
 #include <arch/board/board.h>
 
 #include <drivers/drv_hrt.h>
@@ -184,22 +185,24 @@ esp32_board_initialize(void)
 static struct spi_dev_s *spi2;
 static struct spi_dev_s *spi3;
 
-void test_poll(void)
-{
-	static uint8_t cnt = 0;
-	if(cnt%2==0)
-	{
-		(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
-	}else{
-		(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
-	}
-	cnt++;
-	//hrt_abstime time = hrt_absolute_time();
-	//syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
-}
+// void test_poll(void)
+// {
+// 	static uint8_t cnt = 0;
+// 	if(cnt%2==0)
+// 	{
+// 		(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
+// 	}else{
+// 		(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
+// 	}
+// 	cnt++;
+// 	//hrt_abstime time = hrt_absolute_time();
+// 	//syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
+// }
 
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
+
+
 	syslog(LOG_INFO, "\n[boot] CPU SPEED %d\n",esp_rtc_clk_get_cpu_freq());
 
 	px4_platform_init();
@@ -244,10 +247,13 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	SPI_SETBITS(spi3, 8);
 	SPI_SETMODE(spi3, SPIDEV_MODE3);
 
+
+
+
 	px4_platform_configure();
 
-	static struct hrt_call test_call;
-	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
+	// static struct hrt_call test_call;
+	// hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
 
 
 

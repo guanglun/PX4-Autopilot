@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (C) 2021 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,21 +30,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#include <px4_arch/spi_hw_description.h>
-#include <drivers/drv_sensor.h>
-#include <nuttx/spi/spi.h>
 
-constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
-	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{4}),
+/**
+ * @file io_timer.c
+ *
+ * Servo driver supporting PWM servos connected to RP2040 PWM blocks.
+ */
 
-	}),
-	initSPIBus(SPI::Bus::SPI3, {
-		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{5}, SPI::DRDY{-1}),
-		// initSPIDevice(DRV_BARO_DEVTYPE_MS5611, SPI::CS{17}, SPI::DRDY{-1}),
-		//initSPIDevice(DRV_IMU_DEVTYPE_ICM20689, SPI::CS{17}, SPI::DRDY{-1}),
+#include <px4_platform_common/px4_config.h>
+#include <systemlib/px4_macros.h>
+#include <nuttx/arch.h>
+#include <nuttx/irq.h>
 
-	}),
-};
+#include <sys/types.h>
+#include <stdbool.h>
 
-static constexpr bool unused = validateSPIConfig(px4_spi_buses);
+#include <assert.h>
+#include <debug.h>
+#include <time.h>
+#include <queue.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+
+#include <arch/board/board.h>
+#include <drivers/drv_pwm_output.h>
+
+#include <px4_arch/io_timer.h>
+
+
+uint32_t io_timer_get_group(unsigned timer)
+{
+	if(timer == 0)
+		return 0x0F;
+	return 0;
+
+}

@@ -1,20 +1,20 @@
 /****************************************************************************
  *
- *   Copyright (C) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (C) 2021 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *	notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
+ *	notice, this list of conditions and the following disclaimer in
+ *	the documentation and/or other materials provided with the
+ *	distribution.
  * 3. Neither the name PX4 nor the names of its contributors may be
- *    used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ *	used to endorse or promote products derived from this software
+ *	without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,21 +30,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
-#include <px4_arch/spi_hw_description.h>
-#include <drivers/drv_sensor.h>
-#include <nuttx/spi/spi.h>
 
-constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
-	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{4}),
+#pragma once
 
-	}),
-	initSPIBus(SPI::Bus::SPI3, {
-		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{5}, SPI::DRDY{-1}),
-		// initSPIDevice(DRV_BARO_DEVTYPE_MS5611, SPI::CS{17}, SPI::DRDY{-1}),
-		//initSPIDevice(DRV_IMU_DEVTYPE_ICM20689, SPI::CS{17}, SPI::DRDY{-1}),
 
-	}),
-};
+#include <px4_arch/io_timer.h>
+#include <px4_arch/hw_description.h>
+#include <px4_platform_common/constexpr_util.h>
+#include <px4_platform_common/px4_config.h>
+#include <px4_platform/io_timer_init.h>
 
-static constexpr bool unused = validateSPIConfig(px4_spi_buses);
+static inline constexpr timer_io_channels_t initIOTimerChannel(const io_timers_t io_timers_conf[MAX_IO_TIMERS],
+		Timer::TimerChannel timer, GPIO::GPIOPin pin)
+{
+	timer_io_channels_t ret{};
+	return ret;
+}
+
+static inline constexpr io_timers_t initIOTimer(Timer::Timer timer)
+{
+	io_timers_t ret{};
+
+	return ret;
+}

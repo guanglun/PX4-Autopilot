@@ -33,6 +33,8 @@
 
 px4_add_library(arch_io_pins
 	esp32_pinset.c
+	pwm_servo.c
+	io_timer.c
 )
 
 target_compile_options(arch_io_pins PRIVATE ${MAX_CUSTOM_OPT_LEVEL})

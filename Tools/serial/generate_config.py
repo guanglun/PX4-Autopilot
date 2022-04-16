@@ -87,7 +87,7 @@ serial_ports = {
     "TEL1": { # telemetry link
         "label": "TELEM 1",
         "index": 101,
-        "default_baudrate": 57600,
+        "default_baudrate": 921600,
         },
     "TEL2": { # companion port
         "label": "TELEM 2",
