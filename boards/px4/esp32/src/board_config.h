@@ -70,11 +70,13 @@
 #define ADC_BATTERY_CURRENT_CHANNEL    2
 #define BOARD_ADC_BRICK_VALID          3
 
-#define RC_SERIAL_PORT		"/dev/ttyS1"
+#define RC_SERIAL_PORT		"/dev/ttyS2"
 
 /* AUX PWMs
  */
 #define DIRECT_PWM_OUTPUT_CHANNELS	4
+
+// #define BOARD_ENABLE_CONSOLE_BUFFER
 
 __BEGIN_DECLS
 

@@ -185,19 +185,19 @@ esp32_board_initialize(void)
 static struct spi_dev_s *spi2;
 static struct spi_dev_s *spi3;
 
-// void test_poll(void)
-// {
-// 	static uint8_t cnt = 0;
-// 	if(cnt%2==0)
-// 	{
-// 		(*(volatile uint32_t *)(0x3FF44008) = (1<<2));//HIGH
-// 	}else{
-// 		(*(volatile uint32_t *)(0x3FF4400C) = (1<<2));//LOW
-// 	}
-// 	cnt++;
-// 	//hrt_abstime time = hrt_absolute_time();
-// 	//syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
-// }
+void test_poll(void)
+{
+	static uint8_t cnt = 0;
+	if(cnt%2==0)
+	{
+		(*(volatile uint32_t *)(0x3FF44008) = (1<<0));//HIGH
+	}else{
+		(*(volatile uint32_t *)(0x3FF4400C) = (1<<0));//LOW
+	}
+	cnt++;
+	//hrt_abstime time = hrt_absolute_time();
+	//syslog(LOG_INFO,"%lld %lld\n",time,time/1000/1000);
+}
 
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
@@ -223,6 +223,9 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	px4_esp32_configgpio(GPIO_OUTPUT|4);
 	esp32_gpiowrite(4,true);
+
+	px4_esp32_configgpio(GPIO_OUTPUT|0);
+	esp32_gpiowrite(0,true);
 
 	// Configure SPI-based devices.
 	spi2 = esp32_spibus_initialize(2);
@@ -252,8 +255,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	px4_platform_configure();
 
-	// static struct hrt_call test_call;
-	// hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
+	static struct hrt_call test_call;
+	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
 
 
 

@@ -6,5 +6,6 @@
 # board_adc start
 
 icm20602 -s start
-hmc5883 -T -I -R 2 start
+# hmc5883 -T -I -R 2 start
+ist8310 -I -R 2 start
 ms5611 -I start
