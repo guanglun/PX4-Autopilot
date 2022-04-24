@@ -8,7 +8,7 @@ FLASH_BOOT_FILE="false"
 BIN_FILE_PATH=build/px4_esp32_default
 BOOT_FILE_PATH=boards/px4/esp32/boot
 
-BIN_PARTITIONS_FILE=${BOOT_FILE_PATH}/partition-table-esp32.bin
+BIN_PARTITIONS_FILE=${BOOT_FILE_PATH}/partition-table.bin
 BIN_BOOTLOADER_FILE=${BOOT_FILE_PATH}/bootloader.bin
 BIN_FIRMWARE_FILE=${BIN_FILE_PATH}/px4_esp32_default.bin
 
