@@ -125,19 +125,21 @@ else
 	# Set the parameter file the board supports params on
 	# MTD device.
 	#
-	if mft query -q -k MTD -s MTD_PARAMETERS -v /fs/mtd_params
-	then
-		set PARAM_FILE /fs/mtd_params
-	fi
+	# if mft query -q -k MTD -s MTD_PARAMETERS -v /fs/mtd_params
+	# then
+	# 	set PARAM_FILE /fs/mtd_params
+	# fi
+
+	set PARAM_FILE /dev/esp32flash
 
 	#
 	# Load parameters.
 	#
 	# if the board has a storage for (factory) calibration data
-	if mft query -q -k MTD -s MTD_CALDATA -v /fs/mtd_caldata
-	then
-		param load /fs/mtd_caldata
-	fi
+	# if mft query -q -k MTD -s MTD_CALDATA -v /fs/mtd_caldata
+	# then
+	# 	param load /fs/mtd_caldata
+	# fi
 
 	param select $PARAM_FILE
 	if ! param import

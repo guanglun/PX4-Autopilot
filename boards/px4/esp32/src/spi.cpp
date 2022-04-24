@@ -35,16 +35,20 @@
 #include <nuttx/spi/spi.h>
 
 constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
+#ifdef CONFIG_ESP32_SPI2
 	initSPIBus(SPI::Bus::SPI2, {
 		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{4}),
 
 	}),
+#endif
+#ifdef CONFIG_ESP32_SPI3
 	initSPIBus(SPI::Bus::SPI3, {
 		initSPIDevice(DRV_IMU_DEVTYPE_ICM20602, SPI::CS{5}, SPI::DRDY{-1}),
 		// initSPIDevice(DRV_BARO_DEVTYPE_MS5611, SPI::CS{17}, SPI::DRDY{-1}),
 		//initSPIDevice(DRV_IMU_DEVTYPE_ICM20689, SPI::CS{17}, SPI::DRDY{-1}),
 
 	}),
+#endif
 };
 
 static constexpr bool unused = validateSPIConfig(px4_spi_buses);
