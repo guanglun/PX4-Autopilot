@@ -93,7 +93,7 @@
 
 /* Power supply control and monitoring GPIOs. */
 #define GPIO_VDD_BRICK_VALID         (GPIO_INPUT|GPIO_PULLUP|32)
-#define GPIO_VDD_USB_VALID           (GPIO_INPUT|GPIO_PULLUP|15)
+#define GPIO_VDD_USB_VALID           (GPIO_INPUT|GPIO_PULLUP|35)
 
 
 #define BOARD_ADC_USB_CONNECTED      (px4_arch_gpioread(GPIO_VDD_USB_VALID))
