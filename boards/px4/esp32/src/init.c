@@ -64,7 +64,6 @@
 #include <nuttx/mm/gran.h>
 
 #include "board_config.h"
-
 #include "esp32_rtc.h"
 
 
@@ -154,6 +153,9 @@ esp32_board_initialize(void)
 	// Configure LEDs.
 	board_autoled_initialize();
 
+	px4_esp32_configgpio(GPIO_VDD_BRICK_VALID);
+	px4_esp32_configgpio(GPIO_VDD_USB_VALID);
+
 	esp32_spiinitialize();
 
 }
@@ -218,11 +220,11 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	led_off(LED_GREEN);
 	led_off(LED_BLUE);
 
-	px4_esp32_configgpio(GPIO_OUTPUT|2);
-	esp32_gpiowrite(2,true);
+	// px4_esp32_configgpio(GPIO_OUTPUT|2);
+	// esp32_gpiowrite(2,true);
 
-	px4_esp32_configgpio(GPIO_OUTPUT|4);
-	esp32_gpiowrite(4,true);
+	// px4_esp32_configgpio(GPIO_OUTPUT|4);
+	// esp32_gpiowrite(4,true);
 
 	px4_esp32_configgpio(GPIO_OUTPUT|0);
 	esp32_gpiowrite(0,true);
@@ -257,8 +259,6 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	static struct hrt_call test_call;
 	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
-
-
 
 	return OK;
 }

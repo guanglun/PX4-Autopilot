@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2019 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2019 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,7 +30,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+#pragma once
 
 #include <board_config.h>
 
-#include "ToneAlarmInterfaceGPIO.cpp"
+
+/* Historically PX4 used one ADC1 With FMUvnX this has changes.
+ * These defines maintain compatibility while allowing the
+ * new boards to override the ADC used from HW VER/REV and
+ * the system one.
+ *
+ * Depending on HW configuration (VER/REV POP options) hardware detection
+ * may or may NOT initialize a given ADC. SYSTEM_ADC_COUNT is used to size the
+ * singleton array to ensure this is only done once per ADC.
+ */
+
+#if !defined(HW_REV_VER_ADC_BASE)
+#  define HW_REV_VER_ADC_BASE 0
+//ESP32_ADC1_BASE
+#endif
+
+#if !defined(SYSTEM_ADC_BASE)
+#  define SYSTEM_ADC_BASE 0
+//ESP32_ADC1_BASE
+#endif
+
+#define GPIO_PIN_COUNT                  40
+
+typedef enum {
+    ADC_0db,
+    ADC_2_5db,
+    ADC_6db,
+    ADC_11db
+} adc_attenuation_t;
+
+typedef struct {
+    uint8_t reg;      /*!< GPIO register offset from DR_REG_IO_MUX_BASE */
+    int8_t rtc;       /*!< RTC GPIO number (-1 if not RTC GPIO pin) */
+    int8_t adc;       /*!< ADC Channel number (-1 if not ADC pin) */
+    int8_t touch;     /*!< Touch Channel number (-1 if not Touch pin) */
+} esp32_gpioMux_t;
+
+extern const esp32_gpioMux_t esp32_gpioMux[GPIO_PIN_COUNT];
+
+#define digitalPinToAnalogChannel(pin)  (((pin) < 40)?esp32_gpioMux[(pin)].adc:-1)
+#define digitalPinToTouchChannel(pin)   (((pin) < 40)?esp32_gpioMux[(pin)].touch:-1)
+
+bool adcAttachPin(uint8_t pin);
+uint16_t analogReadPin(uint8_t pin);
+uint16_t analogRead(uint8_t channel);
+
+
+#include <px4_platform/adc.h>
+

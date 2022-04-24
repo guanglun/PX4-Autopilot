@@ -3,7 +3,7 @@
 # PX4 FMUv4 specific board sensors init
 #------------------------------------------------------------------------------
 
-# board_adc start
+board_adc start
 
 icm20602 -s start
 # hmc5883 -T -I -R 2 start

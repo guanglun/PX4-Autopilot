@@ -49,26 +49,39 @@
 
 /* PX4FMU GPIOs ***********************************************************************************/
 /* LEDs */
-#define GPIO_LED1                    (GPIO_OUTPUT|32)
-#define GPIO_LED2                    (GPIO_OUTPUT|32)
-#define GPIO_LED3                    (GPIO_OUTPUT|32)
+#define GPIO_LED1                    (GPIO_OUTPUT|0)
+#define GPIO_LED2                    (GPIO_OUTPUT|0)
+#define GPIO_LED3                    (GPIO_OUTPUT|0)
 
 
 #define GPIO_LED_RED                 GPIO_LED1
 #define GPIO_LED_GREEN               GPIO_LED2
 #define GPIO_LED_BLUE                GPIO_LED3
-#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PULLUP|5)
+#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PULLUP|0)
 
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
 #define BOARD_SPI_BUS_MAX_BUS_ITEMS 2
 
-#define GPIO_TONE_ALARM_IDLE	(GPIO_OUTPUT|GPIO_PULLUP|32)
-#define GPIO_TONE_ALARM_GPIO 	(GPIO_OUTPUT|GPIO_PULLUP|32)
 
-#define ADC_BATTERY_VOLTAGE_CHANNEL    1
-#define ADC_BATTERY_CURRENT_CHANNEL    2
-#define BOARD_ADC_BRICK_VALID          3
+/**
+ * ADC channels:
+ * These are the channel numbers of the ADCs of the microcontroller that can be used by the Px4 Firmware in the adc driver.
+ */
+#define ADC_5V_RAIL_SENSE_IO		36
+#define ADC_BATTERY_VOLTAGE_CHANNEL_IO	39
+#define ADC_BATTERY_CURRENT_CHANNEL_IO	34
+
+#define ADC_5V_RAIL_SENSE            	0
+#define ADC_BATTERY_VOLTAGE_CHANNEL    	3
+#define ADC_BATTERY_CURRENT_CHANNEL    	6
+
+#define ADC_CHANNELS \
+(	(1 << ADC_5V_RAIL_SENSE) 		|\
+ 	(1 << ADC_BATTERY_VOLTAGE_CHANNEL) 	|\
+  	(1 << ADC_BATTERY_CURRENT_CHANNEL))
+
+#define ADC_V5_V_FULL_SCALE (7.17f)
 
 #define RC_SERIAL_PORT		"/dev/ttyS2"
 
@@ -77,6 +90,17 @@
 #define DIRECT_PWM_OUTPUT_CHANNELS	4
 
 // #define BOARD_ENABLE_CONSOLE_BUFFER
+
+/* Power supply control and monitoring GPIOs. */
+#define GPIO_VDD_BRICK_VALID         (GPIO_INPUT|GPIO_PULLUP|32)
+#define GPIO_VDD_USB_VALID           (GPIO_INPUT|GPIO_PULLUP|15)
+
+
+#define BOARD_ADC_USB_CONNECTED      (px4_arch_gpioread(GPIO_VDD_USB_VALID))
+#define BOARD_ADC_BRICK_VALID        (px4_arch_gpioread(GPIO_VDD_BRICK_VALID))
+#define BOARD_ADC_USB_VALID          (px4_arch_gpioread(GPIO_VDD_USB_VALID))
+
+
 
 __BEGIN_DECLS
 
