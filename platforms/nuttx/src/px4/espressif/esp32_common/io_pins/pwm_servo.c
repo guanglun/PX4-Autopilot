@@ -62,13 +62,23 @@
 
 #include "esp32_ledc.h"
 
+#include "hardware/esp32_soc.h"
+#include "hardware/esp32_ledc.h"
+
 struct pwm_info_s pwm_info;
 struct pwm_lowerhalf_s *pwm;
+
+ub16_t get_real_duty(int ch)
+{
+	uint32_t set = (pwm_info.channels[ch].duty*pwm_info.frequency)/(1000000/65535);
+
+	return b16toi(set * 262144 + b16HALF);
+}
 
 int up_pwm_servo_set(unsigned channel, servo_position_t value)
 {
 	//syslog(LOG_INFO, "PWM set ch: %d value:%d\n", channel,value);
-	pwm_info.channels[channel].duty = (value*pwm_info.frequency)/(1000000/65535);
+	pwm_info.channels[channel].duty = value;
 	return OK;
 }
 
@@ -104,8 +114,15 @@ int up_pwm_servo_init(uint32_t channel_mask)
 	pwm_info.channels[0].duty=0,
 	pwm_info.channels[1].duty=0,
 	pwm_info.channels[2].duty=0,
-	pwm_info.channels[3].duty=6553,
+	pwm_info.channels[3].duty=0,
 	pwm->ops->start(pwm,&pwm_info);
+
+	pwm_info.channels[0].duty=900,
+	pwm_info.channels[1].duty=900,
+	pwm_info.channels[2].duty=900,
+	pwm_info.channels[3].duty=900,
+
+	up_pwm_update(0);
 
 	return channel_mask;
 }
@@ -131,7 +148,18 @@ int up_pwm_servo_set_rate_group_update(unsigned group, unsigned rate)
 void up_pwm_update(unsigned channels_mask)
 {
 	//syslog(LOG_INFO, "up_pwm_update channels_mask: %d\n", channels_mask);
-	pwm->ops->start(pwm,&pwm_info);
+	//pwm->ops->start(pwm,&pwm_info);
+
+	*(volatile uint32_t *)(LEDC_LSCH0_DUTY_REG) = (get_real_duty(0) << 4);
+	*(volatile uint32_t *)(LEDC_LSCH1_DUTY_REG) = (get_real_duty(1) << 4);
+	*(volatile uint32_t *)(LEDC_LSCH2_DUTY_REG) = (get_real_duty(2) << 4);
+	*(volatile uint32_t *)(LEDC_LSCH3_DUTY_REG) = (get_real_duty(3) << 4);
+
+	*(volatile uint32_t *)(LEDC_LSCH0_CONF0_REG) |= LEDC_PARA_UP_LSCH0;
+	*(volatile uint32_t *)(LEDC_LSCH1_CONF0_REG) |= LEDC_PARA_UP_LSCH1;
+	*(volatile uint32_t *)(LEDC_LSCH2_CONF0_REG) |= LEDC_PARA_UP_LSCH2;
+	*(volatile uint32_t *)(LEDC_LSCH3_CONF0_REG) |= LEDC_PARA_UP_LSCH3;
+
 }
 
 uint32_t up_pwm_servo_get_rate_group(unsigned group)

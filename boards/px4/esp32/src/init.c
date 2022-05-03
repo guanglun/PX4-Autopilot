@@ -159,6 +159,11 @@ esp32_board_initialize(void)
 	px4_esp32_configgpio(GPIO_VDD_BRICK_VALID);
 	px4_esp32_configgpio(GPIO_VDD_USB_VALID);
 
+	px4_esp32_configgpio(GPIO_OUTPUT | 12);
+	esp32_gpiowrite(12, false);
+	up_udelay(20);
+	esp32_gpiowrite(12, true);
+
 	esp32_spiinitialize();
 
 }
@@ -232,6 +237,10 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	px4_esp32_configgpio(GPIO_OUTPUT | 0);
 	esp32_gpiowrite(0, true);
+	px4_esp32_configgpio(GPIO_OUTPUT | 2);
+	esp32_gpiowrite(2, true);
+	px4_esp32_configgpio(GPIO_OUTPUT | 15);
+	esp32_gpiowrite(15, true);
 
 	// Configure SPI-based devices.
 #ifdef CONFIG_ESP32_SPI2
