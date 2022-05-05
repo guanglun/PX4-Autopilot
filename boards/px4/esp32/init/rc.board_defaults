@@ -16,3 +16,4 @@ param set-default COM_ARM_SDCARD 0
 #disable CPU check. default is 90%
 param set-default COM_CPU_MAX -1
 param set-default BAT1_SOURCE 0
+param set IMU_GYRO_RATEMAX 300

@@ -530,46 +530,46 @@ else
 		gyro_calibration start
 	fi
 
-	#
+
 	# Optional board supplied extras: rc.board_extras
-	#
-	set BOARD_RC_EXTRAS ${R}etc/init.d/rc.board_extras
-	if [ -f $BOARD_RC_EXTRAS ]
-	then
-		echo "Board extras: ${BOARD_RC_EXTRAS}"
-		. $BOARD_RC_EXTRAS
-	fi
-	unset BOARD_RC_EXTRAS
 
-	#
-	# Start any custom addons from the sdcard.
-	#
-	if [ -f $FEXTRAS ]
-	then
-		echo "Addons script: ${FEXTRAS}"
-		. $FEXTRAS
-	fi
+	# set BOARD_RC_EXTRAS ${R}etc/init.d/rc.board_extras
+	# if [ -f $BOARD_RC_EXTRAS ]
+	# then
+	# 	echo "Board extras: ${BOARD_RC_EXTRAS}"
+	# 	. $BOARD_RC_EXTRAS
+	# fi
+	# unset BOARD_RC_EXTRAS
 
-	#
-	# Start the logger.
-	#
-	. ${R}etc/init.d/rc.logging
+	# #
+	# # Start any custom addons from the sdcard.
+	# #
+	# if [ -f $FEXTRAS ]
+	# then
+	# 	echo "Addons script: ${FEXTRAS}"
+	# 	. $FEXTRAS
+	# fi
 
-	#
-	# Set additional parameters and env variables for selected AUTOSTART.
-	#
-	if ! param compare SYS_AUTOSTART 0
-	then
-		. ${R}etc/init.d/rc.autostart.post
-	fi
+	# #
+	# # Start the logger.
+	# #
+	# . ${R}etc/init.d/rc.logging
+
+	# #
+	# # Set additional parameters and env variables for selected AUTOSTART.
+	# #
+	# if ! param compare SYS_AUTOSTART 0
+	# then
+	# 	. ${R}etc/init.d/rc.autostart.post
+	# fi
 
 
-	set BOARD_BOOTLOADER_UPGRADE ${R}etc/init.d/rc.board_bootloader_upgrade
-	if [ -f $BOARD_BOOTLOADER_UPGRADE ]
-	then
-		sh $BOARD_BOOTLOADER_UPGRADE
-	fi
-	unset BOARD_BOOTLOADER_UPGRADE
+	# set BOARD_BOOTLOADER_UPGRADE ${R}etc/init.d/rc.board_bootloader_upgrade
+	# if [ -f $BOARD_BOOTLOADER_UPGRADE ]
+	# then
+	# 	sh $BOARD_BOOTLOADER_UPGRADE
+	# fi
+	# unset BOARD_BOOTLOADER_UPGRADE
 
 #
 # End of autostart.

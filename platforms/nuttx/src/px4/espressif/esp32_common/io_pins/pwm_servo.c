@@ -160,6 +160,7 @@ void up_pwm_update(unsigned channels_mask)
 	*(volatile uint32_t *)(LEDC_LSCH2_CONF0_REG) |= LEDC_PARA_UP_LSCH2;
 	*(volatile uint32_t *)(LEDC_LSCH3_CONF0_REG) |= LEDC_PARA_UP_LSCH3;
 
+	//printf("%d %d %d %d\n",get_real_duty(0),get_real_duty(1),get_real_duty(2),get_real_duty(3));
 }
 
 uint32_t up_pwm_servo_get_rate_group(unsigned group)
