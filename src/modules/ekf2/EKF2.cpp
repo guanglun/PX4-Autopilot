@@ -251,7 +251,7 @@ int EKF2::print_status()
 	return 0;
 }
 
-void EKF2::Run()
+void __attribute__ ((section(".iram1"))) EKF2::Run()
 {
 	if (should_exit()) {
 		_sensor_combined_sub.unregisterCallback();
