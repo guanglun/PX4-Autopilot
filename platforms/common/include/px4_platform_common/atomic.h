@@ -164,7 +164,7 @@ public:
 	 * Atomic AND with a number
 	 * @return value prior to the operation
 	 */
-	inline T fetch_and(T num)
+	inline T __attribute__ ((section(".iram1"))) fetch_and(T num)
 	{
 #if defined(__PX4_NUTTX)
 

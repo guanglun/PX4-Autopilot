@@ -35,7 +35,7 @@
 
 using namespace time_literals;
 
-static constexpr int16_t combine(uint8_t msb, uint8_t lsb)
+static constexpr int16_t __attribute__ ((section(".iram1"))) combine(uint8_t msb, uint8_t lsb)
 {
 	return (msb << 8u) | lsb;
 }
@@ -519,7 +519,7 @@ void ICM20602::RegisterSetAndClearBits(Register reg, uint8_t setbits, uint8_t cl
 	}
 }
 
-uint16_t ICM20602::FIFOReadCount()
+uint16_t __attribute__ ((section(".iram1"))) ICM20602::FIFOReadCount()
 {
 	// read FIFO count
 	uint8_t fifo_count_buf[3] {};

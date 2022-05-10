@@ -377,7 +377,7 @@ public:
 		delete[] buf;
 	}
 
-	Matrix<Type, N, M> transpose() const
+	Matrix<Type, N, M> __attribute__ ((section(".iram1"))) transpose() const
 	{
 		Matrix<Type, N, M> res;
 		const Matrix<Type, M, N> &self = *this;

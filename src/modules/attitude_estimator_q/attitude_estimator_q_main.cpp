@@ -188,7 +188,7 @@ AttitudeEstimatorQ::init()
 	return true;
 }
 
-void
+void __attribute__ ((section(".iram1")))
 AttitudeEstimatorQ::Run()
 {
 	if (should_exit()) {

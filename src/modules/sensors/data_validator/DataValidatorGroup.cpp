@@ -137,7 +137,7 @@ void DataValidatorGroup::put(unsigned index, uint64_t timestamp, const float val
 	}
 }
 
-float *DataValidatorGroup::get_best(uint64_t timestamp, int *index)
+float * DataValidatorGroup::get_best(uint64_t timestamp, int *index)
 {
 
 	DataValidator *next = _first;

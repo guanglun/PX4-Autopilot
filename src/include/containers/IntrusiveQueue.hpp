@@ -56,7 +56,7 @@ public:
 		return sz;
 	}
 
-	void push(T newNode)
+	void __attribute__ ((section(".iram1"))) push(T newNode)
 	{
 		// error, node already queued or already inserted
 		if ((newNode->next_intrusive_queue_node() != nullptr) || (newNode == _tail)) {

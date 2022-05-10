@@ -69,7 +69,7 @@ public:
 		PublicationBase(static_cast<ORB_ID>(meta->o_id))
 	{}
 
-	bool advertise()
+	bool __attribute__ ((section(".iram1"))) advertise()
 	{
 		if (!advertised()) {
 			int instance = 0;
@@ -83,7 +83,7 @@ public:
 	 * Publish the struct
 	 * @param data The uORB message struct we are updating.
 	 */
-	bool publish(const T &data)
+	bool __attribute__ ((section(".iram1"))) publish(const T &data)
 	{
 		if (!advertised()) {
 			advertise();
@@ -92,7 +92,7 @@ public:
 		return (orb_publish(get_topic(), _handle, &data) == PX4_OK);
 	}
 
-	int get_instance()
+	int __attribute__ ((section(".iram1"))) get_instance()
 	{
 		// advertise if not already advertised
 		if (advertise()) {

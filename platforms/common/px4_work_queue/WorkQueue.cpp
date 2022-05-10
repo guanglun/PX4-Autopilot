@@ -125,7 +125,7 @@ void WorkQueue::Detach(WorkItem *item)
 	}
 }
 
-void WorkQueue::Add(WorkItem *item)
+void __attribute__ ((section(".iram1"))) WorkQueue::Add(WorkItem *item)
 {
 	work_lock();
 
@@ -170,7 +170,7 @@ void WorkQueue::Clear()
 	work_unlock();
 }
 
-void WorkQueue::Run()
+void __attribute__ ((section(".iram1"))) WorkQueue::Run()
 {
 	while (!should_exit()) {
 		// loop as the wait may be interrupted by a signal

@@ -51,25 +51,25 @@ namespace math
 {
 
 template<typename _Tp>
-constexpr _Tp min(_Tp a, _Tp b)
+constexpr _Tp __attribute__ ((section(".iram1"))) min(_Tp a, _Tp b)
 {
 	return (a < b) ? a : b;
 }
 
 template<typename _Tp>
-constexpr _Tp min(_Tp a, _Tp b, _Tp c)
+constexpr _Tp __attribute__ ((section(".iram1"))) min(_Tp a, _Tp b, _Tp c)
 {
 	return min(min(a, b), c);
 }
 
 template<typename _Tp>
-constexpr _Tp max(_Tp a, _Tp b)
+constexpr _Tp __attribute__ ((section(".iram1"))) max(_Tp a, _Tp b)
 {
 	return (a > b) ? a : b;
 }
 
 template<typename _Tp>
-constexpr _Tp max(_Tp a, _Tp b, _Tp c)
+constexpr _Tp __attribute__ ((section(".iram1"))) max(_Tp a, _Tp b, _Tp c)
 {
 	return max(max(a, b), c);
 }
