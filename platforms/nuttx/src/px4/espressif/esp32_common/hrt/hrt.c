@@ -282,6 +282,9 @@ hrt_tim_isr(int irq, void *context, void *arg)
 	ESP32_TIM_ACKINT(tim);
         ESP32_TIM_SETALRM(tim, true);			//enable alarm
 
+// (*(volatile uint32_t *)(0x3FF4400C) = (1<<14));//LOW
+// (*(volatile uint32_t *)(0x3FF44008) = (1<<14));//HIGH
+
 // (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	return OK;
 }
