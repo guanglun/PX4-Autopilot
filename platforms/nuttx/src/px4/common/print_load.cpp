@@ -127,6 +127,13 @@ static constexpr const char *tstate_name(const tstate_t s)
 		return "w:pgf";
 #endif
 
+#ifdef CONFIG_SMP
+
+	case TSTATE_TASK_ASSIGNED:
+		return "ASSIG";
+#endif
+
+
 	default:
 		return "ERROR";
 	}
@@ -235,11 +242,17 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 		sched_unlock();
 
 		switch (tcb_task_state) {
+
 		case TSTATE_TASK_PENDING:
 		case TSTATE_TASK_READYTORUN:
 		case TSTATE_TASK_RUNNING:
 			print_state->running_count++;
 			break;
+
+#ifdef CONFIG_SMP
+		case TSTATE_TASK_ASSIGNED:
+			break;
+#endif
 
 #ifndef CONFIG_DISABLE_SIGNALS
 

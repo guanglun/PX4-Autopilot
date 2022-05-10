@@ -571,7 +571,7 @@ else
 	# fi
 	# unset BOARD_BOOTLOADER_UPGRADE
 
-	top
+	# top
 #
 # End of autostart.
 #
