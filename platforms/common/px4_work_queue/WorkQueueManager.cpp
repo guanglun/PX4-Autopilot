@@ -227,6 +227,11 @@ const wq_config_t &ins_instance_to_wq(uint8_t instance)
 static void *
 WorkQueueRunner(void *context)
 {
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(0, &cpuset);
+	sched_setaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
+
 	wq_config_t *config = static_cast<wq_config_t *>(context);
 	WorkQueue wq(*config);
 
@@ -255,6 +260,8 @@ WorkQueueRunner(int argc, char *argv[])
 static int
 WorkQueueManagerRun(int, char **)
 {
+
+
 	_wq_manager_wqs_list = new BlockingList<WorkQueue *>();
 	_wq_manager_create_queue = new BlockingQueue<const wq_config_t *, 1>();
 
@@ -339,7 +346,6 @@ WorkQueueManagerRun(int, char **)
 			if (ret_destroy != 0) {
 				PX4_ERR("failed to destroy thread attributes for %s (%i)", wq->name, ret_create);
 			}
-
 #else
 			// create thread
 

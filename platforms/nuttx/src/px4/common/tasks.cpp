@@ -76,6 +76,10 @@ int px4_task_spawn_cmd(const char *name, int scheduler, int priority, int stack_
 #endif
 
 	if (pid > 0) {
+		cpu_set_t cpuset;
+		CPU_ZERO(&cpuset);
+		CPU_SET(1, &cpuset);
+		sched_setaffinity(pid, sizeof(cpu_set_t), &cpuset);
 		/* configure the scheduler */
 		struct sched_param param = { .sched_priority = priority };
 		sched_setscheduler(pid, scheduler, &param);

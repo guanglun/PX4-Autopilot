@@ -84,7 +84,7 @@ void cpuload_initialize_once()
 		task.valid = false;
 	}
 
-	int static_tasks_count = 2;	// there are at least 2 threads that should be initialized statically - "idle" and "init"
+	int static_tasks_count = 3;	// there are at least 2 threads that should be initialized statically - "idle" and "init"
 
 #ifdef CONFIG_PAGING
 	static_tasks_count++;	// include paging thread in initialization
@@ -106,6 +106,11 @@ void cpuload_initialize_once()
 	}
 
 	system_load.initialized = true;
+
+	esp32_gpiowrite(14, true);
+	px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
+
+
 }
 
 void px4_sched_note_start(FAR struct tcb_s *tcb)
@@ -143,53 +148,53 @@ void px4_sched_note_stop(FAR struct tcb_s *tcb)
 	}
 }
 
-// void sched_note_suspend(FAR struct tcb_s *tcb)
-// {
-// 	if (system_load.initialized) {
-// 		if (tcb->pid == 0) {
-// 			system_load.tasks[0].total_runtime += hrt_elapsed_time(&system_load.tasks[0].curr_start_time);
-// 			return;
+void px4_sched_note_suspend(FAR struct tcb_s *tcb)
+{
+	if (system_load.initialized) {
+		if (tcb->pid == 0) {
+			system_load.tasks[0].total_runtime += hrt_elapsed_time(&system_load.tasks[0].curr_start_time);
+			return;
 
-// 		} else {
-// 			if (cpuload_monitor_all_count.load() == 0) {
-// 				return;
-// 			}
-// 		}
+		} else {
+			if (cpuload_monitor_all_count.load() == 0) {
+				return;
+			}
+		}
 
-// 		for (auto &task : system_load.tasks) {
-// 			// Task ending its current scheduling run
-// 			if (task.valid && (task.curr_start_time > 0)
-// 			    && task.tcb && task.tcb->pid == tcb->pid) {
+		for (auto &task : system_load.tasks) {
+			// Task ending its current scheduling run
+			if (task.valid && (task.curr_start_time > 0)
+			    && task.tcb && task.tcb->pid == tcb->pid) {
+				task.total_runtime += hrt_elapsed_time(&task.curr_start_time);
+				break;
+			}
+		}
+	}
 
-// 				task.total_runtime += hrt_elapsed_time(&task.curr_start_time);
-// 				break;
-// 			}
-// 		}
-// 	}
-// }
+}
 
-// void sched_note_resume(FAR struct tcb_s *tcb)
-// {
-// 	if (system_load.initialized) {
-// 		if (tcb->pid == 0) {
-// 			hrt_store_absolute_time(&system_load.tasks[0].curr_start_time);
-// 			return;
+void px4_sched_note_resume(FAR struct tcb_s *tcb)
+{
+	if (system_load.initialized) {
+		if (tcb->pid == 0) {
+			hrt_store_absolute_time(&system_load.tasks[0].curr_start_time);
+			return;
 
-// 		} else {
-// 			if (cpuload_monitor_all_count.load() == 0) {
-// 				return;
-// 			}
-// 		}
+		} else {
+			if (cpuload_monitor_all_count.load() == 0) {
+				return;
+			}
+		}
 
-// 		for (auto &task : system_load.tasks) {
-// 			if (task.valid && task.tcb && task.tcb->pid == tcb->pid) {
-// 				// curr_start_time is accessed from an IRQ handler (in logger), so we need
-// 				// to make the update atomic
-// 				hrt_store_absolute_time(&task.curr_start_time);
-// 				break;
-// 			}
-// 		}
-// 	}
-// }
+		for (auto &task : system_load.tasks) {
+			if (task.valid && task.tcb && task.tcb->pid == tcb->pid) {
+				// curr_start_time is accessed from an IRQ handler (in logger), so we need
+				// to make the update atomic
+				hrt_store_absolute_time(&task.curr_start_time);
+				break;
+			}
+		}
+	}
+}
 __END_DECLS
 #endif // PX4_NUTTX && CONFIG_SCHED_INSTRUMENTATION

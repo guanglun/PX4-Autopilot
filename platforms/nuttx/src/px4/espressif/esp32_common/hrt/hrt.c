@@ -282,8 +282,7 @@ hrt_tim_isr(int irq, void *context, void *arg)
 	ESP32_TIM_ACKINT(tim);
         ESP32_TIM_SETALRM(tim, true);			//enable alarm
 
-// (*(volatile uint32_t *)(0x3FF4400C) = (1<<14));//LOW
-// (*(volatile uint32_t *)(0x3FF44008) = (1<<14));//HIGH
+
 
 // (*(volatile uint32_t *)(0x3FF44008) = (1<<4));//HIGH
 	return OK;
@@ -297,46 +296,13 @@ hrt_abstime IRAM_ATTR
 hrt_absolute_time(void)
 {
 	hrt_abstime	abstime;
-	//uint32_t	count;
-	irqstate_t	flags;
 
-	/*
-	 * Counter state.  Marked volatile as they may change
-	 * inside this routine but outside the irqsave/restore
-	 * pair.  Discourage the compiler from moving loads/stores
-	 * to these outside of the protected range.
-	 */
-	//static volatile hrt_abstime base_time;
-	//static volatile uint32_t last_count;
-
-	/* prevent re-entry */
-	flags = px4_enter_critical_section();
+	//irqstate_t flags = px4_enter_critical_section();
 
 	rUPDATE = 1;
 	abstime = (hrt_abstime)(((uint64_t)rHI << 32) | (uint64_t)rLO);
 
-	/* get the current counter value */
-	// rUPDATE = 1;
-	// count = rLO;
-
-	/*
-	 * Determine whether the counter has wrapped since the
-	 * last time we're called.
-	 *
-	 * This simple test is sufficient due to the guarantee that
-	 * we are always called at least once per counter period.
-	 */
-	// if (count < last_count) {
-	// 	base_time += HRT_COUNTER_PERIOD;
-	// }
-
-	// /* save the count for next time */
-	// last_count = count;
-
-	// /* compute the current time */
-	// abstime = HRT_COUNTER_SCALE(base_time + count);
-
-	px4_leave_critical_section(flags);
+	//px4_leave_critical_section(flags);
 
 	return abstime;
 }
@@ -344,12 +310,12 @@ hrt_absolute_time(void)
 /**
  * Store the absolute time in an interrupt-safe fashion
  */
-void
+void IRAM_ATTR
 hrt_store_absolute_time(volatile hrt_abstime *t)
 {
-	irqstate_t flags = px4_enter_critical_section();
+	//irqstate_t flags = px4_enter_critical_section();
 	*t = hrt_absolute_time();
-	px4_leave_critical_section(flags);
+	//px4_leave_critical_section(flags);
 }
 
 /**

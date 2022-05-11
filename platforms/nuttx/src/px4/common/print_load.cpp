@@ -166,7 +166,7 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 		print_state->interval_time_us = print_state->new_time - print_state->interval_start_time;
 
 		/* header for task list */
-		snprintf(buffer, buffer_length, "%4s %-*s %8s %6s %11s %10s %-5s %2s",
+		snprintf(buffer, buffer_length, "%4s %-*s %8s %6s %11s %10s %-5s %2s %5s",
 			 "PID",
 			 CONFIG_TASK_NAME_SIZE, "COMMAND",
 			 "CPU(ms)",
@@ -178,7 +178,8 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 #else
 			 "STATE",
 #endif
-			 "FD"
+			 "FD",
+			 "CPUID"
 			);
 
 		cb(user);
@@ -199,6 +200,7 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 		}
 
 		unsigned tcb_pid = system_load.tasks[i].tcb->pid;
+		unsigned int cpu = system_load.tasks[i].tcb->cpu;
 		size_t stack_size = system_load.tasks[i].tcb->adj_stack_size;
 		ssize_t stack_free = 0;
 		char tcb_name[CONFIG_TASK_NAME_SIZE + 1];
@@ -317,12 +319,15 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 #endif
 #if CONFIG_RR_INTERVAL > 0
 		/* print scheduling info with RR time slice */
-		snprintf(buffer + print_len, buffer_length - print_len, " %5d %2d", tcb_timeslice, tcb_num_used_fds);
+		print_len += snprintf(buffer + print_len, buffer_length - print_len, " %5d %2d", tcb_timeslice, tcb_num_used_fds);
 		(void)tstate_name(TSTATE_TASK_INVALID); // Stop not used warning
 #else
 		// print task state instead
-		snprintf(buffer + print_len, buffer_length - print_len, " %-5s %2d", tstate_name(tcb_task_state), tcb_num_used_fds);
+		print_len += snprintf(buffer + print_len, buffer_length - print_len, " %-5s %2d", tstate_name(tcb_task_state), tcb_num_used_fds);
 #endif
+
+		snprintf(buffer + print_len, buffer_length - print_len, " %5d", cpu);
+
 		cb(user);
 	}
 

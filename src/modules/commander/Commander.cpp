@@ -1742,7 +1742,7 @@ void Commander::executeActionRequest(const action_request_s &action_request)
 				mavlink_log_info(&_mavlink_log_pub, kill_switch_string);
 
 			} else {
-				mavlink_log_critical(&_mavlink_log_pub, kill_switch_string);
+				//mavlink_log_critical(&_mavlink_log_pub, kill_switch_string);
 				log_levels.external = events::Log::Critical;
 			}
 
