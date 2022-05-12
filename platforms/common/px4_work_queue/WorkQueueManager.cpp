@@ -227,10 +227,7 @@ const wq_config_t &ins_instance_to_wq(uint8_t instance)
 static void *
 WorkQueueRunner(void *context)
 {
-	cpu_set_t cpuset;
-	CPU_ZERO(&cpuset);
-	CPU_SET(0, &cpuset);
-	sched_setaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
+
 
 	wq_config_t *config = static_cast<wq_config_t *>(context);
 	WorkQueue wq(*config);
@@ -260,8 +257,6 @@ WorkQueueRunner(int argc, char *argv[])
 static int
 WorkQueueManagerRun(int, char **)
 {
-
-
 	_wq_manager_wqs_list = new BlockingList<WorkQueue *>();
 	_wq_manager_create_queue = new BlockingQueue<const wq_config_t *, 1>();
 
@@ -332,6 +327,11 @@ WorkQueueManagerRun(int, char **)
 			// create thread
 			pthread_t thread;
 			int ret_create = pthread_create(&thread, &attr, WorkQueueRunner, (void *)wq);
+
+			cpu_set_t cpuset;
+			CPU_ZERO(&cpuset);
+			CPU_SET(1, &cpuset);
+			pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
 
 			if (ret_create == 0) {
 				PX4_DEBUG("starting: %s, priority: %d, stack: %zu bytes", wq->name, param.sched_priority, stacksize);

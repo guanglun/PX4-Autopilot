@@ -172,6 +172,11 @@ void WorkQueue::Clear()
 
 void __attribute__ ((section(".iram1"))) WorkQueue::Run()
 {
+	// cpu_set_t cpuset;
+	// CPU_ZERO(&cpuset);
+	// CPU_SET(1, &cpuset);
+	// sched_setaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
+
 	while (!should_exit()) {
 		// loop as the wait may be interrupted by a signal
 		do {} while (px4_sem_wait(&_process_lock) != 0);

@@ -340,10 +340,10 @@ protected:
 	// *INDENT-OFF* remove once there's astyle >3.1 in CI
 	void Run() final
 	{
-		cpu_set_t cpuset;
-		CPU_ZERO(&cpuset);
-		CPU_SET(0, &cpuset);
-		sched_setaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
+		// cpu_set_t cpuset;
+		// CPU_ZERO(&cpuset);
+		// CPU_SET(0, &cpuset);
+		// sched_setaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
 		static_cast<T *>(this)->RunImpl();
 
 		if (should_exit()) {
