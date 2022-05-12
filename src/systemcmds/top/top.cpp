@@ -64,7 +64,7 @@ extern "C" __EXPORT int top_main(int argc, char *argv[])
 {
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
-	CPU_SET(0, &cpuset);
+	CPU_SET(1, &cpuset);
 	sched_setaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
 
 	print_load_s load{};

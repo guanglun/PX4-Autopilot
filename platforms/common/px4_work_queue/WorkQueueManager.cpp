@@ -281,7 +281,7 @@ WorkQueueManagerRun(int, char **)
 #endif
 
 			// priority
-			int sched_priority = sched_get_priority_max(SCHED_FIFO) + wq->relative_priority;
+			int sched_priority = sched_get_priority_max(SCHED_FIFO) + wq->relative_priority - 1;
 
 			// use pthreads for NuttX flat and posix builds. For NuttX protected build, use tasks or kernel threads
 #if !defined(__PX4_NUTTX) || defined(CONFIG_BUILD_FLAT)
@@ -328,13 +328,13 @@ WorkQueueManagerRun(int, char **)
 			pthread_t thread;
 			int ret_create = pthread_create(&thread, &attr, WorkQueueRunner, (void *)wq);
 
-			cpu_set_t cpuset;
-			CPU_ZERO(&cpuset);
-			CPU_SET(1, &cpuset);
-			pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
+			// cpu_set_t cpuset;
+			// CPU_ZERO(&cpuset);
+			// CPU_SET(0, &cpuset);
+			// pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
 
 			if (ret_create == 0) {
-				PX4_DEBUG("starting: %s, priority: %d, stack: %zu bytes", wq->name, param.sched_priority, stacksize);
+				PX4_INFO("starting: %s, priority: %d, stack: %zu bytes", wq->name, param.sched_priority, stacksize);
 
 			} else {
 				PX4_ERR("failed to create thread for %s (%i): %s", wq->name, ret_create, strerror(ret_create));
@@ -384,7 +384,7 @@ WorkQueueManagerStart()
 
 		int task_id = px4_task_spawn_cmd("wq:manager",
 						 SCHED_DEFAULT,
-						 SCHED_PRIORITY_MAX,
+						 SCHED_PRIORITY_MAX-1,
 						 PX4_STACK_ADJUSTED(2048),
 						 (px4_main_t)&WorkQueueManagerRun,
 						 nullptr);
