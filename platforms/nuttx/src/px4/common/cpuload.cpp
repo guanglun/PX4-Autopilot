@@ -80,121 +80,120 @@ void cpuload_monitor_stop()
 
 void cpuload_initialize_once()
 {
-	for (auto &task : system_load.tasks) {
-		task.valid = false;
-	}
+// 	for (auto &task : system_load.tasks) {
+// 		task.valid = false;
+// 	}
 
-	int static_tasks_count = 3;	// there are at least 2 threads that should be initialized statically - "idle" and "init"
+// 	int static_tasks_count = 3;	// there are at least 2 threads that should be initialized statically - "idle" and "init"
 
-#ifdef CONFIG_PAGING
-	static_tasks_count++;	// include paging thread in initialization
-#endif /* CONFIG_PAGING */
-#if CONFIG_SCHED_WORKQUEUE
-	static_tasks_count++;	// include high priority work0 thread in initialization
-#endif /* CONFIG_SCHED_WORKQUEUE */
-#if CONFIG_SCHED_LPWORK
-	static_tasks_count++;	// include low priority work1 thread in initialization
-#endif /* CONFIG_SCHED_WORKQUEUE */
+// #ifdef CONFIG_PAGING
+// 	static_tasks_count++;	// include paging thread in initialization
+// #endif /* CONFIG_PAGING */
+// #if CONFIG_SCHED_WORKQUEUE
+// 	static_tasks_count++;	// include high priority work0 thread in initialization
+// #endif /* CONFIG_SCHED_WORKQUEUE */
+// #if CONFIG_SCHED_LPWORK
+// 	static_tasks_count++;	// include low priority work1 thread in initialization
+// #endif /* CONFIG_SCHED_WORKQUEUE */
 
-	// perform static initialization of "system" threads
-	for (system_load.total_count = 0; system_load.total_count < static_tasks_count; system_load.total_count++) {
-		system_load.tasks[system_load.total_count].total_runtime = 0;
-		system_load.tasks[system_load.total_count].curr_start_time = 0;
-		system_load.tasks[system_load.total_count].tcb = nxsched_get_tcb(
-					system_load.total_count);	// it is assumed that these static threads have consecutive PIDs
-		system_load.tasks[system_load.total_count].valid = true;
-	}
+// 	// perform static initialization of "system" threads
+// 	for (system_load.total_count = 0; system_load.total_count < static_tasks_count; system_load.total_count++) {
+// 		system_load.tasks[system_load.total_count].total_runtime = 0;
+// 		system_load.tasks[system_load.total_count].curr_start_time = 0;
+// 		system_load.tasks[system_load.total_count].tcb = nxsched_get_tcb(
+// 					system_load.total_count);	// it is assumed that these static threads have consecutive PIDs
+// 		system_load.tasks[system_load.total_count].valid = true;
+// 	}
 
-	system_load.initialized = true;
+// 	system_load.initialized = true;
 
-	esp32_gpiowrite(14, true);
-	px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
+
 
 
 }
 
 void px4_sched_note_start(FAR struct tcb_s *tcb)
 {
-	// find first free slot
-	if (system_load.initialized) {
-		for (auto &task : system_load.tasks) {
-			if (!task.valid) {
-				// slot is available
-				task.total_runtime = 0;
-				task.curr_start_time = 0;
-				task.tcb = tcb;
-				task.valid = true;
-				system_load.total_count++;
-				break;
-			}
-		}
-	}
+	// // find first free slot
+	// if (system_load.initialized) {
+	// 	for (auto &task : system_load.tasks) {
+	// 		if (!task.valid) {
+	// 			// slot is available
+	// 			task.total_runtime = 0;
+	// 			task.curr_start_time = 0;
+	// 			task.tcb = tcb;
+	// 			task.valid = true;
+	// 			system_load.total_count++;
+	// 			break;
+	// 		}
+	// 	}
+	// }
 }
 
 void px4_sched_note_stop(FAR struct tcb_s *tcb)
 {
-	if (system_load.initialized) {
-		for (auto &task : system_load.tasks) {
-			if (task.tcb && task.tcb->pid == tcb->pid) {
-				// mark slot as free
-				task.valid = false;
-				task.total_runtime = 0;
-				task.curr_start_time = 0;
-				task.tcb = nullptr;
-				system_load.total_count--;
-				break;
-			}
-		}
-	}
+	// if (system_load.initialized) {
+	// 	for (auto &task : system_load.tasks) {
+	// 		if (task.tcb && task.tcb->pid == tcb->pid) {
+	// 			// mark slot as free
+	// 			task.valid = false;
+	// 			task.total_runtime = 0;
+	// 			task.curr_start_time = 0;
+	// 			task.tcb = nullptr;
+	// 			system_load.total_count--;
+	// 			break;
+	// 		}
+	// 	}
+	// }
 }
 
 void px4_sched_note_suspend(FAR struct tcb_s *tcb)
 {
-	if (system_load.initialized) {
-		if (tcb->pid == 0) {
-			system_load.tasks[0].total_runtime += hrt_elapsed_time(&system_load.tasks[0].curr_start_time);
-			return;
+	// if (system_load.initialized) {
+	// 	if (tcb->pid == 0) {
+	// 		system_load.tasks[0].total_runtime += hrt_elapsed_time(&system_load.tasks[0].curr_start_time);
+	// 		return;
 
-		} else {
-			if (cpuload_monitor_all_count.load() == 0) {
-				return;
-			}
-		}
+	// 	} else {
+	// 		if (cpuload_monitor_all_count.load() == 0) {
+	// 			return;
+	// 		}
+	// 	}
 
-		for (auto &task : system_load.tasks) {
-			// Task ending its current scheduling run
-			if (task.valid && (task.curr_start_time > 0)
-			    && task.tcb && task.tcb->pid == tcb->pid) {
-				task.total_runtime += hrt_elapsed_time(&task.curr_start_time);
-				break;
-			}
-		}
-	}
+	// 	for (auto &task : system_load.tasks) {
+	// 		// Task ending its current scheduling run
+	// 		if (task.valid && (task.curr_start_time > 0)
+	// 		    && task.tcb && task.tcb->pid == tcb->pid) {
+	// 			task.total_runtime += hrt_elapsed_time(&task.curr_start_time);
+	// 			break;
+	// 		}
+	// 	}
+	// }
 
 }
 
 void px4_sched_note_resume(FAR struct tcb_s *tcb)
 {
-	if (system_load.initialized) {
-		if (tcb->pid == 0) {
-			hrt_store_absolute_time(&system_load.tasks[0].curr_start_time);
-			return;
+	// if (system_load.initialized) {
+	// 	if (tcb->pid == 0) {
+	// 		hrt_store_absolute_time(&system_load.tasks[0].curr_start_time);
+	// 		return;
 
-		} else {
-			if (cpuload_monitor_all_count.load() == 0) {
-				return;
-			}
-		}
+	// 	} else {
+	// 		if (cpuload_monitor_all_count.load() == 0) {
+	// 			return;
+	// 		}
+	// 	}
 
-		for (auto &task : system_load.tasks) {
-			if (task.valid && task.tcb && task.tcb->pid == tcb->pid) {
-				// curr_start_time is accessed from an IRQ handler (in logger), so we need
-				// to make the update atomic
-				hrt_store_absolute_time(&task.curr_start_time);
-				break;
-			}
-		}
-	}
+	// 	for (auto &task : system_load.tasks) {
+	// 		if (task.valid && task.tcb && task.tcb->pid == tcb->pid) {
+	// 			// curr_start_time is accessed from an IRQ handler (in logger), so we need
+	// 			// to make the update atomic
+	// 			hrt_store_absolute_time(&task.curr_start_time);
+	// 			break;
+	// 		}
+	// 	}
+	// }
 }
 __END_DECLS
 #endif // PX4_NUTTX && CONFIG_SCHED_INSTRUMENTATION

@@ -297,12 +297,12 @@ hrt_absolute_time(void)
 {
 	hrt_abstime	abstime;
 
-	//irqstate_t flags = px4_enter_critical_section();
+	irqstate_t flags = px4_enter_critical_section();
 
 	rUPDATE = 1;
 	abstime = (hrt_abstime)(((uint64_t)rHI << 32) | (uint64_t)rLO);
 
-	//px4_leave_critical_section(flags);
+	px4_leave_critical_section(flags);
 
 	return abstime;
 }
@@ -313,9 +313,9 @@ hrt_absolute_time(void)
 void IRAM_ATTR
 hrt_store_absolute_time(volatile hrt_abstime *t)
 {
-	//irqstate_t flags = px4_enter_critical_section();
+	irqstate_t flags = px4_enter_critical_section();
 	*t = hrt_absolute_time();
-	//px4_leave_critical_section(flags);
+	px4_leave_critical_section(flags);
 }
 
 /**

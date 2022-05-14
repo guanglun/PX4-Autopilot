@@ -172,6 +172,9 @@ else
 	# param set EKF2_MULTI_IMU 0
 	# param set SENS_IMU_MODE 1
 	# param set-default EKF2_PREDICT_US 20000
+
+	param set IMU_GYRO_RATEMAX 800
+
 	icm20602 -s -R 2 start
 	ist8310 -I -R 0 start
 	ms5611 -I start

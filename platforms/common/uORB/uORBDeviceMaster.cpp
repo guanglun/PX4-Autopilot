@@ -51,6 +51,7 @@
 
 uORB::DeviceMaster::DeviceMaster()
 {
+
 	px4_sem_init(&_lock, 0, 1);
 }
 
