@@ -177,11 +177,11 @@ else
 
 	icm20602 -s -R 2 start
 	ist8310 -I -R 0 start
-	ms5611 -I start
+	# ms5611 -I start
 
-	# sensors start
-	# commander start
-	# ekf2 start
+	sensors start
+	commander start
+	ekf2 start
 	# gyro_calibration start
 	# navigator start
 	# mavlink start -d /dev/ttyS0 -b 57600

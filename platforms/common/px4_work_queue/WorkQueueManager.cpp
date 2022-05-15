@@ -324,6 +324,17 @@ WorkQueueManagerRun(int, char **)
 				PX4_ERR("setting sched params for %s failed (%i)", wq->name, ret_setschedparam);
 			}
 
+			cpu_set_t cpuset;
+			CPU_ZERO(&cpuset);
+			CPU_SET(wq->cpu, &cpuset);
+			int ret_setaffinity = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
+
+			if (ret_setaffinity != 0) {
+				PX4_ERR("setting affinity for %s failed (%i)", wq->name, ret_setaffinity);
+			}else{
+				PX4_INFO("setting %s to cpu %d", wq->name, wq->cpu);
+			}
+
 			// create thread
 			pthread_t thread;
 			int ret_create = pthread_create(&thread, &attr, WorkQueueRunner, (void *)wq);
@@ -385,7 +396,7 @@ WorkQueueManagerStart()
 		int task_id = px4_task_spawn_cmd("wq:manager",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX-1,
-						 PX4_STACK_ADJUSTED(2048),
+						 PX4_STACK_ADJUSTED(4096),
 						 (px4_main_t)&WorkQueueManagerRun,
 						 nullptr);
 
