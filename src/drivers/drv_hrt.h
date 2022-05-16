@@ -130,7 +130,7 @@ typedef struct latency_boardctl {
  * Get absolute time in [us] (does not wrap).
  */
 __EXPORT extern hrt_abstime hrt_absolute_time(void);
-
+__EXPORT extern hrt_abstime hrt_absolute_time_(void);
 /**
  * Convert a timespec to absolute time.
  */
@@ -165,13 +165,18 @@ static inline hrt_abstime hrt_elapsed_time(const hrt_abstime *then)
 	return hrt_absolute_time() - *then;
 }
 
+static inline hrt_abstime hrt_elapsed_time_(const hrt_abstime *then)
+{
+	return hrt_absolute_time_() - *then;
+}
+
 /**
  * Store the absolute time in an interrupt-safe fashion.
  *
  * This function ensures that the timestamp cannot be seen half-written by an interrupt handler.
  */
 __EXPORT extern void hrt_store_absolute_time(volatile hrt_abstime *time);
-
+__EXPORT extern void hrt_store_absolute_time_(volatile hrt_abstime *time);
 #ifdef __PX4_QURT
 /**
  * Set a time offset to hrt_absolute_time on the DSP.

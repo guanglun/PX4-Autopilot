@@ -64,8 +64,8 @@
 
 #include <px4_platform_common/log.h>
 
-#include "hardware/esp32_soc.h"
-#include "hardware/esp32_tim.h"
+
+#include "px4_arch/hrt.h"
 
 #ifdef CONFIG_DEBUG_HRT
 #  define hrtinfo _info
@@ -101,45 +101,6 @@ void hrt_usr_call(void *arg)
 #endif
 
 
-
-#ifdef HRT_TIMER
-#define ESP32_HRT_TIMER HRT_TIMER
-#define ESP32_HRT_TIMER_PRESCALER (APB_CLK_FREQ / (1000 * 1000))
-/* HRT configuration */
-#if   HRT_TIMER == 0
-# define HRT_TIMER_BASE		0x3FF5F000
-# if CONFIG_ESP32_TIM1
-#  error must not set CONFIG_ESP32_TIM0=y and HRT_TIMER=0
-# endif
-#elif HRT_TIMER == 1
-# define HRT_TIMER_BASE		0x3FF5F024
-# if CONFIG_ESP32_TIM2
-#  error must not set CONFIG_ESP32_TIM1=y and HRT_TIMER=1
-# endif
-#elif HRT_TIMER == 2
-# define HRT_TIMER_BASE		0x3FF60000
-# if CONFIG_ESP32_TIM2
-#  error must not set CONFIG_ESP32_TIM2=y and HRT_TIMER=2
-# endif
-#elif HRT_TIMER == 3
-# define HRT_TIMER_BASE		0x3FF60024
-# if CONFIG_ESP32_TIM3
-#  error must not set CONFIG_ESP32_TIM3=y and HRT_TIMER=3
-# endif
-#else
-# error HRT_TIMER must be a value between 0 and 3
-#endif
-
-
-
-#define REG(_reg)	(*(volatile uint32_t *)(HRT_TIMER_BASE + _reg))
-
-
-#define rLO 		REG(TIM_LO_OFFSET)
-#define rHI 		REG(TIM_HI_OFFSET)
-#define rUPDATE 	REG(TIM_UPDATE_OFFSET)
-#define rALARMLO 	REG(TIMG_ALARM_LO_OFFSET)
-#define rALARMHI 	REG(TIMG_ALARM_HI_OFFSET)
 
 /**
  * Minimum/maximum deadlines.
@@ -307,6 +268,17 @@ hrt_absolute_time(void)
 	return abstime;
 }
 
+hrt_abstime IRAM_ATTR
+hrt_absolute_time_(void)
+{
+	hrt_abstime	abstime;
+
+	rUPDATE = 1;
+	abstime = (hrt_abstime)(((uint64_t)rHI << 32) | (uint64_t)rLO);
+
+	return abstime;
+}
+
 /**
  * Store the absolute time in an interrupt-safe fashion
  */
@@ -317,6 +289,13 @@ hrt_store_absolute_time(volatile hrt_abstime *t)
 	*t = hrt_absolute_time();
 	px4_leave_critical_section(flags);
 }
+
+void IRAM_ATTR
+hrt_store_absolute_time_(volatile hrt_abstime *t)
+{
+	*t = hrt_absolute_time_();
+}
+
 
 /**
  * Initialise the high-resolution timing module.
@@ -676,5 +655,3 @@ hrt_ioctl(unsigned int cmd, unsigned long arg)
 	return OK;
 }
 #endif
-
-#endif /* HRT_TIMER */

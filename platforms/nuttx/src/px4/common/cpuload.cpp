@@ -78,8 +78,8 @@ void cpuload_monitor_stop()
 	}
 }
 
-void cpuload_initialize_once()
-{
+// void cpuload_initialize_once()
+// {
 // 	for (auto &task : system_load.tasks) {
 // 		task.valid = false;
 // 	}
@@ -107,93 +107,90 @@ void cpuload_initialize_once()
 
 // 	system_load.initialized = true;
 
+// }
 
+// void px4_sched_note_start(FAR struct tcb_s *tcb)
+// {
+// 	// // find first free slot
+// 	if (system_load.initialized) {
+// 		for (auto &task : system_load.tasks) {
+// 			if (!task.valid) {
+// 				// slot is available
+// 				task.total_runtime = 0;
+// 				task.curr_start_time = 0;
+// 				task.tcb = tcb;
+// 				task.valid = true;
+// 				system_load.total_count++;
+// 				break;
+// 			}
+// 		}
+// 	}
+// }
 
+// void px4_sched_note_stop(FAR struct tcb_s *tcb)
+// {
+// 	// if (system_load.initialized) {
+// 	// 	for (auto &task : system_load.tasks) {
+// 	// 		if (task.tcb && task.tcb->pid == tcb->pid) {
+// 	// 			// mark slot as free
+// 	// 			task.valid = false;
+// 	// 			task.total_runtime = 0;
+// 	// 			task.curr_start_time = 0;
+// 	// 			task.tcb = nullptr;
+// 	// 			system_load.total_count--;
+// 	// 			break;
+// 	// 		}
+// 	// 	}
+// 	// }
+// }
 
-}
+// void px4_sched_note_suspend(FAR struct tcb_s *tcb)
+// {
+// 	// if (system_load.initialized) {
+// 	// 	if (tcb->pid == 0) {
+// 	// 		system_load.tasks[0].total_runtime += hrt_elapsed_time(&system_load.tasks[0].curr_start_time);
+// 	// 		return;
 
-void px4_sched_note_start(FAR struct tcb_s *tcb)
-{
-	// // find first free slot
-	// if (system_load.initialized) {
-	// 	for (auto &task : system_load.tasks) {
-	// 		if (!task.valid) {
-	// 			// slot is available
-	// 			task.total_runtime = 0;
-	// 			task.curr_start_time = 0;
-	// 			task.tcb = tcb;
-	// 			task.valid = true;
-	// 			system_load.total_count++;
-	// 			break;
-	// 		}
-	// 	}
-	// }
-}
+// 	// 	} else {
+// 	// 		if (cpuload_monitor_all_count.load() == 0) {
+// 	// 			return;
+// 	// 		}
+// 	// 	}
 
-void px4_sched_note_stop(FAR struct tcb_s *tcb)
-{
-	// if (system_load.initialized) {
-	// 	for (auto &task : system_load.tasks) {
-	// 		if (task.tcb && task.tcb->pid == tcb->pid) {
-	// 			// mark slot as free
-	// 			task.valid = false;
-	// 			task.total_runtime = 0;
-	// 			task.curr_start_time = 0;
-	// 			task.tcb = nullptr;
-	// 			system_load.total_count--;
-	// 			break;
-	// 		}
-	// 	}
-	// }
-}
+// 	// 	for (auto &task : system_load.tasks) {
+// 	// 		// Task ending its current scheduling run
+// 	// 		if (task.valid && (task.curr_start_time > 0)
+// 	// 		    && task.tcb && task.tcb->pid == tcb->pid) {
+// 	// 			task.total_runtime += hrt_elapsed_time(&task.curr_start_time);
+// 	// 			break;
+// 	// 		}
+// 	// 	}
+// 	// }
 
-void px4_sched_note_suspend(FAR struct tcb_s *tcb)
-{
-	// if (system_load.initialized) {
-	// 	if (tcb->pid == 0) {
-	// 		system_load.tasks[0].total_runtime += hrt_elapsed_time(&system_load.tasks[0].curr_start_time);
-	// 		return;
+// }
 
-	// 	} else {
-	// 		if (cpuload_monitor_all_count.load() == 0) {
-	// 			return;
-	// 		}
-	// 	}
+// void px4_sched_note_resume(FAR struct tcb_s *tcb)
+// {
+// 	// if (system_load.initialized) {
+// 	// 	if (tcb->pid == 0) {
+// 	// 		hrt_store_absolute_time(&system_load.tasks[0].curr_start_time);
+// 	// 		return;
 
-	// 	for (auto &task : system_load.tasks) {
-	// 		// Task ending its current scheduling run
-	// 		if (task.valid && (task.curr_start_time > 0)
-	// 		    && task.tcb && task.tcb->pid == tcb->pid) {
-	// 			task.total_runtime += hrt_elapsed_time(&task.curr_start_time);
-	// 			break;
-	// 		}
-	// 	}
-	// }
+// 	// 	} else {
+// 	// 		if (cpuload_monitor_all_count.load() == 0) {
+// 	// 			return;
+// 	// 		}
+// 	// 	}
 
-}
-
-void px4_sched_note_resume(FAR struct tcb_s *tcb)
-{
-	// if (system_load.initialized) {
-	// 	if (tcb->pid == 0) {
-	// 		hrt_store_absolute_time(&system_load.tasks[0].curr_start_time);
-	// 		return;
-
-	// 	} else {
-	// 		if (cpuload_monitor_all_count.load() == 0) {
-	// 			return;
-	// 		}
-	// 	}
-
-	// 	for (auto &task : system_load.tasks) {
-	// 		if (task.valid && task.tcb && task.tcb->pid == tcb->pid) {
-	// 			// curr_start_time is accessed from an IRQ handler (in logger), so we need
-	// 			// to make the update atomic
-	// 			hrt_store_absolute_time(&task.curr_start_time);
-	// 			break;
-	// 		}
-	// 	}
-	// }
-}
+// 	// 	for (auto &task : system_load.tasks) {
+// 	// 		if (task.valid && task.tcb && task.tcb->pid == tcb->pid) {
+// 	// 			// curr_start_time is accessed from an IRQ handler (in logger), so we need
+// 	// 			// to make the update atomic
+// 	// 			hrt_store_absolute_time(&task.curr_start_time);
+// 	// 			break;
+// 	// 		}
+// 	// 	}
+// 	// }
+// }
 __END_DECLS
 #endif // PX4_NUTTX && CONFIG_SCHED_INSTRUMENTATION

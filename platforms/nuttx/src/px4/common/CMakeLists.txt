@@ -41,6 +41,7 @@ if(NOT PX4_BOARD MATCHES "io-v2")
 		cdc_acm_check.cpp
 		console_buffer.cpp
 		cpuload.cpp
+		cpuload2.c
 		gpio.c
 		print_load.cpp
 		tasks.cpp
