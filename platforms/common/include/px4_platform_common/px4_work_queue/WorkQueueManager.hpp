@@ -54,7 +54,7 @@ static constexpr wq_config_t rate_ctrl{"wq:rate_ctrl", 3200, 0, 0}; // PX4 inner
 static constexpr wq_config_t SPI0{"wq:SPI0", 2336, -1, 1};
 static constexpr wq_config_t SPI1{"wq:SPI1", 2336, -2, 1};
 static constexpr wq_config_t SPI2{"wq:SPI2", 2336, -3, 1};
-static constexpr wq_config_t SPI3{"wq:SPI3", 3200, -4, 1};
+static constexpr wq_config_t SPI3{"wq:SPI3", 2336, -4, 1};
 static constexpr wq_config_t SPI4{"wq:SPI4", 2336, -5, 1};
 static constexpr wq_config_t SPI5{"wq:SPI5", 2336, -6, 1};
 static constexpr wq_config_t SPI6{"wq:SPI6", 2336, -7, 1};
