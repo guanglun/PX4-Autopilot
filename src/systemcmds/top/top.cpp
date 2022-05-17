@@ -88,7 +88,10 @@ extern "C" __EXPORT int top_main(int argc, char *argv[])
 	}
 
 	for (;;) {
-		print_load(STDOUT_FILENO, &load);
+		nxsched_get_tcb(1);
+		printf("nxsched_get_tcb\r\n");
+
+		// print_load(STDOUT_FILENO, &load);
 
 		/* Sleep 200 ms waiting for user input five times ~ 1s */
 		for (int k = 0; k < 5; k++) {

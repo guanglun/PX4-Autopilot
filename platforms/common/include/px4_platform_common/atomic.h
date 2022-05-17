@@ -248,6 +248,11 @@ public:
 		}
 	}
 
+	inline bool floatCompare(float f1, float f2) const
+	{
+		return abs(f1 - f2) <= 1.0e-05;
+	}
+
 	/**
 	 * Atomic compare and exchange operation.
 	 * This compares the contents of _value with the contents of *expected. If
@@ -263,7 +268,7 @@ public:
 		if (!__atomic_always_lock_free(sizeof(T), 0)) {
 			irqstate_t flags = enter_critical_section();
 
-			if (_value == *expected) {
+			if (floatCompare(_value,*expected)) {
 				_value = desired;
 				leave_critical_section(flags);
 				return true;

@@ -404,12 +404,14 @@ static void print_load_callback(void *user)
 
 void print_load(int fd, struct print_load_s *print_state)
 {
+	//printf("===================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 	// print system information
 	if (fd == STDOUT_FILENO) {
 		// move cursor home and clear screen
 		dprintf(fd, "\033[H");
+		dprintf(fd, "\033[H");
 	}
-
+	dprintf(fd, "\033[H");
 	print_load_callback_data_s data{};
 	data.fd = fd;
 
