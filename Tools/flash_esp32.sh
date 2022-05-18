@@ -31,5 +31,5 @@ fi
 
 
 if [ $MINICOM = "true" ]; then
-minicom -D ${PORT} -b 115200
+minicom -D ${PORT} -b 921600
 fi
