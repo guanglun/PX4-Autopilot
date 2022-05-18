@@ -638,8 +638,8 @@ FAR void testtest(int pid)
 	      );
 }
 
-// extern FAR struct tcb_s **g_pidhash;
-// extern volatile int g_npidhash;
+extern FAR struct tcb_s **g_pidhash;
+extern volatile int g_npidhash;
 // void nxsched_foreach_(nxsched_foreach_t handler, FAR void *arg)
 // {
 //   int ndx;
@@ -692,12 +692,28 @@ void print_load(int fd, struct print_load_s *print_state)
 	//        intpart, fracpart,
 	//        tcb->name
 	//       );
-	testtest(0);
-	testtest(1);
-	testtest(2);
-	testtest(3);
-	testtest(4);
-	testtest(5);
+	// testtest(0);
+	// testtest(1);
+	// testtest(2);
+	// testtest(3);
+	// testtest(4);
+	// testtest(5);
+
+	int ndx;
+
+	/* Visit each active task */
+
+	for (ndx = 0; ndx < g_npidhash; ndx++)
+	{
+	/* This test and the function call must be atomic */
+
+	if (g_pidhash[ndx])
+		{
+		test2(g_pidhash[ndx], NULL);
+		}
+	}
+
+	// nxsched_foreach_(test2, NULL);
 	// nxsched_foreach(test2, NULL);
 	//print_cpu_load_by_pid(0);
 	// print_cpu_load_by_pid(1);
