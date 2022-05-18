@@ -159,10 +159,10 @@ esp32_board_initialize(void)
 	px4_esp32_configgpio(GPIO_VDD_BRICK_VALID);
 	px4_esp32_configgpio(GPIO_VDD_USB_VALID);
 
-	px4_esp32_configgpio(GPIO_OUTPUT | 12);
-	esp32_gpiowrite(12, false);
-	up_udelay(20);
-	esp32_gpiowrite(12, true);
+	// px4_esp32_configgpio(GPIO_OUTPUT | 12);
+	// esp32_gpiowrite(12, false);
+	// up_udelay(20);
+	// esp32_gpiowrite(12, true);
 
 	esp32_spiinitialize();
 
