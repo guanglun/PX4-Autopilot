@@ -545,7 +545,7 @@ struct print_load_callback_data_s {
 
 void print_cpu_load(struct tcb_s *tcb, void *arg)
 {
-	struct nx_cpuload_s cpuload = {0,0};
+	struct nx_cpuload_s cpuload = {0, 0};
 	uint32_t fracpart;
 	uint32_t intpart;
 	uint32_t tmp;
@@ -575,15 +575,17 @@ void print_cpu_load(struct tcb_s *tcb, void *arg)
 void print_cpu_load_by_pid(int pid)
 {
 	struct tcb_s *tcb = nxsched_get_tcb(pid);
-	print_cpu_load(tcb,NULL);
+	print_cpu_load(tcb, NULL);
 }
 
-static void test2(struct tcb_s *tcb, void *arg)
+
+
+static uint32_t print_cpu_load_tcb(struct tcb_s *tcb, void *arg)
 {
-	struct nx_cpuload_s cpuload = {0,0};
+	struct nx_cpuload_s cpuload = {0, 0};
 	uint32_t fracpart;
 	uint32_t intpart;
-	uint32_t tmp;
+	uint32_t tmp = 0;
 
 	clock_cpuload(tcb->pid, &cpuload);
 
@@ -598,137 +600,60 @@ static void test2(struct tcb_s *tcb, void *arg)
 	}
 
 
-	printf("  %4d   %4d"
-	       "   %3" PRId32 ".%01" PRId32 "%%"
+
+	printf("  %4d   %4d   %4d",
+	       tcb->pid, tcb->sched_priority, tcb->cpu
+	      );
+	printf("   %3" PRId32 ".%01" PRId32 "%%"
 	       "   %s"
 	       "\n",
-	       tcb->pid, tcb->sched_priority,
 	       intpart, fracpart,
 	       tcb->name
 	      );
-}
-FAR void testtest(int pid)
-{
-	struct tcb_s *tcb = nxsched_get_tcb(pid);
-	struct nx_cpuload_s cpuload = {0,0};
-	uint32_t fracpart;
-	uint32_t intpart;
-	uint32_t tmp;
 
-	clock_cpuload(tcb->pid, (nx_cpuload_s *)&cpuload);
-
-	if (cpuload.total > 0) {
-		tmp      = (1000 * cpuload.active) / cpuload.total;
-		intpart  = tmp / 10;
-		fracpart = tmp - 10 * intpart;
-
-	} else {
-		intpart  = 0;
-		fracpart = 0;
+	if(tcb->pid == 0 || tcb->pid == 1)
+	{
+		return tmp;
 	}
 
-
-	printf("  %4d   %4d"
-	       "   %3" PRId32 ".%01" PRId32 "%%"
-	       "   %s"
-	       "\n",
-	       tcb->pid, tcb->sched_priority,
-	       intpart, fracpart,
-	       tcb->name
-	      );
+	return 0;
 }
 
 extern FAR struct tcb_s **g_pidhash;
 extern volatile int g_npidhash;
-// void nxsched_foreach_(nxsched_foreach_t handler, FAR void *arg)
-// {
-//   int ndx;
 
-//   /* Visit each active task */
-
-//   for (ndx = 0; ndx < g_npidhash; ndx++)
-//     {
-//       /* This test and the function call must be atomic */
-
-//       if (g_pidhash[ndx])
-//         {
-//           handler(g_pidhash[ndx], arg);
-//         }
-//     }
-// }
 
 void print_load(int fd, struct print_load_s *print_state)
 {
-	//printf("===================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
 	// print system information
 	if (fd == STDOUT_FILENO) {
 		// move cursor home and clear screen
 		dprintf(fd, "\033[H");
 	}
-	// struct tcb_s *tcb = nxsched_get_tcb(0);
-	// struct nx_cpuload_s cpuload = {0,0};
-	// uint32_t fracpart;
-	// uint32_t intpart;
-	// uint32_t tmp;
-
-	// clock_cpuload(tcb->pid, (nx_cpuload_s *)&cpuload);
-
-	// if (cpuload.total > 0) {
-	// 	tmp      = (1000 * cpuload.active) / cpuload.total;
-	// 	intpart  = tmp / 10;
-	// 	fracpart = tmp - 10 * intpart;
-
-	// } else {
-	// 	intpart  = 0;
-	// 	fracpart = 0;
-	// }
 
 
-	// printf("  %4d   %4d"
-	//        "   %3" PRId32 ".%01" PRId32 "%%"
-	//        "   %s"
-	//        "\n",
-	//        tcb->pid, tcb->sched_priority,
-	//        intpart, fracpart,
-	//        tcb->name
-	//       );
-	// testtest(0);
-	// testtest(1);
-	// testtest(2);
-	// testtest(3);
-	// testtest(4);
-	// testtest(5);
-
+	printf("   PID    PRI   CORE"
+	       "      CPU"
+	       "   COMMAND"
+	       "\n");
 	int ndx;
-
+	irqstate_t flags = enter_critical_section();
 	/* Visit each active task */
 
-	for (ndx = 0; ndx < g_npidhash; ndx++)
-	{
-	/* This test and the function call must be atomic */
+	for (ndx = 0; ndx < g_npidhash; ndx++) {
+		/* This test and the function call must be atomic */
 
-	if (g_pidhash[ndx])
-		{
-		test2(g_pidhash[ndx], NULL);
+		if (g_pidhash[ndx]) {
+			print_cpu_load_tcb(g_pidhash[ndx], NULL);
 		}
 	}
 
-	// nxsched_foreach_(test2, NULL);
-	// nxsched_foreach(test2, NULL);
-	//print_cpu_load_by_pid(0);
-	// print_cpu_load_by_pid(1);
-	// print_cpu_load_by_pid(2);
-	// print_cpu_load_by_pid(3);
-	// print_cpu_load_by_pid(4);
-	// print_cpu_load_by_pid(5);
-	//print_cpu_load();
-	//nxsched_foreach_(print_cpu_load, NULL);
-	//print_load_callback_data_s data{};
-	//data.fd = fd;
+	leave_critical_section(flags);
 
-	//print_load_buffer(data.buffer, sizeof(data.buffer), print_load_callback, &data, print_state);
+	hrt_abstime t = hrt_absolute_time();
+	printf("\n   run: %4llds\n",t/1000000);
 
-	//xtensa_showtasks();
 }
 
 #endif // if CONFIG_SCHED_INSTRUMENTATION
