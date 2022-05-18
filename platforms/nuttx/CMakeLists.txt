@@ -274,10 +274,10 @@ else()
 		-nodefaultlibs
 		-nostdlib
 		-nostdinc++
-		-mlongcalls
+		# -mlongcalls
 		-fno-exceptions
 		-fno-rtti
-		-Wl,--cref
+		# -Wl,--cref
 
 		#-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}script.ld
 		-Wl,-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_out.ld

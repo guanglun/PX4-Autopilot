@@ -88,71 +88,71 @@ void cpuload_initialize_once(void)
 
 void px4_sched_note_start(FAR struct tcb_s *tcb)
 {
-	irqstate_t flags = px4_enter_critical_section();
+	//irqstate_t flags = px4_enter_critical_section();
 
-	if (systemload.initialized) {
-		for (int i=0;i<CONFIG_FS_PROCFS_MAX_TASKS;i++) {
-			if (!systemload.tasks[i].valid) {
-				// slot is available
-				systemload.tasks[i].total_runtime = 0;
-				systemload.tasks[i].curr_start_time = 0;
-				systemload.tasks[i].tcb = tcb;
-				systemload.tasks[i].valid = true;
-				systemload.total_count++;
-				break;
-			}
-		}
-	}
+	// if (systemload.initialized) {
+	// 	for (int i=0;i<CONFIG_FS_PROCFS_MAX_TASKS;i++) {
+	// 		if (!systemload.tasks[i].valid) {
+	// 			// slot is available
+	// 			systemload.tasks[i].total_runtime = 0;
+	// 			systemload.tasks[i].curr_start_time = 0;
+	// 			systemload.tasks[i].tcb = tcb;
+	// 			systemload.tasks[i].valid = true;
+	// 			systemload.total_count++;
+	// 			break;
+	// 		}
+	// 	}
+	// }
 
-	px4_leave_critical_section(flags);
+	//px4_leave_critical_section(flags);
 }
 
 void px4_sched_note_stop(FAR struct tcb_s *tcb)
 {
-	irqstate_t flags = px4_enter_critical_section();
+	//irqstate_t flags = px4_enter_critical_section();
 
-	if (systemload.initialized) {
-		for (int i=0;i<CONFIG_FS_PROCFS_MAX_TASKS;i++) {
-			if (systemload.tasks[i].tcb && systemload.tasks[i].tcb->pid == tcb->pid) {
-				// mark slot as free
-				systemload.tasks[i].valid = false;
-				systemload.tasks[i].total_runtime = 0;
-				systemload.tasks[i].curr_start_time = 0;
-				systemload.tasks[i].tcb = NULL;
-				systemload.total_count--;
-				break;
-			}
-		}
-	}
+	// if (systemload.initialized) {
+	// 	for (int i=0;i<CONFIG_FS_PROCFS_MAX_TASKS;i++) {
+	// 		if (systemload.tasks[i].tcb && systemload.tasks[i].tcb->pid == tcb->pid) {
+	// 			// mark slot as free
+	// 			systemload.tasks[i].valid = false;
+	// 			systemload.tasks[i].total_runtime = 0;
+	// 			systemload.tasks[i].curr_start_time = 0;
+	// 			systemload.tasks[i].tcb = NULL;
+	// 			systemload.total_count--;
+	// 			break;
+	// 		}
+	// 	}
+	// }
 
-	px4_leave_critical_section(flags);
+	//px4_leave_critical_section(flags);
 }
 
 void px4_sched_note_suspend(FAR struct tcb_s *tcb)
 {
 	// //irqstate_t flags = px4_enter_critical_section();
 
-	// if (systemload.initialized) {
+	//if (systemload.initialized) {
 
-	// //systemload.tasks[0].total_runtime = hrt_absolute_time_();
+	//systemload.tasks[0].total_runtime = hrt_absolute_time_();
 
-	// // (*(volatile uint32_t *)(0x3FF60024 + 0x000c)) = 1;
-	// // systemload.tasks[0].total_runtime =
-	// // (hrt_abstime)(((uint64_t)(*(volatile uint32_t *)(0x3FF60024 + 0x0008)) << 32) | (uint64_t)(*(volatile uint32_t *)(0x3FF60024 + 0x0004)));
+	// (*(volatile uint32_t *)(0x3FF60024 + 0x000c)) = 1;
+	// systemload.tasks[0].total_runtime =
+	// (hrt_abstime)(((uint64_t)(*(volatile uint32_t *)(0x3FF60024 + 0x0008)) << 32) | (uint64_t)(*(volatile uint32_t *)(0x3FF60024 + 0x0004)));
 
-	// //rUPDATE = 1;
-	// //systemload.tasks[0].total_runtime = (hrt_abstime)(((uint64_t)rHI << 32) | (uint64_t)rLO);
+	//rUPDATE = 1;
+	//systemload.tasks[0].total_runtime = (hrt_abstime)(((uint64_t)rHI << 32) | (uint64_t)rLO);
 
 	// 	if (tcb->pid == 0) {
 	// 		systemload.tasks[0].total_runtime += hrt_elapsed_time_(&systemload.tasks[0].curr_start_time);
 	// 		return;
 
 	// 	}
-	// 	// else {
-	// 	// 	// if (cpuload_monitor_all_count.load() == 0) {
-	// 	// 	// 	return;
-	// 	// 	// }
-	// 	// }
+	// 	else {
+	// 		// if (cpuload_monitor_all_count.load() == 0) {
+	// 		// 	return;
+	// 		// }
+	// 	}
 
 	// 	for (int i=0;i<CONFIG_FS_PROCFS_MAX_TASKS;i++) {
 	// 		// Task ending its current scheduling run
@@ -177,11 +177,11 @@ void px4_sched_note_resume(FAR struct tcb_s *tcb)
 	// 		return;
 
 	// 	}
-	// 	// else {
-	// 	// 	// if (cpuload_monitor_all_count.load() == 0) {
-	// 	// 	// 	return;
-	// 	// 	// }
-	// 	// }
+	// 	else {
+	// 		// if (cpuload_monitor_all_count.load() == 0) {
+	// 		// 	return;
+	// 		// }
+	// 	}
 
 	// 	for (int i=0;i<CONFIG_FS_PROCFS_MAX_TASKS;i++) {
 	// 		if (systemload.tasks[i].valid && systemload.tasks[i].tcb && systemload.tasks[i].tcb->pid == tcb->pid) {

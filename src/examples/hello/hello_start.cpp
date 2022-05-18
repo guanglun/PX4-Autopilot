@@ -50,55 +50,9 @@ static int daemon_task;             /* Handle of deamon task / thread */
 
 //using namespace px4;
 
-static pthread_addr_t test_thread(pthread_addr_t parameter)
-{
-//   int i=0;
-//   while(1)
-  {
-	  printf("Test Thread Started\n");
-  }
-
-
-  return NULL;
-}
-
 extern "C" __EXPORT int hello_main(int argc, char *argv[]);
 int hello_main(int argc, char *argv[])
 {
-	int ret;
-	pthread_attr_t attr;
-	pthread_t threadid = 0;
-
-	ret = pthread_attr_init(&attr);
-
-	if (ret != OK) {
-		printf("  Main[0]: pthread_attr_init failed, ret=%d\n", ret);
-	}
-
-	ret = pthread_create(&threadid, &attr, test_thread,
-			     (pthread_addr_t)((uintptr_t)1 + 1));
-
-	if (ret != 0) {
-		printf("  Main[0]: Error in thread %d create, ret=%d\n",
-		       1 + 1, ret);
-		printf("  Main[0]: Test aborted with waiting threads\n");
-	} else {
-		printf("  Main[0]: Thread %d created\n", 1 + 1);
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	if (argc < 2) {
 		PX4_WARN("usage: hello {start|stop|status}\n");

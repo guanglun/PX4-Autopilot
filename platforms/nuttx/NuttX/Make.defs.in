@@ -112,8 +112,7 @@ FLAGS = $(MAXOPTIMIZATION) -g2 \
 	-Wno-stringop-truncation \
 	-Wno-sign-compare \
 	-Wno-type-limits \
-	-Wno-unused-parameter \
-	-Wno-pointer-arith
+	-Wno-unused-parameter
 
 FLAGS += $(EXTRAFLAGS)
 

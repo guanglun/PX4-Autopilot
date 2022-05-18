@@ -252,6 +252,7 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 			break;
 
 #ifdef CONFIG_SMP
+
 		case TSTATE_TASK_ASSIGNED:
 			break;
 #endif
@@ -323,7 +324,8 @@ void print_load_buffer(char *buffer, int buffer_length, print_load_callback_f cb
 		(void)tstate_name(TSTATE_TASK_INVALID); // Stop not used warning
 #else
 		// print task state instead
-		print_len += snprintf(buffer + print_len, buffer_length - print_len, " %-5s %2d", tstate_name(tcb_task_state), tcb_num_used_fds);
+		print_len += snprintf(buffer + print_len, buffer_length - print_len, " %-5s %2d", tstate_name(tcb_task_state),
+				      tcb_num_used_fds);
 #endif
 
 		snprintf(buffer + print_len, buffer_length - print_len, " %5d", cpu);
@@ -390,17 +392,270 @@ struct print_load_callback_data_s {
 	char buffer[140];
 };
 
-static void print_load_callback(void *user)
-{
-	char clear_line[] {CL};
-	struct print_load_callback_data_s *data = (struct print_load_callback_data_s *)user;
+// static void print_load_callback(void *user)
+// {
+// 	char clear_line[] {CL};
+// 	struct print_load_callback_data_s *data = (struct print_load_callback_data_s *)user;
 
-	if (data->fd != STDOUT_FILENO) {
-		clear_line[0] = '\0';
+// 	if (data->fd != STDOUT_FILENO) {
+// 		clear_line[0] = '\0';
+// 	}
+
+// 	dprintf(data->fd, "%s%s\n", clear_line, data->buffer);
+// }
+
+// static void nuttx_xtensa_dump_task(struct tcb_s *tcb, void *arg)
+// {
+// #ifdef CONFIG_STACK_COLORATION
+// 	uint32_t stack_filled = 0;
+// 	uint32_t stack_used;
+// #endif
+// #ifdef CONFIG_SCHED_CPULOAD
+// 	struct nx_cpuload_s cpuload;
+// 	uint32_t fracpart;
+// 	uint32_t intpart;
+// 	uint32_t tmp;
+
+// 	clock_cpuload(tcb->pid, &cpuload);
+
+// 	if (cpuload.total > 0) {
+// 		tmp      = (1000 * cpuload.active) / cpuload.total;
+// 		intpart  = tmp / 10;
+// 		fracpart = tmp - 10 * intpart;
+
+// 	} else {
+// 		intpart  = 0;
+// 		fracpart = 0;
+// 	}
+
+// #endif
+
+// #ifdef CONFIG_STACK_COLORATION
+// 	stack_used = up_check_tcbstack(tcb);
+
+// 	if (tcb->adj_stack_size > 0 && stack_used > 0) {
+// 		/* Use fixed-point math with one decimal place */
+
+// 		stack_filled = 10 * 100 * stack_used / tcb->adj_stack_size;
+// 	}
+
+// #endif
+
+// 	/* Dump interesting properties of this task */
+
+// 	dprintf(1, "  %4d   %4d"
+// #ifdef CONFIG_STACK_COLORATION
+// 		"   %7lu"
+// #endif
+// 		"   %7lu"
+// #ifdef CONFIG_STACK_COLORATION
+// 		"   %3" PRId32 ".%1" PRId32 "%%%c"
+// #endif
+// #ifdef CONFIG_SCHED_CPULOAD
+// 		"   %3" PRId32 ".%01" PRId32 "%%"
+// #endif
+// #if CONFIG_TASK_NAME_SIZE > 0
+// 		"   %s"
+// #endif
+// 		"\n",
+// 		tcb->pid, tcb->sched_priority,
+// #ifdef CONFIG_STACK_COLORATION
+// 		(unsigned long)up_check_tcbstack(tcb),
+// #endif
+// 		(unsigned long)tcb->adj_stack_size
+// #ifdef CONFIG_STACK_COLORATION
+// 		, stack_filled / 10, stack_filled % 10,
+// 		(stack_filled >= 10 * 80 ? '!' : ' ')
+// #endif
+// #ifdef CONFIG_SCHED_CPULOAD
+// 		, intpart, fracpart
+// #endif
+// #if CONFIG_TASK_NAME_SIZE > 0
+// 		, tcb->name
+// #endif
+// 	       );
+// }
+
+// static inline void xtensa_showtasks(void)
+// {
+// #if CONFIG_ARCH_INTERRUPTSTACK > 15
+// #  ifdef CONFIG_STACK_COLORATION
+// 	uint32_t stack_used = up_check_intstack();
+// 	uint32_t stack_filled = 0;
+
+// 	if ((CONFIG_ARCH_INTERRUPTSTACK & ~15) > 0 && stack_used > 0) {
+// 		/* Use fixed-point math with one decimal place */
+
+// 		stack_filled = 10 * 100 *
+// 			       stack_used / (CONFIG_ARCH_INTERRUPTSTACK & ~15);
+// 	}
+
+// #  endif
+// #endif
+
+// 	/* Dump interesting properties of each task in the crash environment */
+
+// 	dprintf(1, "   PID    PRI"
+// #ifdef CONFIG_STACK_COLORATION
+// 		"      USED"
+// #endif
+// 		"     STACK"
+// #ifdef CONFIG_STACK_COLORATION
+// 		"   FILLED "
+// #endif
+// #ifdef CONFIG_SCHED_CPULOAD
+// 		"      CPU"
+// #endif
+// #if CONFIG_TASK_NAME_SIZE > 0
+// 		"   COMMAND"
+// #endif
+// 		"\n");
+
+// #if CONFIG_ARCH_INTERRUPTSTACK > 15
+// 	dprintf(1, "  ----   ----"
+// #  ifdef CONFIG_STACK_COLORATION
+// 		"   %7lu"
+// #  endif
+// 		"   %7lu"
+// #  ifdef CONFIG_STACK_COLORATION
+// 		"   %3" PRId32 ".%1" PRId32 "%%%c"
+// #  endif
+// #  ifdef CONFIG_SCHED_CPULOAD
+// 		"     ----"
+// #  endif
+// #  if CONFIG_TASK_NAME_SIZE > 0
+// 		"   irq"
+// #  endif
+// 		"\n"
+// #  ifdef CONFIG_STACK_COLORATION
+// 		, (unsigned long)stack_used
+// #  endif
+// 		, (unsigned long)(CONFIG_ARCH_INTERRUPTSTACK & ~15)
+// #  ifdef CONFIG_STACK_COLORATION
+// 		, stack_filled / 10, stack_filled % 10,
+// 		(stack_filled >= 10 * 80 ? '!' : ' ')
+// #  endif
+// 	       );
+// #endif
+
+// 	nxsched_foreach(nuttx_xtensa_dump_task, NULL);
+// }
+
+
+
+void print_cpu_load(struct tcb_s *tcb, void *arg)
+{
+	struct nx_cpuload_s cpuload = {0,0};
+	uint32_t fracpart;
+	uint32_t intpart;
+	uint32_t tmp;
+
+	clock_cpuload(tcb->pid, &cpuload);
+
+	if (cpuload.total > 0) {
+		tmp      = (1000 * cpuload.active) / cpuload.total;
+		intpart  = tmp / 10;
+		fracpart = tmp - 10 * intpart;
+
+	} else {
+		intpart  = 0;
+		fracpart = 0;
 	}
 
-	dprintf(data->fd, "%s%s\n", clear_line, data->buffer);
+	printf("  %4d   %4d"
+	       "   %3" PRId32 ".%01" PRId32 "%%"
+	       "   %s"
+	       "\n",
+	       tcb->pid, tcb->sched_priority,
+	       intpart, fracpart,
+	       tcb->name
+	      );
 }
+
+void print_cpu_load_by_pid(int pid)
+{
+	struct tcb_s *tcb = nxsched_get_tcb(pid);
+	print_cpu_load(tcb,NULL);
+}
+
+static void test2(struct tcb_s *tcb, void *arg)
+{
+	struct nx_cpuload_s cpuload = {0,0};
+	uint32_t fracpart;
+	uint32_t intpart;
+	uint32_t tmp;
+
+	clock_cpuload(tcb->pid, &cpuload);
+
+	if (cpuload.total > 0) {
+		tmp      = (1000 * cpuload.active) / cpuload.total;
+		intpart  = tmp / 10;
+		fracpart = tmp - 10 * intpart;
+
+	} else {
+		intpart  = 0;
+		fracpart = 0;
+	}
+
+
+	printf("  %4d   %4d"
+	       "   %3" PRId32 ".%01" PRId32 "%%"
+	       "   %s"
+	       "\n",
+	       tcb->pid, tcb->sched_priority,
+	       intpart, fracpart,
+	       tcb->name
+	      );
+}
+FAR void testtest(int pid)
+{
+	struct tcb_s *tcb = nxsched_get_tcb(pid);
+	struct nx_cpuload_s cpuload = {0,0};
+	uint32_t fracpart;
+	uint32_t intpart;
+	uint32_t tmp;
+
+	clock_cpuload(tcb->pid, (nx_cpuload_s *)&cpuload);
+
+	if (cpuload.total > 0) {
+		tmp      = (1000 * cpuload.active) / cpuload.total;
+		intpart  = tmp / 10;
+		fracpart = tmp - 10 * intpart;
+
+	} else {
+		intpart  = 0;
+		fracpart = 0;
+	}
+
+
+	printf("  %4d   %4d"
+	       "   %3" PRId32 ".%01" PRId32 "%%"
+	       "   %s"
+	       "\n",
+	       tcb->pid, tcb->sched_priority,
+	       intpart, fracpart,
+	       tcb->name
+	      );
+}
+
+// extern FAR struct tcb_s **g_pidhash;
+// extern volatile int g_npidhash;
+// void nxsched_foreach_(nxsched_foreach_t handler, FAR void *arg)
+// {
+//   int ndx;
+
+//   /* Visit each active task */
+
+//   for (ndx = 0; ndx < g_npidhash; ndx++)
+//     {
+//       /* This test and the function call must be atomic */
+
+//       if (g_pidhash[ndx])
+//         {
+//           handler(g_pidhash[ndx], arg);
+//         }
+//     }
+// }
 
 void print_load(int fd, struct print_load_s *print_state)
 {
@@ -409,13 +664,55 @@ void print_load(int fd, struct print_load_s *print_state)
 	if (fd == STDOUT_FILENO) {
 		// move cursor home and clear screen
 		dprintf(fd, "\033[H");
-		dprintf(fd, "\033[H");
 	}
-	dprintf(fd, "\033[H");
-	print_load_callback_data_s data{};
-	data.fd = fd;
+	// struct tcb_s *tcb = nxsched_get_tcb(0);
+	// struct nx_cpuload_s cpuload = {0,0};
+	// uint32_t fracpart;
+	// uint32_t intpart;
+	// uint32_t tmp;
 
-	print_load_buffer(data.buffer, sizeof(data.buffer), print_load_callback, &data, print_state);
+	// clock_cpuload(tcb->pid, (nx_cpuload_s *)&cpuload);
+
+	// if (cpuload.total > 0) {
+	// 	tmp      = (1000 * cpuload.active) / cpuload.total;
+	// 	intpart  = tmp / 10;
+	// 	fracpart = tmp - 10 * intpart;
+
+	// } else {
+	// 	intpart  = 0;
+	// 	fracpart = 0;
+	// }
+
+
+	// printf("  %4d   %4d"
+	//        "   %3" PRId32 ".%01" PRId32 "%%"
+	//        "   %s"
+	//        "\n",
+	//        tcb->pid, tcb->sched_priority,
+	//        intpart, fracpart,
+	//        tcb->name
+	//       );
+	testtest(0);
+	testtest(1);
+	testtest(2);
+	testtest(3);
+	testtest(4);
+	testtest(5);
+	// nxsched_foreach(test2, NULL);
+	//print_cpu_load_by_pid(0);
+	// print_cpu_load_by_pid(1);
+	// print_cpu_load_by_pid(2);
+	// print_cpu_load_by_pid(3);
+	// print_cpu_load_by_pid(4);
+	// print_cpu_load_by_pid(5);
+	//print_cpu_load();
+	//nxsched_foreach_(print_cpu_load, NULL);
+	//print_load_callback_data_s data{};
+	//data.fd = fd;
+
+	//print_load_buffer(data.buffer, sizeof(data.buffer), print_load_callback, &data, print_state);
+
+	//xtensa_showtasks();
 }
 
 #endif // if CONFIG_SCHED_INSTRUMENTATION
