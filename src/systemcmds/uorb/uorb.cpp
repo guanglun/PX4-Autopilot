@@ -44,6 +44,12 @@ static void usage();
 
 int uorb_main(int argc, char *argv[])
 {
+
+	// cpu_set_t cpuset;
+	// CPU_ZERO(&cpuset);
+	// CPU_SET(1, &cpuset);
+	// pthread_setaffinity_np(getpid(), sizeof(cpu_set_t), &cpuset);
+
 	if (argc < 2) {
 		usage();
 		return -1;

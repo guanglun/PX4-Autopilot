@@ -3078,6 +3078,12 @@ MavlinkReceiver::handle_message_gimbal_device_attitude_status(mavlink_message_t 
 void
 MavlinkReceiver::run()
 {
+
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(1, &cpuset);
+	pthread_setaffinity_np(getpid(), sizeof(cpu_set_t), &cpuset);
+
 	/* set thread name */
 	{
 		char thread_name[17];

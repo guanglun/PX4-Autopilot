@@ -339,11 +339,6 @@ WorkQueueManagerRun(int, char **)
 			pthread_t thread;
 			int ret_create = pthread_create(&thread, &attr, WorkQueueRunner, (void *)wq);
 
-			// cpu_set_t cpuset;
-			// CPU_ZERO(&cpuset);
-			// CPU_SET(0, &cpuset);
-			// pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
-
 			if (ret_create == 0) {
 				PX4_INFO("starting: %s, priority: %d, stack: %zu bytes", wq->name, param.sched_priority, stacksize);
 
