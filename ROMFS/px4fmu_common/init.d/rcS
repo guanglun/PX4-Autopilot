@@ -570,8 +570,6 @@ else
 	# 	sh $BOARD_BOOTLOADER_UPGRADE
 	# fi
 	# unset BOARD_BOOTLOADER_UPGRADE
-
-	top
 #
 # End of autostart.
 #
