@@ -204,10 +204,10 @@ void test_poll(void)
 	static uint8_t cnt = 0;
 
 	if (cnt % 2 == 0) {
-	led_off(LED_GREEN);
+		led_off(LED_BLUE);
 
 	} else {
-	led_on(LED_GREEN);
+		led_on(LED_BLUE);
 	}
 
 	cnt++;
