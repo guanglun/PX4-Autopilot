@@ -156,16 +156,15 @@ esp32_board_initialize(void)
 	// Configure LEDs.
 	board_autoled_initialize();
 
-	px4_esp32_configgpio(GPIO_VDD_BRICK_VALID);
-	px4_esp32_configgpio(GPIO_VDD_USB_VALID);
+	px4_arch_configgpio(GPIO_VDD_BRICK_VALID);
+	px4_arch_configgpio(GPIO_VDD_USB_VALID);
 
-	px4_esp32_configgpio(GPIO_OUTPUT | 12);
-	esp32_gpiowrite(12, false);
+	px4_arch_configgpio(GPIO_SENSORS_3V3_EN);
+	px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, false);
 	up_udelay(20);
-	esp32_gpiowrite(12, true);
+	px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, true);
 
 	esp32_spiinitialize();
-
 }
 
 /****************************************************************************
@@ -205,10 +204,10 @@ void test_poll(void)
 	static uint8_t cnt = 0;
 
 	if (cnt % 2 == 0) {
-		(*(volatile uint32_t *)(0x3FF44008) = (1 << 0)); //HIGH
+	led_off(LED_GREEN);
 
 	} else {
-		(*(volatile uint32_t *)(0x3FF4400C) = (1 << 0)); //LOW
+	led_on(LED_GREEN);
 	}
 
 	cnt++;
@@ -229,21 +228,9 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	led_off(LED_GREEN);
 	led_off(LED_BLUE);
 
-	// px4_esp32_configgpio(GPIO_OUTPUT|2);
-	// esp32_gpiowrite(2,true);
 
-	// px4_esp32_configgpio(GPIO_OUTPUT|4);
-	// esp32_gpiowrite(4,true);
-
-	px4_esp32_configgpio(GPIO_OUTPUT | 0);
-	esp32_gpiowrite(0, true);
-	px4_esp32_configgpio(GPIO_OUTPUT | 2);
-	esp32_gpiowrite(2, true);
-	px4_esp32_configgpio(GPIO_OUTPUT | 15);
-	esp32_gpiowrite(15, true);
-
-	px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
-	esp32_gpiowrite(14, false);
+	// px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
+	// esp32_gpiowrite(14, false);
 
 	// Configure SPI-based devices.
 #ifdef CONFIG_ESP32_SPI2

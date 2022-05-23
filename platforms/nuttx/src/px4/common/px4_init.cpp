@@ -150,7 +150,7 @@ int px4_platform_init()
 
 	uorb_start();
 
-	px4_log_initialize();
+	//px4_log_initialize();
 
 #if defined(CONFIG_SYSTEM_CDCACM) && defined(CONFIG_BUILD_FLAT)
 	cdcacm_init();

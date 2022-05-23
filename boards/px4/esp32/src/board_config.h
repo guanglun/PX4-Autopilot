@@ -49,15 +49,19 @@
 
 /* PX4FMU GPIOs ***********************************************************************************/
 /* LEDs */
-#define GPIO_LED1                    (GPIO_OUTPUT|0)
-#define GPIO_LED2                    (GPIO_OUTPUT|0)
-#define GPIO_LED3                    (GPIO_OUTPUT|0)
+
+#define GPIO_LED_RED                 (GPIO_OUTPUT|15)
+#define GPIO_LED_GREEN               (GPIO_OUTPUT|0)
+#define GPIO_LED_BLUE                (GPIO_OUTPUT|2)
+// #define GPIO_LED_SAFETY              GPIO_LED_BLUE
+
+#define BOARD_HAS_CONTROL_STATUS_LEDS 1
+#define BOARD_OVERLOAD_LED     LED_RED
+#define BOARD_ARMED_LED        LED_BLUE
+// #define BOARD_ARMED_STATE_LED  LED_GREEN
 
 
-#define GPIO_LED_RED                 GPIO_LED1
-#define GPIO_LED_GREEN               GPIO_LED2
-#define GPIO_LED_BLUE                GPIO_LED3
-#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PULLUP|0)
+#define GPIO_SENSORS_3V3_EN           (GPIO_OUTPUT | 12)
 
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
