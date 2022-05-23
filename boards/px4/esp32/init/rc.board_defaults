@@ -3,7 +3,7 @@
 # board specific defaults
 #------------------------------------------------------------------------------
 
-param set-default BAT1_V_DIV 10.94640827
+param set-default BAT1_V_DIV 10.48445988
 param set-default BAT1_A_PER_V 36.36751556
 
 param set-default SYS_AUTOSTART 4001
@@ -16,4 +16,6 @@ param set-default COM_ARM_SDCARD 0
 #disable CPU check. default is 90%
 param set-default COM_CPU_MAX -1
 param set-default BAT1_SOURCE 0
+param set-default BAT1_N_CELLS 3
 param set IMU_GYRO_RATEMAX 400
+param set PWM_MAIN_RATE 400
