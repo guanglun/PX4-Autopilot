@@ -102,8 +102,8 @@ SPI::init()
 	}
 
 	/* deselect device to ensure high to low transition of pin select */
-	//SPI_SELECT(_dev, _device, false);
-	(*(volatile uint32_t *)(0x3FF44008) = (1<<5)); //HIGH
+	SPI_SELECT(_dev, _device, false);
+	//(*(volatile uint32_t *)(0x3FF44008) = (1<<5)); //HIGH
 
 	/* call the probe function to check whether the device is present */
 	int ret = probe();
@@ -169,14 +169,16 @@ SPI::_transfer(uint8_t *send, uint8_t *recv, unsigned len)
 	SPI_SETFREQUENCY(_dev, _frequency);
 	// SPI_SETMODE(_dev, _mode);
 	// SPI_SETBITS(_dev, 8);
-	//SPI_SELECT(_dev, _device, true);
-	(*(volatile uint32_t *)(0x3FF4400C) = (1<<5));//LOW
+	SPI_SELECT(_dev, _device, true);
+	//(*(volatile uint32_t *)(0x3FF4400C) = (1<<5));//LOW
 	/* do the transfer */
+
+	//printf("do the transfer\r\n");
 	SPI_EXCHANGE(_dev, send, recv, len);
 
-	(*(volatile uint32_t *)(0x3FF44008) = (1<<5)); //HIGH
+	//(*(volatile uint32_t *)(0x3FF44008) = (1<<5)); //HIGH
 	/* and clean up */
-	//SPI_SELECT(_dev, _device, false);
+	SPI_SELECT(_dev, _device, false);
 
 	return PX4_OK;
 }

@@ -60,57 +60,57 @@ ver all
 #
 # Try to mount the microSD card.
 #
-if [ -b "/dev/mmcsd0" ]
-then
-	if mount -t vfat /dev/mmcsd0 /fs/microsd
-	then
-		if [ -f "/fs/microsd/.format" ]
-		then
-			echo "INFO [init] format /dev/mmcsd0 requested (/fs/microsd/.format)"
-			set SDCARD_FORMAT yes
-			rm /fs/microsd/.format
-			umount /fs/microsd
+# if [ -b "/dev/mmcsd0" ]
+# then
+# 	if mount -t vfat /dev/mmcsd0 /fs/microsd
+# 	then
+# 		if [ -f "/fs/microsd/.format" ]
+# 		then
+# 			echo "INFO [init] format /dev/mmcsd0 requested (/fs/microsd/.format)"
+# 			set SDCARD_FORMAT yes
+# 			rm /fs/microsd/.format
+# 			umount /fs/microsd
 
-		else
-			set SDCARD_AVAILABLE yes
-		fi
-	fi
+# 		else
+# 			set SDCARD_AVAILABLE yes
+# 		fi
+# 	fi
 
-	if [ $SDCARD_AVAILABLE = no -o $SDCARD_FORMAT = yes ]
-	then
-		echo "INFO [init] formatting /dev/mmcsd0"
-		set STARTUP_TUNE 15 # tune 15 = SD_ERROR (overridden to SD_INIT if format + mount succeeds)
+# 	if [ $SDCARD_AVAILABLE = no -o $SDCARD_FORMAT = yes ]
+# 	then
+# 		echo "INFO [init] formatting /dev/mmcsd0"
+# 		set STARTUP_TUNE 15 # tune 15 = SD_ERROR (overridden to SD_INIT if format + mount succeeds)
 
-		if mkfatfs -F 32 /dev/mmcsd0
-		then
-			echo "INFO [init] card formatted"
+# 		if mkfatfs -F 32 /dev/mmcsd0
+# 		then
+# 			echo "INFO [init] card formatted"
 
-			if mount -t vfat /dev/mmcsd0 /fs/microsd
-			then
-				set SDCARD_AVAILABLE yes
-				set STARTUP_TUNE 14 # tune 14 = SD_INIT
-			else
-				echo "ERROR [init] card mount failed"
-			fi
-		else
-			echo "ERROR [init] format failed"
-		fi
-	fi
+# 			if mount -t vfat /dev/mmcsd0 /fs/microsd
+# 			then
+# 				set SDCARD_AVAILABLE yes
+# 				set STARTUP_TUNE 14 # tune 14 = SD_INIT
+# 			else
+# 				echo "ERROR [init] card mount failed"
+# 			fi
+# 		else
+# 			echo "ERROR [init] format failed"
+# 		fi
+# 	fi
 
-	if [ $SDCARD_AVAILABLE = yes ]
-	then
-		if hardfault_log check
-		then
-			set STARTUP_TUNE 2 # tune 2 = ERROR_TUNE
-			if hardfault_log commit
-			then
-				hardfault_log reset
-			fi
-		fi
-	fi
+# 	if [ $SDCARD_AVAILABLE = yes ]
+# 	then
+# 		if hardfault_log check
+# 		then
+# 			set STARTUP_TUNE 2 # tune 2 = ERROR_TUNE
+# 			if hardfault_log commit
+# 			then
+# 				hardfault_log reset
+# 			fi
+# 		fi
+# 	fi
 
-	set PARAM_FILE /fs/microsd/params
-fi
+# 	set PARAM_FILE /fs/microsd/params
+# fi
 
 #
 # Look for an init script on the microSD card.
@@ -125,21 +125,21 @@ else
 	# Set the parameter file the board supports params on
 	# MTD device.
 	#
-	# if mft query -q -k MTD -s MTD_PARAMETERS -v /fs/mtd_params
-	# then
-	# 	set PARAM_FILE /fs/mtd_params
-	# fi
+	if mft query -q -k MTD -s MTD_PARAMETERS -v /fs/mtd_params
+	then
+		set PARAM_FILE /fs/mtd_params
+	fi
 
-	set PARAM_FILE /dev/esp32flash
-
+	#set PARAM_FILE /dev/esp32flash
+	#set PARAM_FILE /fs/mtd_params
 	#
 	# Load parameters.
 	#
 	# if the board has a storage for (factory) calibration data
-	# if mft query -q -k MTD -s MTD_CALDATA -v /fs/mtd_caldata
-	# then
-	# 	param load /fs/mtd_caldata
-	# fi
+	if mft query -q -k MTD -s MTD_CALDATA -v /fs/mtd_caldata
+	then
+		param load /fs/mtd_caldata
+	fi
 
 	param select $PARAM_FILE
 	if ! param import
@@ -168,7 +168,6 @@ else
 			param import /fs/microsd/parameters_backup.bson
 		fi
 	fi
-
 	# # param set EKF2_MULTI_IMU 0
 	# # param set SENS_IMU_MODE 1
 	# param set-default EKF2_PREDICT_US 10000
@@ -239,7 +238,7 @@ else
 	# Start the tone_alarm driver.
 	# Needs to be started after the parameters are loaded (for CBRK_BUZZER).
 	#
-	tone_alarm start
+	# tone_alarm start
 
 	#
 	# Waypoint storage.
@@ -288,6 +287,7 @@ else
 				echo "ERROR [init] SD card not mounted - trying to load airframe from ROMFS"
 			fi
 		fi
+		. ${R}etc/init.d/rc.mc_defaults
 		. ${R}$AUTOSTART_PATH
 	fi
 	unset AUTOSTART_PATH

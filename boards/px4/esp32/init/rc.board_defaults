@@ -3,28 +3,19 @@
 # board specific defaults
 #------------------------------------------------------------------------------
 
-param set-default BAT1_V_DIV 10.94640827
+param set-default BAT1_V_DIV 10.48445988
 param set-default BAT1_A_PER_V 36.36751556
 
 param set-default SYS_AUTOSTART 4001
 param set-default MAV_TYPE 2
 param set-default EKF2_MULTI_IMU 0
 param set-default SENS_IMU_MODE 1
-
+param set-default EKF2_PREDICT_US 20000
 param set-default SENS_EXT_I2C_PRB 0
 param set-default COM_ARM_SDCARD 0
 #disable CPU check. default is 90%
 param set-default COM_CPU_MAX -1
 param set-default BAT1_SOURCE 0
-
-param set-default SYS_HAS_BARO 1
-param set-default SYS_HAS_GPS 1
-param set-default SYS_HAS_MAG 1
-
-param set EKF2_PREDICT_US 20000
-param set IMU_GYRO_RATEMAX 800
-param set MC_YAWRATE_K 0.3
-param set MC_YAWRATE_I 0.04
-
-param set MC_ROLLRATE_K 0.35
-param set MC_PITCHRATE_K 0.35
+param set-default BAT1_N_CELLS 3
+param set-default IMU_GYRO_RATEMAX 400
+param set-default PWM_MAIN_RATE 400

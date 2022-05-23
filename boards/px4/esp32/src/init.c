@@ -159,10 +159,10 @@ esp32_board_initialize(void)
 	px4_esp32_configgpio(GPIO_VDD_BRICK_VALID);
 	px4_esp32_configgpio(GPIO_VDD_USB_VALID);
 
-	// px4_esp32_configgpio(GPIO_OUTPUT | 12);
-	// esp32_gpiowrite(12, false);
-	// up_udelay(20);
-	// esp32_gpiowrite(12, true);
+	px4_esp32_configgpio(GPIO_OUTPUT | 12);
+	esp32_gpiowrite(12, false);
+	up_udelay(20);
+	esp32_gpiowrite(12, true);
 
 	esp32_spiinitialize();
 
@@ -271,28 +271,32 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 		led_on(LED_RED);
 	}
 
-	SPI_SETFREQUENCY(spi3, 8 * 1000 * 1000);
+	SPI_SETFREQUENCY(spi3, 10000000);
 	SPI_SETBITS(spi3, 8);
 	SPI_SETMODE(spi3, SPIDEV_MODE3);
+
+	up_udelay(20);
+
+	px4_platform_configure();
 #endif
 
 
 #ifdef CONFIG_ESP32_SPIFLASH
 	// esp32 flash mtd init.
-	int ret = 0;
-	FAR struct mtd_dev_s *mtd;
-	mtd = esp32_spiflash_alloc_mtdpart(CONFIG_ESP32_STORAGE_MTD_OFFSET,
-					   CONFIG_ESP32_STORAGE_MTD_SIZE,
-					   false);
-	if (!mtd) {
-		ferr("ERROR: Failed to alloc MTD partition of SPI Flash\n");
-		return -ENOMEM;
-	}
-	ret = register_mtddriver("/dev/esp32flash", mtd, 0755, NULL);
-	if (ret < 0) {
-		ferr("ERROR: Failed to register MTD: %d\n", ret);
-		return ret;
-	}
+	// int ret = 0;
+	// FAR struct mtd_dev_s *mtd;
+	// mtd = esp32_spiflash_alloc_mtdpart(CONFIG_ESP32_STORAGE_MTD_OFFSET,
+	// 				   CONFIG_ESP32_STORAGE_MTD_SIZE,
+	// 				   false);
+	// if (!mtd) {
+	// 	ferr("ERROR: Failed to alloc MTD partition of SPI Flash\n");
+	// 	return -ENOMEM;
+	// }
+	// ret = register_mtddriver("/dev/esp32flash", mtd, 0755, NULL);
+	// if (ret < 0) {
+	// 	ferr("ERROR: Failed to register MTD: %d\n", ret);
+	// 	return ret;
+	// }
 #endif
 
 

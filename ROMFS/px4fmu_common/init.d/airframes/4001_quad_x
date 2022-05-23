@@ -19,8 +19,7 @@
 #
 # @maintainer Lorenz Meier <lorenz@px4.io>
 #
-
-. ${R}etc/init.d/rc.mc_defaults
+#. ${R}etc/init.d/rc.mc_defaults
 
 param set-default CA_ROTOR_COUNT 4
 param set-default CA_ROTOR0_PX 0.15
