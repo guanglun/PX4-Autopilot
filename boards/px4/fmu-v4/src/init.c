@@ -113,8 +113,10 @@ __EXPORT void board_peripheral_reset(int ms)
 {
 	// Set the peripheral rails off.
 	stm32_configgpio(GPIO_PERIPH_3V3_EN);
+	//stm32_configgpio(GPIO_PERIPH_WIFI_EN);
 
 	stm32_gpiowrite(GPIO_PERIPH_3V3_EN, 0);
+	//stm32_gpiowrite(GPIO_PERIPH_WIFI_EN, 0);
 
 	bool last = stm32_gpioread(GPIO_SPEKTRUM_PWR_EN);
 	// Keep Spektum on to discharge rail.

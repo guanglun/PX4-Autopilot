@@ -167,6 +167,19 @@ else
 		fi
 	fi
 
+	# param set EKF2_MULTI_IMU 0
+	# param set SENS_IMU_MODE 1
+	# param set-default EKF2_PREDICT_US 20000
+	# icm20602 -s start
+	# hmc5883 -T -I -R 12 start
+	# ms5611 -I start
+	# sensors start
+	# commander start
+	# ekf2 start
+	# # gyro_calibration start
+	# navigator start
+	# # mavlink start -d /dev/ttyS0 -b 57600
+
 	if [ $SDCARD_AVAILABLE = yes ]
 	then
 		param select-backup /fs/microsd/parameters_backup.bson
