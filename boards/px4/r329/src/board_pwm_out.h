@@ -59,7 +59,7 @@ private:
 
 	static const int MAX_NUM_PWM = 4;
 	static const int FREQUENCY_PWM = 400;
-	int pwm_pin_map[4] = {2,3,7,8};
+	int pwm_pin_map[4] = {2,3,6,7};
 	int _pwm_fd[MAX_NUM_PWM];
 	int _pwm_num;
 

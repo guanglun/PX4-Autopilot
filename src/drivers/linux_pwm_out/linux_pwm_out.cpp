@@ -319,7 +319,13 @@ int LinuxPWMOut::ioctl(device::file_t *filp, int cmd, unsigned long arg)
 			update_params();
 			break;
 		}
-
+	case PWM_SERVO_SET_ARM_OK:
+	case PWM_SERVO_CLEAR_ARM_OK:
+	case PWM_SERVO_SET_FORCE_SAFETY_OFF:
+	case PWM_SERVO_SET_FORCE_SAFETY_ON:
+	case PWM_SERVO_ARM:
+	case PWM_SERVO_DISARM:
+		break;
 	default:
 		ret = -ENOTTY;
 		break;
