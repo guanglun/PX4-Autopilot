@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015-2016 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2017 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,15 +31,8 @@
 #
 ############################################################################
 
-px4_add_module(
-	MODULE drivers__linux_pwm_out
-	MAIN linux_pwm_out
-	COMPILE_FLAGS
-	SRCS
-		linux_pwm_out.cpp
-	DEPENDS
-		mixer
-		mixer_module
-		output_limit
-	)
-
+add_library(drivers_board
+	board_pwm_out.cpp
+	i2c.cpp
+	spi.cpp
+)

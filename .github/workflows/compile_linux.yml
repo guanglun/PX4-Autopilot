@@ -18,6 +18,7 @@ jobs:
           beaglebone_blue_default,
           emlid_navio2_default,
           px4_raspberrypi_default,
+          px4_r329_default,
           scumaker_pilotpi_default,
           ]
     steps:

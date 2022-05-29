@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015-2016 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2020 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,15 +31,17 @@
 #
 ############################################################################
 
-px4_add_module(
-	MODULE drivers__linux_pwm_out
-	MAIN linux_pwm_out
-	COMPILE_FLAGS
-	SRCS
-		linux_pwm_out.cpp
-	DEPENDS
-		mixer
-		mixer_module
-		output_limit
-	)
+if(DEFINED ENV{AUTOPILOT_HOST})
+	set(AUTOPILOT_HOST $ENV{AUTOPILOT_HOST})
+else()
+	set(AUTOPILOT_HOST "R329")
+endif()
 
+add_custom_target(upload
+	COMMAND rsync -arh --progress
+			${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PX4_BOARD_DIR}/init/* ${PX4_SOURCE_DIR}/posix-configs/r329/*.config ${PX4_BINARY_DIR}/etc # source
+			root@${AUTOPILOT_HOST}:/root/px4 # destination
+	DEPENDS px4
+	COMMENT "uploading px4"
+	USES_TERMINAL
+)
