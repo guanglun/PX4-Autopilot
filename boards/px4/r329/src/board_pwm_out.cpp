@@ -41,14 +41,26 @@
 #include <unistd.h>
 #include <px4_platform_common/log.h>
 
+#include <time.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+
 using namespace pwm_out;
 
 const char NavioSysfsPWMOut::_device[] = "/sys/class/pwm/pwmchip0";
 
+volatile unsigned int *PWM_BASE_MAP;
+
+#define PPR(ch) (PWM_BASE_MAP + (0x0C00 + 0x0104 + 0x20 * ch) / 4)
+#define PWM_BASE_REL (0x02000C00)
+#define PWM_BASE     (PWM_BASE_REL/0x1000*0x1000)
+
 NavioSysfsPWMOut::NavioSysfsPWMOut(int max_num_outputs)
 {
 	if (max_num_outputs > MAX_NUM_PWM) {
-		PX4_WARN("number of outputs too large %i. Setting to %i",max_num_outputs, MAX_NUM_PWM);
+		//PX4_WARN("number of outputs too large %i. Setting to %i",max_num_outputs, MAX_NUM_PWM);
 		max_num_outputs = MAX_NUM_PWM;
 	}
 
@@ -73,6 +85,20 @@ int NavioSysfsPWMOut::init()
 	int i;
 	char path[128];
 
+	int mm_fd = open("/dev/mem", O_RDWR | O_SYNC);
+	if (mm_fd < 0){
+		PX4_ERR("PWM open(/dev/mem) failed.");
+		return -1;
+	}
+
+	PWM_BASE_MAP = (volatile unsigned int * )mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, mm_fd, PWM_BASE);
+
+	if(PWM_BASE_MAP == MAP_FAILED)
+	{
+		PX4_ERR("PWM mmap fail.");
+		return -1;
+	}
+
 	for (i = 0; i < _pwm_num; ++i) {
 		::snprintf(path, sizeof(path), "%s/export", _device);
 
@@ -84,23 +110,28 @@ int NavioSysfsPWMOut::init()
 	for (i = 0; i < _pwm_num; ++i) {
 		::snprintf(path, sizeof(path), "%s/pwm%u/period", _device, pwm_pin_map[i]);
 
-		// if (pwm_write_sysfs(path, (int)1e9 / FREQUENCY_PWM)) {
-		// 	PX4_ERR("PWM period failed");
-		// }
-		if (pwm_write_sysfs(path, (int)2499900)) { //400Hz
-			PX4_ERR("PWM period failed");
+		if (pwm_write_sysfs(path, (int)2500000)) { //400Hz
+			PX4_ERR("PWM set period failed");
 		}
 
 	}
 
 	for (i = 0; i < _pwm_num; ++i) {
 		::snprintf(path, sizeof(path), "%s/pwm%u/duty_cycle", _device, pwm_pin_map[i]);
-		_pwm_fd[i] = ::open(path, O_WRONLY | O_CLOEXEC);
 
-		if (_pwm_fd[i] == -1) {
-			PX4_ERR("PWM: Failed to open duty_cycle.");
-			return -errno;
+		if (pwm_write_sysfs(path, (int)900)) { //900us
+			PX4_ERR("PWM set duty_cycle failed");
 		}
+
+	}
+
+	for (i = 0; i < _pwm_num; ++i) {
+		::snprintf(path, sizeof(path), "%s/pwm%u/polarity", _device, pwm_pin_map[i]);
+
+		if (pwm_write_sysfs_string(path, (char *)"normal")) { //400Hz
+			PX4_ERR("PWM set polarity failed");
+		}
+
 	}
 
 	for (i = 0; i < _pwm_num; ++i) {
@@ -116,22 +147,21 @@ int NavioSysfsPWMOut::init()
 
 int NavioSysfsPWMOut::send_output_pwm(const uint16_t *pwm, int num_outputs)
 {
-	char data[16];
 
 	if (num_outputs > _pwm_num) {
 		num_outputs = _pwm_num;
 	}
 
 	int ret = 0;
-
+	__uint32_t ppr[4];
 	//convert this to duty_cycle in ns
 	for (int i = 0; i < num_outputs; ++i) {
-		int n = ::snprintf(data, sizeof(data), "%u", 2476000 - pwm[i] * 1000);
-		int write_ret = ::write(_pwm_fd[i], data, n);
+		ppr[i] = (__uint32_t)((60000<<16)|(60000*pwm[i]/2500));
+	}
 
-		if (n != write_ret) {
-			ret = -1;
-		}
+
+	for (int i = 0; i < num_outputs; ++i) {
+		*PPR(pwm_pin_map[i]) = ppr[i];
 	}
 
 	return ret;
@@ -148,6 +178,27 @@ int NavioSysfsPWMOut::pwm_write_sysfs(char *path, int value)
 	}
 
 	n = ::snprintf(data, sizeof(data), "%u", value);
+
+	if (n > 0) {
+		n = ::write(fd, data, n);	// This n is not used, but to avoid a compiler error.
+	}
+
+	::close(fd);
+
+	return 0;
+}
+
+int NavioSysfsPWMOut::pwm_write_sysfs_string(char *path, char *str)
+{
+	int fd = ::open(path, O_WRONLY | O_CLOEXEC);
+	int n;
+	char data[16];
+
+	if (fd == -1) {
+		return -errno;
+	}
+
+	n = ::snprintf(data, sizeof(data), "%s", str);
 
 	if (n > 0) {
 		n = ::write(fd, data, n);	// This n is not used, but to avoid a compiler error.
