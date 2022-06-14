@@ -112,6 +112,7 @@ else()
 		nuttx_arch
 		nuttx_mm
 		nuttx_c
+		nuttx_net
 		)
 endif()
 
@@ -243,6 +244,8 @@ else()
 	${PX4_STARTUP_DIR}/xtensa_user_handler.o
 	${PX4_STARTUP_DIR}/esp32_start.o
 	${PX4_STARTUP_DIR}/esp32_wdt.o
+
+
 	# ${PX4_STARTUP_DIR}/xtensa_cpupause.o
 	)
 
@@ -262,12 +265,32 @@ else()
 			drivers_board
 			arch_hrt
 			arch_board_reset
+			-Wl,--start-group
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcore.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/librtc.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libnet80211.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libsmartconfig.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libespnow.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libpp.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libwpa_supplicant.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcoexist.a
+			-Wl,--end-group
+
+
+			# -lcore -lrtc -lnet80211 -lpp -lsmartconfig -lespnow -lphy -lwpa_supplicant
 	)
+
+	# link_directories(${PX4_SOURCE_DIR}/boards/px4/esp32/libs)
+	# add_library(esp32_lib OBJECT
+	# 		${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
+	# 		${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libwapi.a)
 
 	target_link_libraries(nuttx_c INTERFACE nuttx_drivers)
 	target_link_libraries(nuttx_drivers INTERFACE nuttx_c nuttx_fs)
 	target_link_libraries(nuttx_xx INTERFACE nuttx_c)
-	target_link_libraries(nuttx_fs INTERFACE nuttx_c)
+	target_link_libraries(nuttx_fs INTERFACE nuttx_c nuttx_net)
+	target_link_libraries(nuttx_net INTERFACE nuttx_mm)
 
 	target_link_libraries(px4 PRIVATE
 		-nostartfiles
@@ -290,9 +313,16 @@ else()
 		-Wl,--start-group
 			${nuttx_libs}
 			${NUTTX_STARTUP_OBJS}
-
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcore.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/librtc.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libnet80211.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libsmartconfig.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libespnow.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libpp.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libwpa_supplicant.a
+			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcoexist.a
 		-Wl,--end-group
-
 		m
 		gcc
 		)

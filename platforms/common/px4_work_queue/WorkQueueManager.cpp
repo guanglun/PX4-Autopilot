@@ -224,7 +224,7 @@ const wq_config_t &ins_instance_to_wq(uint8_t instance)
 	return wq_configurations::INS0;
 }
 
-static void * __attribute__ ((section(".iram1")))
+static void *
 WorkQueueRunner(void *context)
 {
 	wq_config_t *config = static_cast<wq_config_t *>(context);
@@ -252,7 +252,7 @@ WorkQueueRunner(int argc, char *argv[])
 }
 #endif
 
-static int __attribute__ ((section(".iram1")))
+static int
 WorkQueueManagerRun(int, char **)
 {
 	_wq_manager_wqs_list = new BlockingList<WorkQueue *>();

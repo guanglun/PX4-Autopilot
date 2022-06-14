@@ -54,12 +54,12 @@ WorkItemSingleShot::~WorkItemSingleShot()
 	px4_sem_destroy(&_sem);
 }
 
-void __attribute__ ((section(".iram1"))) WorkItemSingleShot::wait()
+void  WorkItemSingleShot::wait()
 {
 	while (px4_sem_wait(&_sem) != 0) {}
 }
 
-void __attribute__ ((section(".iram1"))) WorkItemSingleShot::Run()
+void  WorkItemSingleShot::Run()
 {
 	_method(_argument);
 	px4_sem_post(&_sem);

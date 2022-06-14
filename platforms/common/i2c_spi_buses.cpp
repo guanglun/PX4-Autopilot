@@ -339,9 +339,9 @@ bool BusInstanceIterator::next()
 #if defined(CONFIG_I2C)
 
 	} else if (busType() == BOARD_I2C_BUS) {
-		if (_i2c_bus_iterator.next()) {
-			bus = _i2c_bus_iterator.bus().bus;
-		}
+		// if (_i2c_bus_iterator.next()) {
+		// 	bus = _i2c_bus_iterator.bus().bus;
+		// }
 
 #endif // CONFIG_I2C
 	}

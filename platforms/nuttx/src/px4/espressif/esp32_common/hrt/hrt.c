@@ -375,7 +375,7 @@ hrt_init(void)
 /**
  * Call callout(arg) after interval has elapsed.
  */
-void __attribute__ ((section(".iram1")))
+void
 hrt_call_after(struct hrt_call *entry, hrt_abstime delay, hrt_callout callout, void *arg)
 {
 	hrt_call_internal(entry,
@@ -388,7 +388,7 @@ hrt_call_after(struct hrt_call *entry, hrt_abstime delay, hrt_callout callout, v
 /**
  * Call callout(arg) at calltime.
  */
-void __attribute__ ((section(".iram1")))
+void
 hrt_call_at(struct hrt_call *entry, hrt_abstime calltime, hrt_callout callout, void *arg)
 {
 	hrt_call_internal(entry, calltime, 0, callout, arg);
@@ -397,7 +397,7 @@ hrt_call_at(struct hrt_call *entry, hrt_abstime calltime, hrt_callout callout, v
 /**
  * Call callout(arg) every period.
  */
-void __attribute__ ((section(".iram1")))
+void
 hrt_call_every(struct hrt_call *entry, hrt_abstime delay, hrt_abstime interval, hrt_callout callout, void *arg)
 {
 	hrt_call_internal(entry,
@@ -407,7 +407,7 @@ hrt_call_every(struct hrt_call *entry, hrt_abstime delay, hrt_abstime interval, 
 			  arg);
 }
 
-static void __attribute__ ((section(".iram1")))
+static void
 hrt_call_internal(struct hrt_call *entry, hrt_abstime deadline, hrt_abstime interval, hrt_callout callout, void *arg)
 {
 	irqstate_t flags = px4_enter_critical_section();
@@ -438,7 +438,7 @@ hrt_call_internal(struct hrt_call *entry, hrt_abstime deadline, hrt_abstime inte
  *
  * Always returns false for repeating callouts.
  */
-bool __attribute__ ((section(".iram1")))
+bool
 hrt_called(struct hrt_call *entry)
 {
 	return (entry->deadline == 0);
@@ -447,7 +447,7 @@ hrt_called(struct hrt_call *entry)
 /**
  * Remove the entry from the callout list.
  */
-void __attribute__ ((section(".iram1")))
+void
 hrt_cancel(struct hrt_call *entry)
 {
 	irqstate_t flags = px4_enter_critical_section();
@@ -463,7 +463,7 @@ hrt_cancel(struct hrt_call *entry)
 	px4_leave_critical_section(flags);
 }
 
-static void __attribute__ ((section(".iram1")))
+static void
 hrt_call_enter(struct hrt_call *entry)
 {
 	struct hrt_call	*call, *next;
@@ -491,7 +491,7 @@ hrt_call_enter(struct hrt_call *entry)
 	hrtinfo("scheduled\n");
 }
 
-static void __attribute__ ((section(".iram1")))
+static void
 hrt_call_invoke(void)
 {
 	struct hrt_call	*call;
@@ -548,7 +548,7 @@ hrt_call_invoke(void)
  *
  * This routine must be called with interrupts disabled.
  */
-static void __attribute__ ((section(".iram1")))
+static void
 hrt_call_reschedule()
 {
 	hrt_abstime	now = hrt_absolute_time();
@@ -607,13 +607,13 @@ hrt_call_reschedule()
 // 	latency_counters[index]++;
 // }
 
-void __attribute__ ((section(".iram1")))
+void
 hrt_call_init(struct hrt_call *entry)
 {
 	memset(entry, 0, sizeof(*entry));
 }
 
-void __attribute__ ((section(".iram1")))
+void
 hrt_call_delay(struct hrt_call *entry, hrt_abstime delay)
 {
 	entry->deadline = hrt_absolute_time() + delay;

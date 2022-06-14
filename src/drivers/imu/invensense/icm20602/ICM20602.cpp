@@ -35,7 +35,7 @@
 
 using namespace time_literals;
 
-static constexpr int16_t __attribute__ ((section(".iram1"))) combine(uint8_t msb, uint8_t lsb)
+static constexpr int16_t  combine(uint8_t msb, uint8_t lsb)
 {
 	return (msb << 8u) | lsb;
 }
@@ -519,7 +519,7 @@ void ICM20602::RegisterSetAndClearBits(Register reg, uint8_t setbits, uint8_t cl
 	}
 }
 
-uint16_t __attribute__ ((section(".iram1"))) ICM20602::FIFOReadCount()
+uint16_t  ICM20602::FIFOReadCount()
 {
 	// read FIFO count
 	uint8_t fifo_count_buf[3] {};
@@ -533,7 +533,7 @@ uint16_t __attribute__ ((section(".iram1"))) ICM20602::FIFOReadCount()
 	return combine(fifo_count_buf[1], fifo_count_buf[2]);
 }
 
-bool __attribute__ ((section(".iram1"))) ICM20602::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
+bool  ICM20602::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
 {
 	FIFOTransferBuffer buffer{};
 	const size_t transfer_size = math::min(samples * sizeof(FIFO::DATA) + 3, FIFO::SIZE);
@@ -599,7 +599,7 @@ static bool fifo_accel_equal(const FIFO::DATA &f0, const FIFO::DATA &f1)
 	return (memcmp(&f0.ACCEL_XOUT_H, &f1.ACCEL_XOUT_H, 6) == 0);
 }
 
-bool __attribute__ ((section(".iram1"))) ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
+bool  ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
 	sensor_accel_fifo_s accel{};
 	accel.timestamp_sample = timestamp_sample;
@@ -652,7 +652,7 @@ bool __attribute__ ((section(".iram1"))) ICM20602::ProcessAccel(const hrt_abstim
 	return !bad_data;
 }
 
-void __attribute__ ((section(".iram1"))) ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
+void  ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
 	sensor_gyro_fifo_s gyro{};
 	gyro.timestamp_sample = timestamp_sample;
@@ -677,7 +677,7 @@ void __attribute__ ((section(".iram1"))) ICM20602::ProcessGyro(const hrt_abstime
 	_px4_gyro.updateFIFO(gyro);
 }
 
-bool __attribute__ ((section(".iram1"))) ICM20602::ProcessTemperature(const FIFO::DATA fifo[], const uint8_t samples)
+bool  ICM20602::ProcessTemperature(const FIFO::DATA fifo[], const uint8_t samples)
 {
 	int16_t temperature[FIFO_MAX_SAMPLES];
 	float temperature_sum{0};

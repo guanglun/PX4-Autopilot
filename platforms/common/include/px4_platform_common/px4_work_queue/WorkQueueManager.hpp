@@ -48,51 +48,51 @@ struct wq_config_t {
 
 namespace wq_configurations
 {
-static constexpr wq_config_t rate_ctrl{"wq:rate_ctrl", 3200, 0}; // PX4 inner loop highest priority
+static constexpr wq_config_t rate_ctrl{"wq:rate_ctrl", 1000, 0}; // PX4 inner loop highest priority
 
-static constexpr wq_config_t SPI0{"wq:SPI0", 2336, -1};
-static constexpr wq_config_t SPI1{"wq:SPI1", 2336, -2};
-static constexpr wq_config_t SPI2{"wq:SPI2", 2336, -3};
-static constexpr wq_config_t SPI3{"wq:SPI3", 3200, -4};
-static constexpr wq_config_t SPI4{"wq:SPI4", 2336, -5};
-static constexpr wq_config_t SPI5{"wq:SPI5", 2336, -6};
-static constexpr wq_config_t SPI6{"wq:SPI6", 2336, -7};
+static constexpr wq_config_t SPI0{"wq:SPI0", 1000, -1};
+static constexpr wq_config_t SPI1{"wq:SPI1", 1000, -2};
+static constexpr wq_config_t SPI2{"wq:SPI2", 1000, -3};
+static constexpr wq_config_t SPI3{"wq:SPI3", 1000, -4};
+static constexpr wq_config_t SPI4{"wq:SPI4", 1000, -5};
+static constexpr wq_config_t SPI5{"wq:SPI5", 1000, -6};
+static constexpr wq_config_t SPI6{"wq:SPI6", 1000, -7};
 
-static constexpr wq_config_t I2C0{"wq:I2C0", 2336, -8};
-static constexpr wq_config_t I2C1{"wq:I2C1", 2336, -9};
-static constexpr wq_config_t I2C2{"wq:I2C2", 2336, -10};
-static constexpr wq_config_t I2C3{"wq:I2C3", 2336, -11};
-static constexpr wq_config_t I2C4{"wq:I2C4", 2336, -12};
+static constexpr wq_config_t I2C0{"wq:I2C0", 1000, -8};
+static constexpr wq_config_t I2C1{"wq:I2C1", 1000, -9};
+static constexpr wq_config_t I2C2{"wq:I2C2", 1000, -10};
+static constexpr wq_config_t I2C3{"wq:I2C3", 1000, -11};
+static constexpr wq_config_t I2C4{"wq:I2C4", 1000, -12};
 
 // PX4 att/pos controllers, highest priority after sensors.
 static constexpr wq_config_t nav_and_controllers{"wq:nav_and_controllers", 3000, -13};
 
-static constexpr wq_config_t INS0{"wq:INS0", 6000, -14};
-static constexpr wq_config_t INS1{"wq:INS1", 6000, -15};
-static constexpr wq_config_t INS2{"wq:INS2", 6000, -16};
-static constexpr wq_config_t INS3{"wq:INS3", 6000, -17};
+static constexpr wq_config_t INS0{"wq:INS0", 1000, -14};
+static constexpr wq_config_t INS1{"wq:INS1", 1000, -15};
+static constexpr wq_config_t INS2{"wq:INS2", 1000, -16};
+static constexpr wq_config_t INS3{"wq:INS3", 1000, -17};
 
 static constexpr wq_config_t hp_default{"wq:hp_default", 2336, -18};
 
 static constexpr wq_config_t uavcan{"wq:uavcan", 3624, -19};
 
-static constexpr wq_config_t ttyS0{"wq:ttyS0", 2048, -21};
-static constexpr wq_config_t ttyS1{"wq:ttyS1", 2048, -22};
-static constexpr wq_config_t ttyS2{"wq:ttyS2", 2048, -23};
-static constexpr wq_config_t ttyS3{"wq:ttyS3", 2048, -24};
-static constexpr wq_config_t ttyS4{"wq:ttyS4", 2048, -25};
-static constexpr wq_config_t ttyS5{"wq:ttyS5", 2048, -26};
-static constexpr wq_config_t ttyS6{"wq:ttyS6", 2048, -27};
-static constexpr wq_config_t ttyS7{"wq:ttyS7", 2048, -28};
-static constexpr wq_config_t ttyS8{"wq:ttyS8", 2048, -29};
-static constexpr wq_config_t ttyS9{"wq:ttyS9", 2048, -30};
-static constexpr wq_config_t ttyACM0{"wq:ttyACM0", 2048, -31};
-static constexpr wq_config_t ttyUnknown{"wq:ttyUnknown", 2048, -32};
+static constexpr wq_config_t ttyS0{"wq:ttyS0", 1000, -21};
+static constexpr wq_config_t ttyS1{"wq:ttyS1", 1000, -22};
+static constexpr wq_config_t ttyS2{"wq:ttyS2", 1000, -23};
+static constexpr wq_config_t ttyS3{"wq:ttyS3", 1000, -24};
+static constexpr wq_config_t ttyS4{"wq:ttyS4", 1000, -25};
+static constexpr wq_config_t ttyS5{"wq:ttyS5", 1000, -26};
+static constexpr wq_config_t ttyS6{"wq:ttyS6", 1000, -27};
+static constexpr wq_config_t ttyS7{"wq:ttyS7", 1000, -28};
+static constexpr wq_config_t ttyS8{"wq:ttyS8", 1000, -29};
+static constexpr wq_config_t ttyS9{"wq:ttyS9", 1000, -30};
+static constexpr wq_config_t ttyACM0{"wq:ttyACM0", 1000, -31};
+static constexpr wq_config_t ttyUnknown{"wq:ttyUnknown", 1000, -32};
 
-static constexpr wq_config_t lp_default{"wq:lp_default", 2048, -50};
+static constexpr wq_config_t lp_default{"wq:lp_default", 1000, -50};
 
-static constexpr wq_config_t test1{"wq:test1", 2000, 0};
-static constexpr wq_config_t test2{"wq:test2", 2000, 0};
+static constexpr wq_config_t test1{"wq:test1", 1000, 0};
+static constexpr wq_config_t test2{"wq:test2", 1000, 0};
 
 } // namespace wq_configurations
 

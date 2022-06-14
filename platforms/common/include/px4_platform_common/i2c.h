@@ -87,7 +87,7 @@ public:
 	I2CBusIterator(FilterType filter, int bus = -1)
 		: _filter(filter), _bus(bus) {}
 
-	bool next();
+	//bool next();
 
 	const px4_i2c_bus_t &bus() const { return px4_i2c_buses[_index]; }
 

@@ -44,46 +44,46 @@ bool px4_i2c_bus_external(const px4_i2c_bus_t &bus)
 }
 #endif
 
-bool I2CBusIterator::next()
-{
-	while (++_index < I2C_BUS_MAX_BUS_ITEMS && px4_i2c_buses[_index].bus != -1) {
-		const px4_i2c_bus_t &bus_data = px4_i2c_buses[_index];
+// bool I2CBusIterator::next()
+// {
+// 	while (++_index < I2C_BUS_MAX_BUS_ITEMS && px4_i2c_buses[_index].bus != -1) {
+// 		const px4_i2c_bus_t &bus_data = px4_i2c_buses[_index];
 
-		if (!board_has_bus(BOARD_I2C_BUS, bus_data.bus)) {
-			continue;
-		}
+// 		if (!board_has_bus(BOARD_I2C_BUS, bus_data.bus)) {
+// 			continue;
+// 		}
 
-		switch (_filter) {
-		case FilterType::All:
-			if (_bus == bus_data.bus || _bus == -1) {
-				return true;
-			}
+// 		switch (_filter) {
+// 		case FilterType::All:
+// 			if (_bus == bus_data.bus || _bus == -1) {
+// 				return true;
+// 			}
 
-			break;
+// 			break;
 
-		case FilterType::InternalBus:
-			if (!px4_i2c_bus_external(bus_data)) {
-				if (_bus == bus_data.bus || _bus == -1) {
-					return true;
-				}
-			}
+// 		case FilterType::InternalBus:
+// 			if (!px4_i2c_bus_external(bus_data)) {
+// 				if (_bus == bus_data.bus || _bus == -1) {
+// 					return true;
+// 				}
+// 			}
 
-			break;
+// 			break;
 
-		case FilterType::ExternalBus:
-			if (px4_i2c_bus_external(bus_data)) {
-				++_external_bus_counter;
+// 		case FilterType::ExternalBus:
+// 			if (px4_i2c_bus_external(bus_data)) {
+// 				++_external_bus_counter;
 
-				if (_bus == bus_data.bus || _bus == -1) {
-					return true;
-				}
-			}
+// 				if (_bus == bus_data.bus || _bus == -1) {
+// 					return true;
+// 				}
+// 			}
 
-			break;
-		}
-	}
+// 			break;
+// 		}
+// 	}
 
-	return false;
-}
+// 	return false;
+// }
 
 #endif // CONFIG_I2C
