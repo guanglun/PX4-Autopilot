@@ -81,7 +81,7 @@ WorkQueue::~WorkQueue()
 #endif /* __PX4_NUTTX */
 }
 
-bool WorkQueue::Attach(WorkItem *item)
+bool __attribute__ ((section(".iram1"))) WorkQueue::Attach(WorkItem *item)
 {
 	work_lock();
 
@@ -96,7 +96,7 @@ bool WorkQueue::Attach(WorkItem *item)
 	return false;
 }
 
-void WorkQueue::Detach(WorkItem *item)
+void __attribute__ ((section(".iram1"))) WorkQueue::Detach(WorkItem *item)
 {
 	bool exiting = false;
 
