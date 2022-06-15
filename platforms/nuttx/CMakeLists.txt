@@ -307,7 +307,7 @@ else()
 		-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32.ld
 		-T ${NUTTX_CONFIG_DIR_CYG}/scripts/${SCRIPT_PREFIX}esp32_rom.ld
 		-Wl,-Map=${PX4_CONFIG}.map
-		-Wl,--warn-common
+
 		-Wl,--gc-sections
 
 		-Wl,--start-group
@@ -319,9 +319,6 @@ else()
 			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libsmartconfig.a
 			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libespnow.a
 			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libpp.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libwpa_supplicant.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcoexist.a
 		-Wl,--end-group
 		m
 		gcc

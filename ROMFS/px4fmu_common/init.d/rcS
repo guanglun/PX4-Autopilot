@@ -15,6 +15,11 @@
 # #
 # #------------------------------------------------------------------------------
 
+
+ifup wlan1
+dhcpd_start wlan1
+ifdown wlan0
+ifconfig
 # #
 # # Set default paramter values.
 # # Do not add intra word spaces
