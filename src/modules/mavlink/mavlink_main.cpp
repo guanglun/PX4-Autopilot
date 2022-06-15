@@ -981,7 +981,7 @@ const in_addr Mavlink::compute_broadcast_addr(const in_addr &host_addr, const in
 
 void Mavlink::init_udp()
 {
-	PX4_DEBUG("Setting up UDP with port %hu", _network_port);
+	PX4_INFO("Setting up UDP with port %hu", _network_port);
 
 	_myaddr.sin_family = AF_INET;
 	_myaddr.sin_addr.s_addr = htonl(INADDR_ANY);

@@ -81,7 +81,7 @@ WorkQueue::~WorkQueue()
 #endif /* __PX4_NUTTX */
 }
 
-bool  WorkQueue::Attach(WorkItem *item)
+bool __attribute__ ((section(".iram1"))) WorkQueue::Attach(WorkItem *item)
 {
 	work_lock();
 
@@ -96,7 +96,7 @@ bool  WorkQueue::Attach(WorkItem *item)
 	return false;
 }
 
-void  WorkQueue::Detach(WorkItem *item)
+void __attribute__ ((section(".iram1"))) WorkQueue::Detach(WorkItem *item)
 {
 	bool exiting = false;
 
@@ -125,7 +125,7 @@ void  WorkQueue::Detach(WorkItem *item)
 	}
 }
 
-void  WorkQueue::Add(WorkItem *item)
+void __attribute__ ((section(".iram1"))) WorkQueue::Add(WorkItem *item)
 {
 	work_lock();
 
@@ -170,7 +170,7 @@ void WorkQueue::Clear()
 	work_unlock();
 }
 
-void  WorkQueue::Run()
+void __attribute__ ((section(".iram1"))) WorkQueue::Run()
 {
 	while (!should_exit()) {
 		// loop as the wait may be interrupted by a signal
