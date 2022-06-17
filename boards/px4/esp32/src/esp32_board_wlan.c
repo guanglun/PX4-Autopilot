@@ -35,7 +35,7 @@
 
 #include "esp32_spiflash.h"
 #include "esp32_wlan.h"
-
+#include "netutils/netlib.h"
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
@@ -64,7 +64,9 @@ int board_wlan_init(void)
 {
   int ret = OK;
 
+
 #ifdef ESP32_WLAN_HAS_STA
+  printf("start sta\n");
   ret = esp32_wlan_sta_initialize();
   if (ret)
     {
@@ -73,7 +75,9 @@ int board_wlan_init(void)
     }
 #endif
 
+
 #ifdef ESP32_WLAN_HAS_SOFTAP
+  printf("start softap\n");
   ret = esp32_wlan_softap_initialize();
   if (ret)
     {
@@ -81,6 +85,9 @@ int board_wlan_init(void)
       return ret;
     }
 #endif
+
+  netlib_ifup("wlan1");
+  netlib_ifdown("wlan0");
 
   return ret;
 }

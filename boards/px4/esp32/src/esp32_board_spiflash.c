@@ -45,6 +45,8 @@
 #include "esp32_spiflash.h"
 #include "esp32_board_spiflash.h"
 
+#define CONFIG_ESP32_SPIFLASH_SPIFFS
+
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
@@ -471,7 +473,6 @@ static int init_storage_partition(void)
     }
 
 #elif defined(CONFIG_ESP32_SPIFLASH_SPIFFS)
-
   const char *path = "/dev/esp32flash";
   ret = setup_spiffs(path, mtd, NULL, 0755);
   if (ret < 0)
