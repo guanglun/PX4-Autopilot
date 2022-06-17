@@ -33,7 +33,7 @@
 px4_add_module(
 	MODULE systemcmds__top
 	MAIN top
-	STACK_MAIN 4096
+	STACK_MAIN 5120
 	PRIORITY
 		"SCHED_PRIORITY_MAX - 18" # max priority below high priority WQ threads
 	SRCS

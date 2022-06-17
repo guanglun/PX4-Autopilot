@@ -67,7 +67,6 @@ int board_wlan_init(void)
 
 
 #ifdef ESP32_WLAN_HAS_STA
-  printf("start sta\n");
   ret = esp32_wlan_sta_initialize();
   if (ret)
     {
@@ -78,7 +77,6 @@ int board_wlan_init(void)
 
 
 #ifdef ESP32_WLAN_HAS_SOFTAP
-  printf("start softap\n");
   ret = esp32_wlan_softap_initialize();
   if (ret)
     {

@@ -194,13 +194,13 @@ esp32_board_initialize(void)
  *   any failure to indicate the nature of the failure.
  *
  ****************************************************************************/
-// #ifdef CONFIG_ESP32_SPI2
-// static struct spi_dev_s *spi2;
-// #endif
+#ifdef CONFIG_ESP32_SPI2
+static struct spi_dev_s *spi2;
+#endif
 
-// #ifdef CONFIG_ESP32_SPI3
-// static struct spi_dev_s *spi3;
-// #endif
+#ifdef CONFIG_ESP32_SPI3
+static struct spi_dev_s *spi3;
+#endif
 
 void test_poll(void)
 {
@@ -221,55 +221,55 @@ void test_poll(void)
 #include "esp32_board_spiflash.h"
 #include "esp32_board_wlan.h"
 #include "esp32_rt_timer.h"
-void wifi_init(void);
+static void esp32_wifi_init(void);
 
 __EXPORT int board_app_initialize(uintptr_t arg)
 {
 
 	syslog(LOG_INFO, "\n[boot] CPU SPEED %d\n", esp_rtc_clk_get_cpu_freq());
 
-// 	px4_platform_init();
+	px4_platform_init();
 
-// 	// Initial LED state.
-// 	drv_led_start();
-// 	led_off(LED_RED);
-// 	led_off(LED_GREEN);
-// 	led_off(LED_BLUE);
+	// Initial LED state.
+	drv_led_start();
+	led_off(LED_RED);
+	led_off(LED_GREEN);
+	led_off(LED_BLUE);
 
 
-// 	// px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
-// 	// esp32_gpiowrite(14, false);
+	// px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
+	// esp32_gpiowrite(14, false);
 
-// 	// Configure SPI-based devices.
-// #ifdef CONFIG_ESP32_SPI2
-// 	spi2 = esp32_spibus_initialize(2);
+	// Configure SPI-based devices.
+#ifdef CONFIG_ESP32_SPI2
+	spi2 = esp32_spibus_initialize(2);
 
-// 	if (!spi2) {
-// 		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 2\n");
-// 		led_on(LED_RED);
-// 	}
+	if (!spi2) {
+		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 2\n");
+		led_on(LED_RED);
+	}
 
-// 	// Default SPI1 to 10MHz
-// 	SPI_SETFREQUENCY(spi2, 10000000);
-// 	SPI_SETBITS(spi2, 8);
-// 	SPI_SETMODE(spi2, SPIDEV_MODE3);
-// 	up_udelay(20);
+	// Default SPI1 to 10MHz
+	SPI_SETFREQUENCY(spi2, 10000000);
+	SPI_SETBITS(spi2, 8);
+	SPI_SETMODE(spi2, SPIDEV_MODE3);
+	up_udelay(20);
 
-// 	px4_platform_configure();
-// #endif
+	px4_platform_configure();
+#endif
 
-// #ifdef CONFIG_ESP32_SPI3
-// 	spi3 = esp32_spibus_initialize(3);
+#ifdef CONFIG_ESP32_SPI3
+	spi3 = esp32_spibus_initialize(3);
 
-// 	if (!spi3) {
-// 		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 3\n");
-// 		led_on(LED_RED);
-// 	}
+	if (!spi3) {
+		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port 3\n");
+		led_on(LED_RED);
+	}
 
-// 	SPI_SETFREQUENCY(spi3, 8 * 1000 * 1000);
-// 	SPI_SETBITS(spi3, 8);
-// 	SPI_SETMODE(spi3, SPIDEV_MODE3);
-// #endif
+	SPI_SETFREQUENCY(spi3, 8 * 1000 * 1000);
+	SPI_SETBITS(spi3, 8);
+	SPI_SETMODE(spi3, SPIDEV_MODE3);
+#endif
 
 
 // #ifdef CONFIG_ESP32_SPIFLASH
@@ -291,7 +291,7 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 // #endif
 
 
-	wifi_init();
+	esp32_wifi_init();
 
 	// static struct hrt_call test_call;
 	// hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
@@ -300,20 +300,19 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 }
 
 
-void wifi_init(void)
+static void esp32_wifi_init(void)
 {
     int ret;
 
-#ifdef CONFIG_FS_PROCFS
-  /* Mount the procfs file system */
+// #ifdef CONFIG_FS_PROCFS
+//   /* Mount the procfs file system */
 
-  ret = nx_mount(NULL, "/proc", "procfs", 0, NULL);
-  if (ret < 0)
-    {
-      syslog(LOG_ERR, "ERROR: Failed to mount procfs at /proc: %d\n", ret);
-    }
-#endif
-
+//   ret = nx_mount(NULL, "/proc", "procfs", 0, NULL);
+//   if (ret < 0)
+//     {
+//       syslog(LOG_ERR, "ERROR: Failed to mount procfs at /proc: %d\n", ret);
+//     }
+// #endif
 
 #ifdef CONFIG_ESP32_SPIFLASH
   ret = esp32_spiflash_init();
