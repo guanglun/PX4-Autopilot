@@ -37,6 +37,7 @@ endif()
 
 include(cygwin_cygpath)
 
+link_directories(${PX4_SOURCE_DIR}/platforms/nuttx/NuttX/nuttx/arch/xtensa/src/chip/esp-wireless-drivers-3rdparty/libs/esp32)
 add_executable(px4 ${PX4_SOURCE_DIR}/platforms/common/empty.c)
 set(FW_NAME ${PX4_BOARD_VENDOR}_${PX4_BOARD_MODEL}_${PX4_BOARD_LABEL}.elf)
 set_target_properties(px4 PROPERTIES OUTPUT_NAME ${FW_NAME})
@@ -249,6 +250,17 @@ else()
 	# ${PX4_STARTUP_DIR}/xtensa_cpupause.o
 	)
 
+	set(NUTTX_NETWORK_LIB
+	libcore.a
+	librtc.a
+	libnet80211.a
+	libpp.a
+	libsmartconfig.a
+	libespnow.a
+	libphy.a
+	libwpa_supplicant.a
+	)
+
 	execute_process(COMMAND touch ${NUTTX_STARTUP_OBJS}
 	WORKING_DIRECTORY ${PX4_SOURCE_DIR})
 
@@ -266,22 +278,14 @@ else()
 			arch_hrt
 			arch_board_reset
 			-Wl,--start-group
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcore.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/librtc.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libnet80211.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libsmartconfig.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libespnow.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libpp.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libwpa_supplicant.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcoexist.a
+			${NUTTX_NETWORK_LIB}
 			-Wl,--end-group
 
 
 			# -lcore -lrtc -lnet80211 -lpp -lsmartconfig -lespnow -lphy -lwpa_supplicant
 	)
 
-	# link_directories(${PX4_SOURCE_DIR}/boards/px4/esp32/libs)
+
 	# add_library(esp32_lib OBJECT
 	# 		${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
 	# 		${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libwapi.a)
@@ -313,12 +317,8 @@ else()
 		-Wl,--start-group
 			${nuttx_libs}
 			${NUTTX_STARTUP_OBJS}
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libcore.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/librtc.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libnet80211.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libsmartconfig.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libespnow.a
-			${PX4_SOURCE_DIR}/boards/px4/esp32/libs/libphy.a
+			${NUTTX_NETWORK_LIB}
+
 		-Wl,--end-group
 		m
 		gcc

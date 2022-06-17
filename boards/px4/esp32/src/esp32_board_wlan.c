@@ -36,6 +36,7 @@
 #include "esp32_spiflash.h"
 #include "esp32_wlan.h"
 #include "netutils/netlib.h"
+#include "netutils/dhcpd.h"
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
@@ -87,7 +88,7 @@ int board_wlan_init(void)
 #endif
 
   netlib_ifup("wlan1");
-  netlib_ifdown("wlan0");
+  dhcpd_start("wlan1");
 
   return ret;
 }
