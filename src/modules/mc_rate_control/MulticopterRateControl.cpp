@@ -98,7 +98,7 @@ MulticopterRateControl::parameters_updated()
 	_actuators_0_circuit_breaker_enabled = circuit_breaker_enabled_by_val(_param_cbrk_rate_ctrl.get(), CBRK_RATE_CTRL_KEY);
 }
 
-void
+void __attribute__ ((section(".iram1")))
 MulticopterRateControl::Run()
 {
 	if (should_exit()) {

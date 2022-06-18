@@ -70,11 +70,11 @@ class PublicationBase
 {
 public:
 
-	bool advertised() const { return _handle != nullptr; }
+	inline bool advertised() const { return _handle != nullptr; }
 
 	bool unadvertise() { return (Manager::orb_unadvertise(_handle) == PX4_OK); }
 
-	orb_id_t get_topic() const { return get_orb_meta(_orb_id); }
+	inline orb_id_t get_topic() const { return get_orb_meta(_orb_id); }
 
 protected:
 
@@ -123,7 +123,7 @@ public:
 	 * Publish the struct
 	 * @param data The uORB message struct we are updating.
 	 */
-	bool publish(const T &data)
+	bool __attribute__ ((section(".iram1"))) publish(const T &data)
 	{
 		if (!advertised()) {
 			advertise();

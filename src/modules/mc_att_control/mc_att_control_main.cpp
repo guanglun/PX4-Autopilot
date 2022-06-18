@@ -218,7 +218,7 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
 }
 
-void
+void __attribute__ ((section(".iram1")))
 MulticopterAttitudeControl::Run()
 {
 	if (should_exit()) {

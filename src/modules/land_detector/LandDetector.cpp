@@ -72,7 +72,7 @@ void LandDetector::start()
 	_vehicle_local_position_sub.registerCallback();
 }
 
-void LandDetector::Run()
+void __attribute__ ((section(".iram1"))) LandDetector::Run()
 {
 	// push backup schedule
 	ScheduleDelayed(50_ms);

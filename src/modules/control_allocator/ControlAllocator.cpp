@@ -275,7 +275,7 @@ ControlAllocator::update_effectiveness_source()
 	return false;
 }
 
-void
+void __attribute__ ((section(".iram1")))
 ControlAllocator::Run()
 {
 	if (should_exit()) {

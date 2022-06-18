@@ -205,7 +205,7 @@ void VehicleAcceleration::ParametersUpdate(bool force)
 	}
 }
 
-void VehicleAcceleration::Run()
+void __attribute__ ((section(".iram1"))) VehicleAcceleration::Run()
 {
 	// backup schedule
 	ScheduleDelayed(10_ms);

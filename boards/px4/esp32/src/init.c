@@ -293,8 +293,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	esp32_wifi_init();
 
-	// static struct hrt_call test_call;
-	// hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
+	static struct hrt_call test_call;
+	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
 
 	return OK;
 }

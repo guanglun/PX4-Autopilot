@@ -1829,7 +1829,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 	return ret;
 }
 
-int
+int __attribute__ ((section(".iram1")))
 Mavlink::task_main(int argc, char *argv[])
 {
 	int ch;

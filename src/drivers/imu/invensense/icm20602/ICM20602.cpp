@@ -141,7 +141,7 @@ int ICM20602::probe()
 	return PX4_OK;
 }
 
-void ICM20602::RunImpl()
+void __attribute__ ((section(".iram1"))) ICM20602::RunImpl()
 {
 	const hrt_abstime now = hrt_absolute_time();
 

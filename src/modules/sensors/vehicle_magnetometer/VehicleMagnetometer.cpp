@@ -358,7 +358,7 @@ void VehicleMagnetometer::UpdatePowerCompensation()
 
 }
 
-void VehicleMagnetometer::Run()
+void __attribute__ ((section(".iram1"))) VehicleMagnetometer::Run()
 {
 	perf_begin(_cycle_perf);
 
