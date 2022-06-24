@@ -495,6 +495,33 @@ static int init_storage_partition(void)
   return ret;
 }
 
+#define CONFIG_ESP32_PARAM_MTD_OFFSET   0x310000
+#define CONFIG_ESP32_PARAM_MTD_SIZE     0x50000
+
+static int init_param_partition(void)
+{
+  int ret = OK;
+  struct mtd_dev_s *mtd;
+
+  mtd = esp32_spiflash_alloc_mtdpart(CONFIG_ESP32_PARAM_MTD_OFFSET,
+                                     CONFIG_ESP32_PARAM_MTD_SIZE,
+                                     STORAGE_ENCRYPT);
+  if (!mtd)
+    {
+      ferr("ERROR: Failed to alloc PARAM MTD partition of SPI Flash\n");
+      return -ENOMEM;
+    }
+
+  ret = register_mtddriver("/dev/param", mtd, 0755, NULL);
+  if (ret < 0)
+    {
+      ferr("ERROR: Failed to register PARAM MTD: %d\n", ret);
+      return ret;
+    }
+
+  return ret;
+}
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -539,6 +566,13 @@ int esp32_spiflash_init(void)
     {
       return ret;
     }
+
+  ret = init_param_partition();
+  if (ret < 0)
+    {
+      return ret;
+    }
+
 
   return ret;
 }
