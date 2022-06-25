@@ -19,3 +19,10 @@ param set-default BAT1_SOURCE 0
 param set-default BAT1_N_CELLS 3
 param set IMU_GYRO_RATEMAX 300
 param set PWM_MAIN_RATE 400
+
+param set-default COM_FLTMODE1  8
+param set-default COM_FLTMODE2  8
+param set-default COM_FLTMODE3  8
+param set-default COM_FLTMODE4  8
+param set-default COM_FLTMODE5  8
+param set-default COM_FLTMODE6  8
