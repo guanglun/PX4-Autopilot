@@ -148,6 +148,8 @@ int px4_platform_init()
 
 	px4::WorkQueueManagerStart();
 
+	printf("uorb start\n");
+
 	uorb_start();
 
 	// px4_log_initialize();

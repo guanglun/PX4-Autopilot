@@ -3079,10 +3079,10 @@ void
 MavlinkReceiver::run()
 {
 
-	cpu_set_t cpuset;
-	CPU_ZERO(&cpuset);
-	CPU_SET(1, &cpuset);
-	pthread_setaffinity_np(getpid(), sizeof(cpu_set_t), &cpuset);
+	// cpu_set_t cpuset;
+	// CPU_ZERO(&cpuset);
+	// CPU_SET(1, &cpuset);
+	// pthread_setaffinity_np(getpid(), sizeof(cpu_set_t), &cpuset);
 
 	/* set thread name */
 	{

@@ -1,1 +1,8 @@
-ms5611 -I start
+# param set IMU_GYRO_RATEMAX 800
+# ms5611 -X start
+# sleep 5
+# ist8310 -I -R 0 start
+# sleep 5
+# icm20602 -s -R 2 start
+# sleep 5
+# sensors start
