@@ -451,7 +451,7 @@ else
 	# Start UART/Serial device drivers.
 	# Note: rc.serial is auto-generated from Tools/serial/generate_config.py
 	#
-	. ${R}etc/init.d/rc.serial
+	# . ${R}etc/init.d/rc.serial
 
 	if [ $IO_PRESENT = no ]
 	then
@@ -570,12 +570,14 @@ else
 	# 	sh $BOARD_BOOTLOADER_UPGRADE
 	# fi
 	# unset BOARD_BOOTLOADER_UPGRADE
-
+	wapi psk wlan0 Zhou74110 3
+	wapi essid wlan0 gogogo 1
+	renew wlan0
 	# ifup wlan1
-	dhcpd_start wlan1
+	# dhcpd_start wlan1
 	# ifdown wlan0
 	# ifconfig
-	mavlink start -x -u 14556 -p -r 4096 -n wlan1
+	mavlink start -x -u 14556 -p -r 1000000 -n wlan0
 	# mavlink start -u 14556 -p -n wlan1
 	# sleep 1
 	# top

@@ -73,6 +73,7 @@ int board_wlan_init(void)
       printf("ERROR: Failed to initialize Wi-Fi station\n");
       return ret;
     }
+
 #endif
 
 
@@ -83,10 +84,14 @@ int board_wlan_init(void)
       wlerr("ERROR: Failed to initialize Wi-Fi softAP\n");
       return ret;
     }
+
+    netlib_ifup("wlan1");
+    dhcpd_start("wlan1");
+#else
+    netlib_ifup("wlan0");
 #endif
 
-  netlib_ifup("wlan1");
-  dhcpd_start("wlan1");
+
 
   return ret;
 }
