@@ -281,7 +281,7 @@ WorkQueueManagerRun(int, char **)
 #endif
 
 			// priority
-			int sched_priority = sched_get_priority_max(SCHED_FIFO) + wq->relative_priority - 1;
+			int sched_priority = sched_get_priority_max(SCHED_FIFO) + wq->relative_priority;
 
 			// use pthreads for NuttX flat and posix builds. For NuttX protected build, use tasks or kernel threads
 #if !defined(__PX4_NUTTX) || defined(CONFIG_BUILD_FLAT)
