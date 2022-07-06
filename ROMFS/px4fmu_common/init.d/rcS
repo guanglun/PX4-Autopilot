@@ -1,29 +1,30 @@
-ver all
+# # # ver all
 param select /dev/esp32flash
 param import
 
-param set EKF2_MULTI_IMU 0
-param set SENS_IMU_MODE 1
-param set EKF2_PREDICT_US 20000
-param set IMU_GYRO_RATEMAX 300
+# # # param set EKF2_MULTI_IMU 0
+# # # param set SENS_IMU_MODE 1
+param set EKF2_PREDICT_US 10000
+param set IMU_GYRO_RATEMAX 800
 
-ms5611 -I start
-ist8310 -I -R 0 start
+# ms5611 -I start
+# ist8310 -I -R 0 start
 icm20602 -s -R 2 start
-sensors start
-commander start
-ekf2 start
-gyro_calibration start
-navigator start
+# sensors start
+# # # commander start
+# ekf2 start
+# # # gyro_calibration start
+# # # navigator start
 
-land_detector start multicopter
-mc_hover_thrust_estimator start
-flight_mode_manager start
-mc_pos_control start
-mc_att_control start
-mc_rate_control start
+# # # land_detector start multicopter
+# # # mc_hover_thrust_estimator start
+# # # flight_mode_manager start
+# # # mc_pos_control start
+# # # mc_att_control start
+# # # mc_rate_control start
 
-send_event start
-load_mon start
-rc_update start
-manual_control start
+# # # send_event start
+# # # load_mon start
+# # # rc_update start
+# # # manual_control start
+# hello start

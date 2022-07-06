@@ -242,8 +242,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	px4_esp32_configgpio(GPIO_OUTPUT | 15);
 	esp32_gpiowrite(15, true);
 
-	// px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
-	// esp32_gpiowrite(14, true);
+	px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
+	esp32_gpiowrite(14, true);
 
 	// Configure SPI-based devices.
 #ifdef CONFIG_ESP32_SPI2

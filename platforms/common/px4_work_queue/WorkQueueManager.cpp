@@ -281,7 +281,7 @@ WorkQueueManagerRun(int, char **)
 #endif
 
 			// priority
-			int sched_priority = sched_get_priority_max(SCHED_FIFO) + wq->relative_priority;
+			int sched_priority = sched_get_priority_max(SCHED_FIFO) + wq->relative_priority - 1;
 
 			// use pthreads for NuttX flat and posix builds. For NuttX protected build, use tasks or kernel threads
 #if !defined(__PX4_NUTTX) || defined(CONFIG_BUILD_FLAT)
@@ -324,16 +324,16 @@ WorkQueueManagerRun(int, char **)
 				PX4_ERR("setting sched params for %s failed (%i)", wq->name, ret_setschedparam);
 			}
 
-			// cpu_set_t cpuset;
-			// CPU_ZERO(&cpuset);
-			// CPU_SET(wq->cpu, &cpuset);
-			// int ret_setaffinity = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
+			cpu_set_t cpuset;
+			CPU_ZERO(&cpuset);
+			CPU_SET(wq->cpu, &cpuset);
+			int ret_setaffinity = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
 
-			// if (ret_setaffinity != 0) {
-			// 	PX4_ERR("setting affinity for %s failed (%i)", wq->name, ret_setaffinity);
-			// }else{
-			// 	PX4_INFO("setting %s to cpu %d", wq->name, wq->cpu);
-			// }
+			if (ret_setaffinity != 0) {
+				PX4_ERR("setting affinity for %s failed (%i)", wq->name, ret_setaffinity);
+			}else{
+				PX4_INFO("setting %s to cpu %d", wq->name, wq->cpu);
+			}
 
 			// create thread
 			pthread_t thread;
