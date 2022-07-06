@@ -163,6 +163,41 @@ SPI::transfer(uint8_t *send, uint8_t *recv, unsigned len)
 }
 
 int
+SPI::transfer2(uint8_t *send, uint8_t *recv, unsigned len)
+{
+	int result;
+
+	if ((send == nullptr) && (recv == nullptr)) {
+		return -EINVAL;
+	}
+
+	LockMode mode = up_interrupt_context() ? LOCK_NONE : _locking_mode;
+
+	/* lock the bus as required */
+	switch (mode) {
+	default:
+	case LOCK_PREEMPTION: {
+			irqstate_t state = px4_enter_critical_section();
+			result = _transfer(send, recv, len);
+			px4_leave_critical_section(state);
+		}
+		break;
+
+	case LOCK_THREADS:
+		SPI_LOCK(_dev, true);
+		result = _transfer(send, recv, len);
+		SPI_LOCK(_dev, false);
+		break;
+
+	case LOCK_NONE:
+		result = _transfer(send, recv, len);
+		break;
+	}
+
+	return result;
+}
+
+int
 SPI::_transfer(uint8_t *send, uint8_t *recv, unsigned len)
 {
 	SPI_SETFREQUENCY(_dev, _frequency);
