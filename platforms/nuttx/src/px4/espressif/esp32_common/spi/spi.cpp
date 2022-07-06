@@ -89,20 +89,25 @@ __EXPORT void esp32_spiinitialize()
 
 }
 
-static inline void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *dev, uint32_t devid, bool selected)
+void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *dev, uint32_t devid, bool selected)
 {
 	//syslog(LOG_DEBUG, "esp32 spixselect %i\n", bus->bus);
 
 	for (int i = 0; i < SPI_BUS_MAX_DEVICES; ++i) {
-		if (bus->devices[i].cs_gpio == 0) {
-			break;
+		if (bus->devices[i].cs_gpio != 0) {
+			//syslog(LOG_DEBUG, "pin %i\n", bus->devices[i].cs_gpio);
+			if (devid == bus->devices[i].devid) {
+				// SPI select is active low, so write !selected to select the device
+				//syslog(LOG_DEBUG, "esp32_gpiowrite %i\n", bus->bus);
+				//px4_arch_gpiowrite(bus->devices[i].cs_gpio, !selected);
+
+				if(selected)
+					(*(volatile uint32_t *)(0x3FF4400C) = (1<<5));//LOW
+				else
+					(*(volatile uint32_t *)(0x3FF44008) = (1<<5));//HIGH
+			}
 		}
 
-		if (devid == bus->devices[i].devid) {
-			// SPI select is active low, so write !selected to select the device
-			//syslog(LOG_DEBUG, "esp32_gpiowrite %i\n", bus->bus);
-			px4_arch_gpiowrite(bus->devices[i].cs_gpio, !selected);
-		}
 	}
 }
 
