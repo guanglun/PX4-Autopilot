@@ -172,6 +172,7 @@ void WorkQueue::Clear()
 
 void __attribute__ ((section(".iram1"))) WorkQueue::Run()
 {
+	printf("WorkQueue %d %s\n",pthread_self(),get_name());
 	while (!should_exit()) {
 		// loop as the wait may be interrupted by a signal
 		do {} while (px4_sem_wait(&_process_lock) != 0);

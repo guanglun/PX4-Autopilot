@@ -43,20 +43,49 @@
 #include <px4_platform_common/time.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <drivers/drv_hrt.h>
+#include <px4_platform_common/sem.h>
+
+px4_sem_t _qlock;
+void work_lock() { do {} while (px4_sem_wait(&_qlock) != 0); }
+void work_unlock() { px4_sem_post(&_qlock); }
+
+void test_poll11(void)
+{
+	px4_sem_post(&_qlock);
+	// work_lock();
+
+	// (*(volatile uint32_t *)(0x3FF4400C) = (1 << 14)); //LOW
+
+	// for(unsigned int i=0;i<2000000;i++)
+	// {
+	// 	__asm("nop");
+	// }
+	// (*(volatile uint32_t *)(0x3FF44008) = (1 << 14)); //HIGH
+
+
+	// work_unlock();
+}
 
 px4::AppState HelloExample::appState;
 
 int HelloExample::main()
 {
 	appState.setRunning(true);
+	px4_sem_init(&_qlock, 0, 1);
+	static struct hrt_call test_call;
+	hrt_call_every(&test_call, 100000, 100000, (hrt_callout)test_poll11, NULL);
 
-	int i = 0;
+	while (!appState.exitRequested()) {
 
-	while (!appState.exitRequested() && i < 5) {
-		px4_sleep(2);
+		do {} while (px4_sem_wait(&_qlock) != 0);
 
-		printf("  Doing work...\n");
-		++i;
+		(*(volatile uint32_t *)(0x3FF4400C) = (1 << 14)); //LOW
+		for(unsigned int i=0;i<2000000;i++)
+		{
+			__asm("nop");
+		}
+		(*(volatile uint32_t *)(0x3FF44008) = (1 << 14)); //HIGH
 	}
 
 	return 0;

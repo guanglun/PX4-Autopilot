@@ -143,194 +143,210 @@ int ICM20602::probe()
 
 void ICM20602::RunImpl()
 {
-	const hrt_abstime now = hrt_absolute_time();
+	static int isfirst = 1;
 
-	switch (_state) {
-	case STATE::RESET:
-		// PWR_MGMT_1: Device Reset
-		RegisterWrite(Register::PWR_MGMT_1, PWR_MGMT_1_BIT::DEVICE_RESET);
-		_reset_timestamp = now;
-		_failure_count = 0;
-		_state = STATE::WAIT_FOR_RESET;
-		ScheduleDelayed(2_ms); // From power-up 2 ms start-up time for register read/write
-		break;
-
-	case STATE::WAIT_FOR_RESET:
-
-		// The reset value is 0x00 for all registers other than the registers below
-		//  Document Number: DS-000176 Page 31 of 57
-		if ((RegisterRead(Register::WHO_AM_I) == WHOAMI)
-		    && (RegisterRead(Register::PWR_MGMT_1) == 0x41)
-		    && (RegisterRead(Register::CONFIG) == 0x80)) {
-
-			// offset registers (factory calibration) should not change during normal operation
-			StoreCheckedRegisterValue(Register::XG_OFFS_TC_H);
-			StoreCheckedRegisterValue(Register::XG_OFFS_TC_L);
-			StoreCheckedRegisterValue(Register::YG_OFFS_TC_H);
-			StoreCheckedRegisterValue(Register::YG_OFFS_TC_L);
-			StoreCheckedRegisterValue(Register::ZG_OFFS_TC_H);
-			StoreCheckedRegisterValue(Register::ZG_OFFS_TC_L);
-
-			StoreCheckedRegisterValue(Register::XA_OFFSET_H);
-			StoreCheckedRegisterValue(Register::XA_OFFSET_L);
-			StoreCheckedRegisterValue(Register::YA_OFFSET_H);
-			StoreCheckedRegisterValue(Register::YA_OFFSET_L);
-			StoreCheckedRegisterValue(Register::ZA_OFFSET_H);
-			StoreCheckedRegisterValue(Register::ZA_OFFSET_L);
-
-			// Disable I2C, wakeup, and reset digital signal path
-			RegisterWrite(Register::I2C_IF, I2C_IF_BIT::I2C_IF_DIS); // set immediately to prevent switching into I2C mode
-			RegisterWrite(Register::PWR_MGMT_1, PWR_MGMT_1_BIT::CLKSEL_0);
-			RegisterWrite(Register::SIGNAL_PATH_RESET, SIGNAL_PATH_RESET_BIT::ACCEL_RST | SIGNAL_PATH_RESET_BIT::TEMP_RST);
-			RegisterSetAndClearBits(Register::USER_CTRL, USER_CTRL_BIT::SIG_COND_RST, 0);
-
-			// if reset succeeded then configure
-			_state = STATE::CONFIGURE;
-			ScheduleDelayed(35_ms); // max 35 ms start-up time from sleep
-
-		} else {
-			// RESET not complete
-			if (hrt_elapsed_time(&_reset_timestamp) > 1000_ms) {
-				PX4_DEBUG("Reset failed, retrying");
-				_state = STATE::RESET;
-				ScheduleDelayed(100_ms);
-
-			} else {
-				PX4_DEBUG("Reset not complete, check again in 10 ms");
-				ScheduleDelayed(10_ms);
-			}
-		}
-
-		break;
-
-	case STATE::CONFIGURE:
-		if (Configure()) {
-			// if configure succeeded then start reading from FIFO
-			_state = STATE::FIFO_READ;
-
-			if (DataReadyInterruptConfigure()) {
-				_data_ready_interrupt_enabled = true;
-
-				// backup schedule as a watchdog timeout
-				ScheduleDelayed(100_ms);
-
-			} else {
-				_data_ready_interrupt_enabled = false;
-				ScheduleOnInterval(_fifo_empty_interval_us, _fifo_empty_interval_us);
-			}
-
-			FIFOReset();
-
-		} else {
-			// CONFIGURE not complete
-			if (hrt_elapsed_time(&_reset_timestamp) > 1000_ms) {
-				PX4_DEBUG("Configure failed, resetting");
-				_state = STATE::RESET;
-
-			} else {
-				PX4_DEBUG("Configure failed, retrying");
-			}
-
-			ScheduleDelayed(100_ms);
-		}
-
-		break;
-
-	case STATE::FIFO_READ: {
-			hrt_abstime timestamp_sample = now;
-			uint8_t samples = 0;
-
-			if (_data_ready_interrupt_enabled) {
-				// scheduled from interrupt if _drdy_timestamp_sample was set as expected
-				const hrt_abstime drdy_timestamp_sample = _drdy_timestamp_sample.fetch_and(0);
-
-				if ((now - drdy_timestamp_sample) < _fifo_empty_interval_us) {
-					timestamp_sample = drdy_timestamp_sample;
-					samples = _fifo_gyro_samples;
-
-				} else {
-					perf_count(_drdy_missed_perf);
-				}
-
-				// push backup schedule back
-				ScheduleDelayed(_fifo_empty_interval_us * 2);
-			}
-
-			if (samples == 0) {
-				// check current FIFO count
-				const uint16_t fifo_count = FIFOReadCount();
-
-				if (fifo_count >= FIFO::SIZE) {
-					FIFOReset();
-					perf_count(_fifo_overflow_perf);
-
-				} else if (fifo_count == 0) {
-					perf_count(_fifo_empty_perf);
-
-				} else {
-					// FIFO count (size in bytes) should be a multiple of the FIFO::DATA structure
-					samples = fifo_count / sizeof(FIFO::DATA);
-
-					if (samples > _fifo_gyro_samples) {
-						// grab desired number of samples, but reschedule next cycle sooner
-						int extra_samples = samples - _fifo_gyro_samples;
-						samples = _fifo_gyro_samples;
-
-						if (_fifo_gyro_samples > extra_samples) {
-							// reschedule to run when a total of _fifo_gyro_samples should be available in the FIFO
-							const uint32_t reschedule_delay_us = (_fifo_gyro_samples - extra_samples) * static_cast<int>(FIFO_SAMPLE_DT);
-							ScheduleOnInterval(_fifo_empty_interval_us, reschedule_delay_us);
-
-						} else {
-							// otherwise reschedule to run immediately
-							ScheduleOnInterval(_fifo_empty_interval_us);
-						}
-
-					} else if (samples < _fifo_gyro_samples) {
-						// reschedule next cycle to catch the desired number of samples
-						ScheduleOnInterval(_fifo_empty_interval_us, (_fifo_gyro_samples - samples) * static_cast<int>(FIFO_SAMPLE_DT));
-					}
-				}
-			}
-
-			bool success = false;
-
-			if (samples == _fifo_gyro_samples) {
-				if (FIFORead(timestamp_sample, samples)) {
-					success = true;
-
-					if (_failure_count > 0) {
-						_failure_count--;
-					}
-				}
-			}
-
-			if (!success) {
-				_failure_count++;
-
-				// full reset if things are failing consistently
-				if (_failure_count > 10) {
-					Reset();
-					return;
-				}
-			}
-
-			if (!success || hrt_elapsed_time(&_last_config_check_timestamp) > 100_ms) {
-				// check configuration registers periodically or immediately following any failure
-				if (RegisterCheck(_register_cfg[_checked_register])) {
-					_last_config_check_timestamp = now;
-					_checked_register = (_checked_register + 1) % size_register_cfg;
-
-				} else {
-					// register check failed, force reset
-					perf_count(_bad_register_perf);
-					Reset();
-				}
-			}
-		}
-
-		break;
+	if(isfirst == 1)
+	{
+		ScheduleOnInterval(25000, 25000);
+		isfirst = 0;
 	}
+
+	(*(volatile uint32_t *)(0x3FF4400C) = (1 << 14)); //LOW
+
+	for(unsigned int i=0;i<400000;i++)
+	{
+		__asm("nop");
+	}
+
+	// const hrt_abstime now = hrt_absolute_time();
+
+	// switch (_state) {
+	// case STATE::RESET:
+	// 	// PWR_MGMT_1: Device Reset
+	// 	RegisterWrite(Register::PWR_MGMT_1, PWR_MGMT_1_BIT::DEVICE_RESET);
+	// 	_reset_timestamp = now;
+	// 	_failure_count = 0;
+	// 	_state = STATE::WAIT_FOR_RESET;
+	// 	ScheduleDelayed(2_ms); // From power-up 2 ms start-up time for register read/write
+	// 	break;
+
+	// case STATE::WAIT_FOR_RESET:
+
+	// 	// The reset value is 0x00 for all registers other than the registers below
+	// 	//  Document Number: DS-000176 Page 31 of 57
+	// 	if ((RegisterRead(Register::WHO_AM_I) == WHOAMI)
+	// 	    && (RegisterRead(Register::PWR_MGMT_1) == 0x41)
+	// 	    && (RegisterRead(Register::CONFIG) == 0x80)) {
+
+	// 		// offset registers (factory calibration) should not change during normal operation
+	// 		StoreCheckedRegisterValue(Register::XG_OFFS_TC_H);
+	// 		StoreCheckedRegisterValue(Register::XG_OFFS_TC_L);
+	// 		StoreCheckedRegisterValue(Register::YG_OFFS_TC_H);
+	// 		StoreCheckedRegisterValue(Register::YG_OFFS_TC_L);
+	// 		StoreCheckedRegisterValue(Register::ZG_OFFS_TC_H);
+	// 		StoreCheckedRegisterValue(Register::ZG_OFFS_TC_L);
+
+	// 		StoreCheckedRegisterValue(Register::XA_OFFSET_H);
+	// 		StoreCheckedRegisterValue(Register::XA_OFFSET_L);
+	// 		StoreCheckedRegisterValue(Register::YA_OFFSET_H);
+	// 		StoreCheckedRegisterValue(Register::YA_OFFSET_L);
+	// 		StoreCheckedRegisterValue(Register::ZA_OFFSET_H);
+	// 		StoreCheckedRegisterValue(Register::ZA_OFFSET_L);
+
+	// 		// Disable I2C, wakeup, and reset digital signal path
+	// 		RegisterWrite(Register::I2C_IF, I2C_IF_BIT::I2C_IF_DIS); // set immediately to prevent switching into I2C mode
+	// 		RegisterWrite(Register::PWR_MGMT_1, PWR_MGMT_1_BIT::CLKSEL_0);
+	// 		RegisterWrite(Register::SIGNAL_PATH_RESET, SIGNAL_PATH_RESET_BIT::ACCEL_RST | SIGNAL_PATH_RESET_BIT::TEMP_RST);
+	// 		RegisterSetAndClearBits(Register::USER_CTRL, USER_CTRL_BIT::SIG_COND_RST, 0);
+
+	// 		// if reset succeeded then configure
+	// 		_state = STATE::CONFIGURE;
+	// 		ScheduleDelayed(35_ms); // max 35 ms start-up time from sleep
+
+	// 	} else {
+	// 		// RESET not complete
+	// 		if (hrt_elapsed_time(&_reset_timestamp) > 1000_ms) {
+	// 			PX4_DEBUG("Reset failed, retrying");
+	// 			_state = STATE::RESET;
+	// 			ScheduleDelayed(100_ms);
+
+	// 		} else {
+	// 			PX4_DEBUG("Reset not complete, check again in 10 ms");
+	// 			ScheduleDelayed(10_ms);
+	// 		}
+	// 	}
+
+	// 	break;
+
+	// case STATE::CONFIGURE:
+	// 	if (Configure()) {
+	// 		// if configure succeeded then start reading from FIFO
+	// 		_state = STATE::FIFO_READ;
+
+	// 		if (DataReadyInterruptConfigure()) {
+	// 			_data_ready_interrupt_enabled = true;
+
+	// 			// backup schedule as a watchdog timeout
+	// 			ScheduleDelayed(100_ms);
+
+	// 		} else {
+	// 			_data_ready_interrupt_enabled = false;
+	// 			ScheduleOnInterval(_fifo_empty_interval_us, _fifo_empty_interval_us);
+	// 		}
+
+	// 		FIFOReset();
+
+	// 	} else {
+	// 		// CONFIGURE not complete
+	// 		if (hrt_elapsed_time(&_reset_timestamp) > 1000_ms) {
+	// 			PX4_DEBUG("Configure failed, resetting");
+	// 			_state = STATE::RESET;
+
+	// 		} else {
+	// 			PX4_DEBUG("Configure failed, retrying");
+	// 		}
+
+	// 		ScheduleDelayed(100_ms);
+	// 	}
+
+	// 	break;
+
+	// case STATE::FIFO_READ: {
+	// 		hrt_abstime timestamp_sample = now;
+	// 		uint8_t samples = 0;
+
+	// 		if (_data_ready_interrupt_enabled) {
+	// 			// scheduled from interrupt if _drdy_timestamp_sample was set as expected
+	// 			const hrt_abstime drdy_timestamp_sample = _drdy_timestamp_sample.fetch_and(0);
+
+	// 			if ((now - drdy_timestamp_sample) < _fifo_empty_interval_us) {
+	// 				timestamp_sample = drdy_timestamp_sample;
+	// 				samples = _fifo_gyro_samples;
+
+	// 			} else {
+	// 				perf_count(_drdy_missed_perf);
+	// 			}
+
+	// 			// push backup schedule back
+	// 			ScheduleDelayed(_fifo_empty_interval_us * 2);
+	// 		}
+
+	// 		if (samples == 0) {
+	// 			// check current FIFO count
+	// 			const uint16_t fifo_count = FIFOReadCount();
+
+	// 			if (fifo_count >= FIFO::SIZE) {
+	// 				FIFOReset();
+	// 				perf_count(_fifo_overflow_perf);
+
+	// 			} else if (fifo_count == 0) {
+	// 				perf_count(_fifo_empty_perf);
+
+	// 			} else {
+	// 				// FIFO count (size in bytes) should be a multiple of the FIFO::DATA structure
+	// 				samples = fifo_count / sizeof(FIFO::DATA);
+
+	// 				if (samples > _fifo_gyro_samples) {
+	// 					// grab desired number of samples, but reschedule next cycle sooner
+	// 					int extra_samples = samples - _fifo_gyro_samples;
+	// 					samples = _fifo_gyro_samples;
+
+	// 					if (_fifo_gyro_samples > extra_samples) {
+	// 						// reschedule to run when a total of _fifo_gyro_samples should be available in the FIFO
+	// 						const uint32_t reschedule_delay_us = (_fifo_gyro_samples - extra_samples) * static_cast<int>(FIFO_SAMPLE_DT);
+	// 						ScheduleOnInterval(_fifo_empty_interval_us, reschedule_delay_us);
+
+	// 					} else {
+	// 						// otherwise reschedule to run immediately
+	// 						ScheduleOnInterval(_fifo_empty_interval_us);
+	// 					}
+
+	// 				} else if (samples < _fifo_gyro_samples) {
+	// 					// reschedule next cycle to catch the desired number of samples
+	// 					ScheduleOnInterval(_fifo_empty_interval_us, (_fifo_gyro_samples - samples) * static_cast<int>(FIFO_SAMPLE_DT));
+	// 				}
+	// 			}
+	// 		}
+
+	// 		bool success = false;
+
+	// 		if (samples == _fifo_gyro_samples) {
+	// 			if (FIFORead(timestamp_sample, samples)) {
+	// 				success = true;
+
+	// 				if (_failure_count > 0) {
+	// 					_failure_count--;
+	// 				}
+	// 			}
+	// 		}
+
+	// 		if (!success) {
+	// 			_failure_count++;
+
+	// 			// full reset if things are failing consistently
+	// 			if (_failure_count > 10) {
+	// 				Reset();
+	// 				return;
+	// 			}
+	// 		}
+
+	// 		if (!success || hrt_elapsed_time(&_last_config_check_timestamp) > 100_ms) {
+	// 			// check configuration registers periodically or immediately following any failure
+	// 			if (RegisterCheck(_register_cfg[_checked_register])) {
+	// 				_last_config_check_timestamp = now;
+	// 				_checked_register = (_checked_register + 1) % size_register_cfg;
+
+	// 			} else {
+	// 				// register check failed, force reset
+	// 				perf_count(_bad_register_perf);
+	// 				Reset();
+	// 			}
+	// 		}
+	// 	}
+
+	// 	break;
+	// }
+	(*(volatile uint32_t *)(0x3FF44008) = (1 << 14)); //HIGH
 }
 
 void ICM20602::ConfigureAccel()
@@ -598,10 +614,10 @@ static bool fifo_accel_equal(const FIFO::DATA &f0, const FIFO::DATA &f1)
 {
 	return (memcmp(&f0.ACCEL_XOUT_H, &f1.ACCEL_XOUT_H, 6) == 0);
 }
-
+sensor_accel_fifo_s accel{};
 bool __attribute__ ((section(".iram1"))) ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
-	sensor_accel_fifo_s accel{};
+
 	accel.timestamp_sample = timestamp_sample;
 	accel.samples = 0;
 	accel.dt = FIFO_SAMPLE_DT * SAMPLES_PER_TRANSFER;
@@ -645,16 +661,16 @@ bool __attribute__ ((section(".iram1"))) ICM20602::ProcessAccel(const hrt_abstim
 	_px4_accel.set_error_count(perf_event_count(_bad_register_perf) + perf_event_count(_bad_transfer_perf) +
 				   perf_event_count(_fifo_empty_perf) + perf_event_count(_fifo_overflow_perf));
 
-	if (accel.samples > 0) {
-		_px4_accel.updateFIFO(accel);
-	}
+	// if (accel.samples > 0) {
+	// 	_px4_accel.updateFIFO(accel);
+	// }
 
 	return !bad_data;
 }
-
+sensor_gyro_fifo_s gyro{};
 void __attribute__ ((section(".iram1"))) ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
-	sensor_gyro_fifo_s gyro{};
+
 	gyro.timestamp_sample = timestamp_sample;
 	gyro.samples = samples;
 	gyro.dt = FIFO_SAMPLE_DT;
@@ -674,7 +690,7 @@ void __attribute__ ((section(".iram1"))) ICM20602::ProcessGyro(const hrt_abstime
 	_px4_gyro.set_error_count(perf_event_count(_bad_register_perf) + perf_event_count(_bad_transfer_perf) +
 				  perf_event_count(_fifo_empty_perf) + perf_event_count(_fifo_overflow_perf));
 
-	_px4_gyro.updateFIFO(gyro);
+	// _px4_gyro.updateFIFO(gyro);
 }
 
 bool __attribute__ ((section(".iram1"))) ICM20602::ProcessTemperature(const FIFO::DATA fifo[], const uint8_t samples)
