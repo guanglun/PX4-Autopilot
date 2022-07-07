@@ -49,17 +49,17 @@ void ScheduledWorkItem::schedule_trampoline(void *arg)
 	dev->ScheduleNow();
 }
 
-void __attribute__ ((section(".iram1"))) ScheduledWorkItem::ScheduleDelayed(uint32_t delay_us)
+void  ScheduledWorkItem::ScheduleDelayed(uint32_t delay_us)
 {
 	hrt_call_after(&_call, delay_us, (hrt_callout)&ScheduledWorkItem::schedule_trampoline, this);
 }
 
-void __attribute__ ((section(".iram1"))) ScheduledWorkItem::ScheduleOnInterval(uint32_t interval_us, uint32_t delay_us)
+void  ScheduledWorkItem::ScheduleOnInterval(uint32_t interval_us, uint32_t delay_us)
 {
 	hrt_call_every(&_call, delay_us, interval_us, (hrt_callout)&ScheduledWorkItem::schedule_trampoline, this);
 }
 
-void __attribute__ ((section(".iram1"))) ScheduledWorkItem::ScheduleAt(hrt_abstime time_us)
+void  ScheduledWorkItem::ScheduleAt(hrt_abstime time_us)
 {
 	hrt_call_at(&_call, time_us, (hrt_callout)&ScheduledWorkItem::schedule_trampoline, this);
 }

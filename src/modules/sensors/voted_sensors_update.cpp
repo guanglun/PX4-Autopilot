@@ -141,7 +141,7 @@ void VotedSensorsUpdate::parametersUpdate()
 	}
 }
 
-void __attribute__ ((section(".iram1"))) VotedSensorsUpdate::imuPoll(struct sensor_combined_s &raw)
+void  VotedSensorsUpdate::imuPoll(struct sensor_combined_s &raw)
 {
 	const hrt_abstime time_now_us = hrt_absolute_time();
 

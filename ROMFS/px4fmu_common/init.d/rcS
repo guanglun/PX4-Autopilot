@@ -10,7 +10,7 @@ param set IMU_GYRO_RATEMAX 800
 # ms5611 -I start
 # ist8310 -I -R 0 start
 icm20602 -s -R 2 start
-# sensors start
+sensors start
 # # # commander start
 # ekf2 start
 # # # gyro_calibration start

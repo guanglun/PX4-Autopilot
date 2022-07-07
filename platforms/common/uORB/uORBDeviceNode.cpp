@@ -164,7 +164,7 @@ uORB::DeviceNode::read(cdev::file_t *filp, char *buffer, size_t buflen)
 }
 
 ssize_t
-__attribute__ ((section(".iram1"))) uORB::DeviceNode::write(cdev::file_t *filp, const char *buffer, size_t buflen)
+ uORB::DeviceNode::write(cdev::file_t *filp, const char *buffer, size_t buflen)
 {
 	/*
 	 * Writes are legal from interrupt context as long as the
@@ -274,7 +274,7 @@ uORB::DeviceNode::ioctl(cdev::file_t *filp, int cmd, unsigned long arg)
 }
 
 ssize_t
-__attribute__ ((section(".iram1"))) uORB::DeviceNode::publish(const orb_metadata *meta, orb_advert_t handle, const void *data)
+ uORB::DeviceNode::publish(const orb_metadata *meta, orb_advert_t handle, const void *data)
 {
 	uORB::DeviceNode *devnode = (uORB::DeviceNode *)handle;
 	int ret;

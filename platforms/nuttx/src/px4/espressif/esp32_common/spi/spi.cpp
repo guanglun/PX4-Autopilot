@@ -99,12 +99,12 @@ void esp32_spixselect(const px4_spi_bus_t *bus, struct spi_dev_s *dev, uint32_t 
 			if (devid == bus->devices[i].devid) {
 				// SPI select is active low, so write !selected to select the device
 				//syslog(LOG_DEBUG, "esp32_gpiowrite %i\n", bus->bus);
-				//px4_arch_gpiowrite(bus->devices[i].cs_gpio, !selected);
+				px4_arch_gpiowrite(bus->devices[i].cs_gpio, !selected);
 
-				if(selected)
-					(*(volatile uint32_t *)(0x3FF4400C) = (1<<5));//LOW
-				else
-					(*(volatile uint32_t *)(0x3FF44008) = (1<<5));//HIGH
+				// if(selected)
+				// 	(*(volatile uint32_t *)(0x3FF4400C) = (1<<5));//LOW
+				// else
+				// 	(*(volatile uint32_t *)(0x3FF44008) = (1<<5));//HIGH
 			}
 		}
 
