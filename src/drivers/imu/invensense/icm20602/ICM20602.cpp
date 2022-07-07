@@ -35,7 +35,7 @@
 
 using namespace time_literals;
 
-static constexpr int16_t __attribute__ ((section(".iram1"))) combine(uint8_t msb, uint8_t lsb)
+static constexpr int16_t  combine(uint8_t msb, uint8_t lsb)
 {
 	return (msb << 8u) | lsb;
 }
@@ -243,97 +243,97 @@ void ICM20602::RunImpl()
 			{
 				__asm("nop");
 			}
-			FIFOReadCount2();
-			// hrt_abstime timestamp_sample = now;
-			// uint8_t samples = 0;
+			// FIFOReadCount2();
+			hrt_abstime timestamp_sample = now;
+			uint8_t samples = 0;
 
-			// if (_data_ready_interrupt_enabled) {
-			// 	// scheduled from interrupt if _drdy_timestamp_sample was set as expected
-			// 	const hrt_abstime drdy_timestamp_sample = _drdy_timestamp_sample.fetch_and(0);
+			if (_data_ready_interrupt_enabled) {
+				// scheduled from interrupt if _drdy_timestamp_sample was set as expected
+				const hrt_abstime drdy_timestamp_sample = _drdy_timestamp_sample.fetch_and(0);
 
-			// 	if ((now - drdy_timestamp_sample) < _fifo_empty_interval_us) {
-			// 		timestamp_sample = drdy_timestamp_sample;
-			// 		samples = _fifo_gyro_samples;
+				if ((now - drdy_timestamp_sample) < _fifo_empty_interval_us) {
+					timestamp_sample = drdy_timestamp_sample;
+					samples = _fifo_gyro_samples;
 
-			// 	} else {
-			// 		perf_count(_drdy_missed_perf);
-			// 	}
+				} else {
+					perf_count(_drdy_missed_perf);
+				}
 
-			// 	// push backup schedule back
-			// 	ScheduleDelayed(_fifo_empty_interval_us * 2);
-			// }
+				// push backup schedule back
+				ScheduleDelayed(_fifo_empty_interval_us * 2);
+			}
 
-			// if (samples == 0) {
-			// 	// check current FIFO count
-			// 	const uint16_t fifo_count = FIFOReadCount();
+			if (samples == 0) {
+				// check current FIFO count
+				const uint16_t fifo_count = FIFOReadCount();
 
-			// 	if (fifo_count >= FIFO::SIZE) {
-			// 		FIFOReset();
-			// 		perf_count(_fifo_overflow_perf);
+				if (fifo_count >= FIFO::SIZE) {
+					FIFOReset();
+					perf_count(_fifo_overflow_perf);
 
-			// 	} else if (fifo_count == 0) {
-			// 		perf_count(_fifo_empty_perf);
+				} else if (fifo_count == 0) {
+					perf_count(_fifo_empty_perf);
 
-			// 	} else {
-			// 		// FIFO count (size in bytes) should be a multiple of the FIFO::DATA structure
-			// 		samples = fifo_count / sizeof(FIFO::DATA);
+				} else {
+					// FIFO count (size in bytes) should be a multiple of the FIFO::DATA structure
+					samples = fifo_count / sizeof(FIFO::DATA);
 
-			// 		if (samples > _fifo_gyro_samples) {
-			// 			// grab desired number of samples, but reschedule next cycle sooner
-			// 			int extra_samples = samples - _fifo_gyro_samples;
-			// 			samples = _fifo_gyro_samples;
+					if (samples > _fifo_gyro_samples) {
+						// grab desired number of samples, but reschedule next cycle sooner
+						int extra_samples = samples - _fifo_gyro_samples;
+						samples = _fifo_gyro_samples;
 
-			// 			if (_fifo_gyro_samples > extra_samples) {
-			// 				// reschedule to run when a total of _fifo_gyro_samples should be available in the FIFO
-			// 				const uint32_t reschedule_delay_us = (_fifo_gyro_samples - extra_samples) * static_cast<int>(FIFO_SAMPLE_DT);
-			// 				ScheduleOnInterval(_fifo_empty_interval_us, reschedule_delay_us);
+						if (_fifo_gyro_samples > extra_samples) {
+							// reschedule to run when a total of _fifo_gyro_samples should be available in the FIFO
+							const uint32_t reschedule_delay_us = (_fifo_gyro_samples - extra_samples) * static_cast<int>(FIFO_SAMPLE_DT);
+							ScheduleOnInterval(_fifo_empty_interval_us, reschedule_delay_us);
 
-			// 			} else {
-			// 				// otherwise reschedule to run immediately
-			// 				ScheduleOnInterval(_fifo_empty_interval_us);
-			// 			}
+						} else {
+							// otherwise reschedule to run immediately
+							ScheduleOnInterval(_fifo_empty_interval_us);
+						}
 
-			// 		} else if (samples < _fifo_gyro_samples) {
-			// 			// reschedule next cycle to catch the desired number of samples
-			// 			ScheduleOnInterval(_fifo_empty_interval_us, (_fifo_gyro_samples - samples) * static_cast<int>(FIFO_SAMPLE_DT));
-			// 		}
-			// 	}
-			// }
+					} else if (samples < _fifo_gyro_samples) {
+						// reschedule next cycle to catch the desired number of samples
+						ScheduleOnInterval(_fifo_empty_interval_us, (_fifo_gyro_samples - samples) * static_cast<int>(FIFO_SAMPLE_DT));
+					}
+				}
+			}
 
-			// bool success = false;
+			bool success = false;
 
-			// if (samples == _fifo_gyro_samples) {
-			// 	if (FIFORead(timestamp_sample, samples)) {
-			// 		success = true;
+			if (samples == _fifo_gyro_samples) {
+				if (FIFORead(timestamp_sample, samples)) {
+					success = true;
 
-			// 		if (_failure_count > 0) {
-			// 			_failure_count--;
-			// 		}
-			// 	}
-			// }
+					if (_failure_count > 0) {
+						_failure_count--;
+					}
+				}
+			}
 
-			// if (!success) {
-			// 	_failure_count++;
+			if (!success) {
+				_failure_count++;
 
-			// 	// full reset if things are failing consistently
-			// 	if (_failure_count > 10) {
-			// 		Reset();
-			// 		return;
-			// 	}
-			// }
+				// full reset if things are failing consistently
+				if (_failure_count > 10) {
+					Reset();
+					return;
+				}
+			}
 
-			// if (!success || hrt_elapsed_time(&_last_config_check_timestamp) > 100_ms) {
-			// 	// check configuration registers periodically or immediately following any failure
-			// 	if (RegisterCheck(_register_cfg[_checked_register])) {
-			// 		_last_config_check_timestamp = now;
-			// 		_checked_register = (_checked_register + 1) % size_register_cfg;
+			if (!success || hrt_elapsed_time(&_last_config_check_timestamp) > 100_ms) {
+				// check configuration registers periodically or immediately following any failure
+				if (RegisterCheck(_register_cfg[_checked_register])) {
+					_last_config_check_timestamp = now;
+					_checked_register = (_checked_register + 1) % size_register_cfg;
 
-			// 	} else {
-			// 		// register check failed, force reset
-			// 		perf_count(_bad_register_perf);
-			// 		Reset();
-			// 	}
-			// }
+				} else {
+					// register check failed, force reset
+					perf_count(_bad_register_perf);
+					Reset();
+				}
+			}
 		}
 
 		break;
@@ -555,7 +555,7 @@ uint16_t ICM20602::FIFOReadCount2()
 	return combine(fifo_count_buf[1], fifo_count_buf[2]);
 }
 
-bool __attribute__ ((section(".iram1"))) ICM20602::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
+bool  ICM20602::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
 {
 	FIFOTransferBuffer buffer{};
 	const size_t transfer_size = math::min(samples * sizeof(FIFO::DATA) + 3, FIFO::SIZE);
@@ -621,7 +621,7 @@ static bool fifo_accel_equal(const FIFO::DATA &f0, const FIFO::DATA &f1)
 	return (memcmp(&f0.ACCEL_XOUT_H, &f1.ACCEL_XOUT_H, 6) == 0);
 }
 sensor_accel_fifo_s accel{};
-bool __attribute__ ((section(".iram1"))) ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
+bool  ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
 
 	accel.timestamp_sample = timestamp_sample;
@@ -674,7 +674,7 @@ bool __attribute__ ((section(".iram1"))) ICM20602::ProcessAccel(const hrt_abstim
 	return !bad_data;
 }
 sensor_gyro_fifo_s gyro{};
-void __attribute__ ((section(".iram1"))) ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
+void  ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
 
 	gyro.timestamp_sample = timestamp_sample;
@@ -699,7 +699,7 @@ void __attribute__ ((section(".iram1"))) ICM20602::ProcessGyro(const hrt_abstime
 	// _px4_gyro.updateFIFO(gyro);
 }
 
-bool __attribute__ ((section(".iram1"))) ICM20602::ProcessTemperature(const FIFO::DATA fifo[], const uint8_t samples)
+bool  ICM20602::ProcessTemperature(const FIFO::DATA fifo[], const uint8_t samples)
 {
 	int16_t temperature[FIFO_MAX_SAMPLES];
 	float temperature_sum{0};
