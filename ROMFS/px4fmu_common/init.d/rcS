@@ -2,14 +2,17 @@
 param select /dev/esp32flash
 param import
 
-# # # param set EKF2_MULTI_IMU 0
-# # # param set SENS_IMU_MODE 1
-param set EKF2_PREDICT_US 20000
-param set IMU_GYRO_RATEMAX 300
+# # # # param set EKF2_MULTI_IMU 0
+# # # # param set SENS_IMU_MODE 1
+# param set EKF2_PREDICT_US 20000
+# param set IMU_GYRO_RATEMAX 300
 
-ms5611 -I start
-ist8310 -I -R 0 start
-icm20602 -s -R 2 start
+. /etc/init.d/rc.board_defaults
+. /etc/init.d/rc.board_sensors
+
+# ms5611 -I start
+# ist8310 -I -R 0 start
+# icm20602 -s -R 2 start
 
 sensors start
 ekf2 start
@@ -27,5 +30,11 @@ mc_rate_control start
 
 send_event start
 load_mon start
+# rc_input start -d /dev/ttyS2
 rc_update start
 manual_control start
+
+pwm_out start
+mixer load /dev/pwm_output0 etc/mixers/quad_x.main.mix
+
+mavlink start -x -d /dev/ttyS1
