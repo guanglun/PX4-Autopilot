@@ -117,7 +117,6 @@ protected:
 	 *			otherwise.
 	 */
 	int		transfer(uint8_t *send, uint8_t *recv, unsigned len);
-	int		transfer2(uint8_t *send, uint8_t *recv, unsigned len);
 
 	/**
 	 * Perform a SPI 16 bit transfer.

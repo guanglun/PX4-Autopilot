@@ -144,7 +144,7 @@ int ICM20602::probe()
 void ICM20602::RunImpl()
 {
 
-
+	// (*(volatile uint32_t *)(0x3FF44008) = (1 << 14)); //HIGH
 	const hrt_abstime now = hrt_absolute_time();
 
 	switch (_state) {
@@ -239,11 +239,7 @@ void ICM20602::RunImpl()
 		break;
 
 	case STATE::FIFO_READ: {
-			for(unsigned int i=0;i<20000;i++)
-			{
-				__asm("nop");
-			}
-			// FIFOReadCount2();
+
 			hrt_abstime timestamp_sample = now;
 			uint8_t samples = 0;
 
@@ -338,7 +334,8 @@ void ICM20602::RunImpl()
 
 		break;
 	}
-	(*(volatile uint32_t *)(0x3FF44008) = (1 << 14)); //HIGH
+	// (*(volatile uint32_t *)(0x3FF4400C) = (1 << 14)); //LOW
+
 }
 
 void ICM20602::ConfigureAccel()
@@ -541,20 +538,6 @@ uint16_t ICM20602::FIFOReadCount()
 	return combine(fifo_count_buf[1], fifo_count_buf[2]);
 }
 
-uint16_t ICM20602::FIFOReadCount2()
-{
-	// read FIFO count
-	uint8_t fifo_count_buf[3] {};
-	fifo_count_buf[0] = static_cast<uint8_t>(Register::FIFO_COUNTH) | DIR_READ;
-
-	if (transfer2(fifo_count_buf, fifo_count_buf, sizeof(fifo_count_buf)) != PX4_OK) {
-		perf_count(_bad_transfer_perf);
-		return 0;
-	}
-
-	return combine(fifo_count_buf[1], fifo_count_buf[2]);
-}
-
 bool  ICM20602::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
 {
 	FIFOTransferBuffer buffer{};
@@ -586,7 +569,7 @@ bool  ICM20602::FIFORead(const hrt_abstime &timestamp_sample, uint8_t samples)
 			ProcessGyro(timestamp_sample, buffer.f, valid_samples);
 
 			if (ProcessAccel(timestamp_sample, buffer.f, valid_samples)) {
-				return true;
+		 		return true;
 			}
 		}
 	}
@@ -620,10 +603,10 @@ static bool fifo_accel_equal(const FIFO::DATA &f0, const FIFO::DATA &f1)
 {
 	return (memcmp(&f0.ACCEL_XOUT_H, &f1.ACCEL_XOUT_H, 6) == 0);
 }
-sensor_accel_fifo_s accel{};
+
 bool  ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
-
+	sensor_accel_fifo_s accel{};
 	accel.timestamp_sample = timestamp_sample;
 	accel.samples = 0;
 	accel.dt = FIFO_SAMPLE_DT * SAMPLES_PER_TRANSFER;
@@ -667,16 +650,16 @@ bool  ICM20602::ProcessAccel(const hrt_abstime &timestamp_sample, const FIFO::DA
 	_px4_accel.set_error_count(perf_event_count(_bad_register_perf) + perf_event_count(_bad_transfer_perf) +
 				   perf_event_count(_fifo_empty_perf) + perf_event_count(_fifo_overflow_perf));
 
-	// if (accel.samples > 0) {
-	// 	_px4_accel.updateFIFO(accel);
-	// }
+	if (accel.samples > 0) {
+		_px4_accel.updateFIFO(accel);
+	}
 
 	return !bad_data;
 }
-sensor_gyro_fifo_s gyro{};
+
 void  ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DATA fifo[], const uint8_t samples)
 {
-
+	sensor_gyro_fifo_s gyro{};
 	gyro.timestamp_sample = timestamp_sample;
 	gyro.samples = samples;
 	gyro.dt = FIFO_SAMPLE_DT;
@@ -696,7 +679,7 @@ void  ICM20602::ProcessGyro(const hrt_abstime &timestamp_sample, const FIFO::DAT
 	_px4_gyro.set_error_count(perf_event_count(_bad_register_perf) + perf_event_count(_bad_transfer_perf) +
 				  perf_event_count(_fifo_empty_perf) + perf_event_count(_fifo_overflow_perf));
 
-	// _px4_gyro.updateFIFO(gyro);
+	_px4_gyro.updateFIFO(gyro);
 }
 
 bool  ICM20602::ProcessTemperature(const FIFO::DATA fifo[], const uint8_t samples)
