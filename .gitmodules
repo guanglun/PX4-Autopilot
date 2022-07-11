@@ -25,7 +25,7 @@
 [submodule "platforms/nuttx/NuttX/nuttx"]
 	path = platforms/nuttx/NuttX/nuttx
 	url = https://github.com/guanglun/incubator-nuttx.git
-	branch = releases/10.3-px4
+	branch = compare_double
 [submodule "platforms/nuttx/NuttX/apps"]
 	path = platforms/nuttx/NuttX/apps
 	url = https://github.com/guanglun/incubator-nuttx-apps.git
