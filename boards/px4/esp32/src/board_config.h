@@ -61,7 +61,7 @@
 // #define BOARD_ARMED_STATE_LED  LED_GREEN
 
 
-#define GPIO_SENSORS_3V3_EN           (GPIO_OUTPUT | 12)
+// #define GPIO_SENSORS_3V3_EN           (GPIO_OUTPUT | 12)
 
 #define HRT_TIMER                    3  /* use timer 3 for the HRT */
 
@@ -72,13 +72,16 @@
  * ADC channels:
  * These are the channel numbers of the ADCs of the microcontroller that can be used by the Px4 Firmware in the adc driver.
  */
-#define ADC_5V_RAIL_SENSE_IO		36
-#define ADC_BATTERY_VOLTAGE_CHANNEL_IO	39
-#define ADC_BATTERY_CURRENT_CHANNEL_IO	34
 
-#define ADC_5V_RAIL_SENSE            	0
-#define ADC_BATTERY_VOLTAGE_CHANNEL    	3
-#define ADC_BATTERY_CURRENT_CHANNEL    	6
+#define ADC_BATTERY_VOLTAGE_CHANNEL_IO	36
+#define ADC_BATTERY_CURRENT_CHANNEL_IO	37
+#define ADC_5V_RAIL_SENSE_IO		38
+
+
+#define ADC_BATTERY_VOLTAGE_CHANNEL    	0
+#define ADC_BATTERY_CURRENT_CHANNEL    	1
+#define ADC_5V_RAIL_SENSE            	2
+
 
 #define ADC_CHANNELS \
 (	(1 << ADC_5V_RAIL_SENSE) 		|\

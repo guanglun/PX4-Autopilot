@@ -101,10 +101,14 @@ int up_pwm_servo_init(uint32_t channel_mask)
 
 
 	pwm_info.frequency=50;
-	pwm_info.channels[0].duty=0,
-	pwm_info.channels[1].duty=0,
-	pwm_info.channels[2].duty=0,
+	pwm_info.channels[0].duty=6553,
+	pwm_info.channels[1].duty=6553,
+	pwm_info.channels[2].duty=6553,
 	pwm_info.channels[3].duty=6553,
+	pwm_info.channels[4].duty=6553,
+	pwm_info.channels[5].duty=6553,
+	pwm_info.channels[6].duty=6553,
+	pwm_info.channels[7].duty=6553,
 	pwm->ops->start(pwm,&pwm_info);
 
 	return channel_mask;

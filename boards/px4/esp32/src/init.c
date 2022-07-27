@@ -162,10 +162,10 @@ esp32_board_initialize(void)
 	px4_arch_configgpio(GPIO_VDD_BRICK_VALID);
 	px4_arch_configgpio(GPIO_VDD_USB_VALID);
 
-	px4_arch_configgpio(GPIO_SENSORS_3V3_EN);
-	px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, false);
-	up_udelay(20);
-	px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, true);
+	// px4_arch_configgpio(GPIO_SENSORS_3V3_EN);
+	// px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, false);
+	// up_udelay(20);
+	// px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, true);
 
 	esp32_spiinitialize();
 }
