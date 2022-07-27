@@ -37,7 +37,7 @@
 constexpr px4_spi_bus_t px4_spi_buses[SPI_BUS_MAX_BUS_ITEMS] = {
 #ifdef CONFIG_ESP32_SPI2
 	initSPIBus(SPI::Bus::SPI2, {
-		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{4}),
+		initSPIDevice(SPIDEV_FLASH(0), SPI::CS{2}),
 
 	}),
 #endif

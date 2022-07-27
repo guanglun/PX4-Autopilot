@@ -131,6 +131,7 @@ else
 	# fi
 
 	set PARAM_FILE /dev/param
+	#set PARAM_FILE /fs/mtd_params
 
 	#
 	# Load parameters.
