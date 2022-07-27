@@ -26,3 +26,12 @@ param set-default COM_FLTMODE3  8
 param set-default COM_FLTMODE4  8
 param set-default COM_FLTMODE5  8
 param set-default COM_FLTMODE6  8
+
+# RC configuration
+param set-default RC_MAP_PITCH      2
+param set-default RC_MAP_ROLL       1
+param set-default RC_MAP_THROTTLE   3
+param set-default RC_MAP_YAW        4
+param set-default RC_MAP_FLTMODE    5
+param set-default RC_MAP_ARM_SW     6
+
