@@ -361,10 +361,10 @@ else
 	#
 	# Set USE_IO flag.
 	#
-	if param compare -s SYS_USE_IO 1
-	then
-		set USE_IO yes
-	fi
+	# if param compare -s SYS_USE_IO 1
+	# then
+	# 	set USE_IO yes
+	# fi
 
 	if [ $USE_IO = yes -a $IO_PRESENT = no ]
 	then
@@ -425,16 +425,16 @@ else
 	fi
 
 	# Pre-takeoff continuous magnetometer calibration
-	if param compare -s MBE_ENABLE 1
-	then
-		mag_bias_estimator start
-	fi
+	# if param compare -s MBE_ENABLE 1
+	# then
+	# 	mag_bias_estimator start
+	# fi
 
-	if param greater -s TRIG_MODE 0
-	then
-		camera_trigger start
-		camera_feedback start
-	fi
+	# if param greater -s TRIG_MODE 0
+	# then
+	# 	camera_trigger start
+	# 	camera_feedback start
+	# fi
 
 	#
 	# Optional board mavlink streams: rc.board_mavlink
@@ -451,7 +451,7 @@ else
 	# Start UART/Serial device drivers.
 	# Note: rc.serial is auto-generated from Tools/serial/generate_config.py
 	#
-	. ${R}etc/init.d/rc.serial
+	#. ${R}etc/init.d/rc.serial
 
 	if [ $IO_PRESENT = no ]
 	then
@@ -460,19 +460,19 @@ else
 	fi
 
 	# PPS capture driver (before pwm_out)
-	if param greater -s PPS_CAP_ENABLE 0
-	then
-		pps_capture start
-	fi
+	# if param greater -s PPS_CAP_ENABLE 0
+	# then
+	# 	pps_capture start
+	# fi
 
 	# Camera capture driver (before pwm_out)
-	if param greater -s CAM_CAP_FBACK 0
-	then
-		if camera_capture start
-		then
-			camera_capture on
-		fi
-	fi
+	# if param greater -s CAM_CAP_FBACK 0
+	# then
+	# 	if camera_capture start
+	# 	then
+	# 		camera_capture on
+	# 	fi
+	# fi
 
 	#
 	# Configure vehicle type specific parameters.
@@ -484,11 +484,11 @@ else
 	#
 	# Play the startup tune (if not disabled or there is an error)
 	#
-	param compare CBRK_BUZZER 782090
-	if [ "$?" != "0" -o "$STARTUP_TUNE" != "1" ]
-	then
-		tune_control play -t $STARTUP_TUNE
-	fi
+	# param compare CBRK_BUZZER 782090
+	# if [ "$?" != "0" -o "$STARTUP_TUNE" != "1" ]
+	# then
+	# 	tune_control play -t $STARTUP_TUNE
+	# fi
 
 	#
 	# Start the navigator.
@@ -498,37 +498,37 @@ else
 	#
 	# Start a thermal calibration if required.
 	#
-	. ${R}etc/init.d/rc.thermal_cal
+	# . ${R}etc/init.d/rc.thermal_cal
 
 	#
 	# Start gimbal to control mounts such as gimbals, disabled by default.
 	#
-	if param greater -s MNT_MODE_IN -1
-	then
-		gimbal start
-	fi
+	# if param greater -s MNT_MODE_IN -1
+	# then
+	# 	gimbal start
+	# fi
 
 	# Check for flow sensor
-	if param compare -s SENS_EN_PX4FLOW 1
-	then
-		px4flow start -X
-	fi
+	# if param compare -s SENS_EN_PX4FLOW 1
+	# then
+	# 	px4flow start -X
+	# fi
 
 	# Blacksheep telemetry
-	if param compare -s TEL_BST_EN 1
-	then
-		bst start -X
-	fi
+	# if param compare -s TEL_BST_EN 1
+	# then
+	# 	bst start -X
+	# fi
 
-	if param compare -s IMU_GYRO_FFT_EN 1
-	then
-		gyro_fft start
-	fi
+	# if param compare -s IMU_GYRO_FFT_EN 1
+	# then
+	# 	gyro_fft start
+	# fi
 
-	if param compare -s IMU_GYRO_CAL_EN 1
-	then
-		gyro_calibration start
-	fi
+	# if param compare -s IMU_GYRO_CAL_EN 1
+	# then
+	# 	gyro_calibration start
+	# fi
 
 
 	# Optional board supplied extras: rc.board_extras
@@ -575,7 +575,7 @@ else
 	dhcpd_start wlan1
 	# ifdown wlan0
 	# ifconfig
-	mavlink start -x -u 14556 -p -r 4096 -n wlan1
+	mavlink start -x -u 14556 -p -r 100000 -n wlan1
 	# mavlink start -u 14556 -p -n wlan1
 	# sleep 1
 	# top
