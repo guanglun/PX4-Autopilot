@@ -36,6 +36,7 @@ add_library(drivers_board
 	led.c
 	i2c.cpp
 	spi.cpp
+	mtd.cpp
 	timer_config.cpp
 	esp32_board_wlan.c
 	esp32_board_spiflash.c

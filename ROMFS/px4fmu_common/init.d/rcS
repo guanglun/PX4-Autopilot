@@ -130,8 +130,8 @@ else
 	# 	set PARAM_FILE /fs/mtd_params
 	# fi
 
-	set PARAM_FILE /dev/param
-	#set PARAM_FILE /fs/mtd_params
+	#set PARAM_FILE /dev/param
+	set PARAM_FILE /fs/mtd_params
 
 	#
 	# Load parameters.

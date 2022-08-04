@@ -159,8 +159,8 @@ esp32_board_initialize(void)
 	// Configure LEDs.
 	board_autoled_initialize();
 
-	px4_arch_configgpio(GPIO_VDD_BRICK_VALID);
-	px4_arch_configgpio(GPIO_VDD_USB_VALID);
+	// px4_arch_configgpio(GPIO_VDD_BRICK_VALID);
+	// px4_arch_configgpio(GPIO_VDD_USB_VALID);
 
 	// px4_arch_configgpio(GPIO_SENSORS_3V3_EN);
 	// px4_arch_gpiowrite(GPIO_SENSORS_3V3_EN, false);
@@ -249,8 +249,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 		led_on(LED_RED);
 	}
 
-	// Default SPI1 to 10MHz
-	SPI_SETFREQUENCY(spi2, 10000000);
+	// Default SPI2 to 40MHz
+	SPI_SETFREQUENCY(spi2, 40*1000*1000);
 	SPI_SETBITS(spi2, 8);
 	SPI_SETMODE(spi2, SPIDEV_MODE3);
 	up_udelay(20);
@@ -266,8 +266,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 		led_on(LED_RED);
 	}
 
-	SPI_SETFREQUENCY(spi3, 8 * 1000 * 1000);
-	SPI_SETBITS(spi3, 8);
+	SPI_SETFREQUENCY(spi3, 10 * 1000 * 1000);
+	SPI_SETBITS(spi3, 10);
 	SPI_SETMODE(spi3, SPIDEV_MODE3);
 #endif
 

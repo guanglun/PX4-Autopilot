@@ -76,9 +76,9 @@ static int ramtron_attach(mtd_instance_s &instance)
 
 	/* start the RAMTRON driver, attempt 10 times */
 
-	int spi_speed_mhz = 10;
+	int spi_speed_mhz = 40;
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 8; i++) {
 		/* initialize the right spi */
 		struct spi_dev_s *spi = px4_spibus_initialize(px4_find_spi_bus(instance.devid));
 
@@ -107,7 +107,7 @@ static int ramtron_attach(mtd_instance_s &instance)
 		}
 
 		// try reducing speed for next attempt
-		spi_speed_mhz--;
+		spi_speed_mhz-=4;
 		px4_usleep(10000);
 	}
 

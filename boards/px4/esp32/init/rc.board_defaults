@@ -3,7 +3,8 @@
 # board specific defaults
 #------------------------------------------------------------------------------
 
-param set-default BAT1_V_DIV 10.48445988
+param set BAT1_N_CELLS 1
+param set-default BAT1_V_DIV 2.1998
 param set-default BAT1_A_PER_V 36.36751556
 
 param set-default SYS_AUTOSTART 4001
@@ -35,3 +36,33 @@ param set-default RC_MAP_YAW        4
 param set-default RC_MAP_FLTMODE    5
 param set-default RC_MAP_ARM_SW     6
 
+param set CAL_ACC0_ID 3538970
+param set CAL_ACC0_PRIO 50
+param set CAL_ACC0_TEMP 51.5979
+param set CAL_ACC0_XOFF 0.0405
+param set CAL_ACC0_XSCALE 1.0003
+param set CAL_ACC0_YOFF 0.2861
+param set CAL_ACC0_YSCALE 1.0008
+param set CAL_ACC0_ZOFF -0.4584
+param set CAL_ACC0_ZSCALE 0.9875
+param set CAL_GYRO0_ID 3538970
+param set CAL_GYRO0_PRIO 50
+param set CAL_GYRO0_XOFF 0.0112
+param set CAL_GYRO0_YOFF -0.0144
+param set CAL_GYRO0_ZOFF 0.0043
+param set CAL_MAG0_ID 73217
+param set CAL_MAG0_PRIO 50
+param set CAL_MAG0_ROT -1
+param set CAL_MAG0_TEMP -1000.0000
+param set CAL_MAG0_XCOMP 0.0000
+param set CAL_MAG0_XODIAG -0.0162
+param set CAL_MAG0_XOFF -0.0139
+param set CAL_MAG0_XSCALE 0.9671
+param set CAL_MAG0_YCOMP 0.0000
+param set CAL_MAG0_YODIAG 0.0001
+param set CAL_MAG0_YOFF -0.0238
+param set CAL_MAG0_YSCALE 0.9896
+param set CAL_MAG0_ZCOMP 0.0000
+param set CAL_MAG0_ZODIAG -0.0185
+param set CAL_MAG0_ZOFF 0.0754
+param set CAL_MAG0_ZSCALE 1.0385
