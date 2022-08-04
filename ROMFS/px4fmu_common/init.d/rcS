@@ -556,13 +556,13 @@ else
 	# #
 	# . ${R}etc/init.d/rc.logging
 
-	# #
-	# # Set additional parameters and env variables for selected AUTOSTART.
-	# #
-	# if ! param compare SYS_AUTOSTART 0
-	# then
-	# 	. ${R}etc/init.d/rc.autostart.post
-	# fi
+	#
+	# Set additional parameters and env variables for selected AUTOSTART.
+	#
+	if ! param compare SYS_AUTOSTART 0
+	then
+		. ${R}etc/init.d/rc.autostart.post
+	fi
 
 
 	# set BOARD_BOOTLOADER_UPGRADE ${R}etc/init.d/rc.board_bootloader_upgrade

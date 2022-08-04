@@ -67,7 +67,7 @@ struct pwm_lowerhalf_s *pwm;
 
 int up_pwm_servo_set(unsigned channel, servo_position_t value)
 {
-	//syslog(LOG_INFO, "PWM set ch: %d value:%d\n", channel,value);
+	syslog(LOG_INFO, "PWM set ch: %d value:%d\n", channel,value);
 	pwm_info.channels[channel].duty = (value*pwm_info.frequency)/(1000000/65535);
 	return OK;
 }
@@ -80,7 +80,8 @@ servo_position_t up_pwm_servo_get(unsigned channel)
 
 int up_pwm_servo_init(uint32_t channel_mask)
 {
-	//syslog(LOG_INFO, "channel_mask: %02X\n", channel_mask);
+	syslog(LOG_INFO, "======>>>>>PWM init channel_mask: %02X\n", channel_mask);
+	syslog(LOG_INFO, "======>>>>>PWM init channel_mask: %02X\n", channel_mask);
 
 	// int ret = 0;
 
@@ -134,7 +135,7 @@ int up_pwm_servo_set_rate_group_update(unsigned group, unsigned rate)
 
 void up_pwm_update(unsigned channels_mask)
 {
-	//syslog(LOG_INFO, "up_pwm_update channels_mask: %d\n", channels_mask);
+	//syslog(LOG_INFO, "up_pwm_update channels_mask: %02X\n", channels_mask);
 	pwm->ops->start(pwm,&pwm_info);
 }
 
@@ -150,7 +151,7 @@ uint32_t up_pwm_servo_get_rate_group(unsigned group)
 void
 up_pwm_servo_arm(bool armed, uint32_t channel_mask)
 {
-	//syslog(LOG_INFO, "up_pwm_servo_arm armed:%d channel_mask:%02X\n", armed,channel_mask);
+	syslog(LOG_INFO, "up_pwm_servo_arm armed:%d channel_mask:%02X\n", armed,channel_mask);
 	if(channel_mask == 0x0F)
 	{
 		if(armed)

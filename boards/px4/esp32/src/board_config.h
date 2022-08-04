@@ -92,9 +92,24 @@
 
 #define RC_SERIAL_PORT		"/dev/ttyS2"
 
-/* AUX PWMs
+/* PWM
  */
 #define DIRECT_PWM_OUTPUT_CHANNELS	4
+
+/* PWM directly wired to transistor. Duty cycle directly corresponds to power
+ * So we need to override the defaults
+ */
+
+#define PX4_PWM_ALTERNATE_RANGES
+#define PWM_LOWEST_MIN 0
+#define PWM_MOTOR_OFF	0
+#define PWM_DEFAULT_MIN 20
+#define PWM_HIGHEST_MIN 0
+#define PWM_HIGHEST_MAX 255
+#define PWM_DEFAULT_MAX 255
+#define PWM_LOWEST_MAX 255
+#define PWM_DEFAULT_TRIM 1500
+
 
 // #define BOARD_ENABLE_CONSOLE_BUFFER
 
@@ -106,8 +121,6 @@
 // #define BOARD_ADC_USB_CONNECTED      (px4_arch_gpioread(GPIO_VDD_USB_VALID))
 // #define BOARD_ADC_BRICK_VALID        (px4_arch_gpioread(GPIO_VDD_BRICK_VALID))
 // #define BOARD_ADC_USB_VALID          (px4_arch_gpioread(GPIO_VDD_USB_VALID))
-
-
 
 __BEGIN_DECLS
 
