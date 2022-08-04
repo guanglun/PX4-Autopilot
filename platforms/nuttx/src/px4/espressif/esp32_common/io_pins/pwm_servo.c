@@ -67,8 +67,8 @@ struct pwm_lowerhalf_s *pwm;
 
 int up_pwm_servo_set(unsigned channel, servo_position_t value)
 {
-	syslog(LOG_INFO, "PWM set ch: %d value:%d\n", channel,value);
-	pwm_info.channels[channel].duty = (value*pwm_info.frequency)/(1000000/65535);
+	//syslog(LOG_INFO, "PWM set ch: %d value:%d\n", channel,value);
+	pwm_info.channels[channel].duty = value;
 	return OK;
 }
 
@@ -80,8 +80,6 @@ servo_position_t up_pwm_servo_get(unsigned channel)
 
 int up_pwm_servo_init(uint32_t channel_mask)
 {
-	syslog(LOG_INFO, "======>>>>>PWM init channel_mask: %02X\n", channel_mask);
-	syslog(LOG_INFO, "======>>>>>PWM init channel_mask: %02X\n", channel_mask);
 
 	// int ret = 0;
 
@@ -101,15 +99,15 @@ int up_pwm_servo_init(uint32_t channel_mask)
 	pwm->ops->setup(pwm);
 
 
-	pwm_info.frequency=50;
-	pwm_info.channels[0].duty=6553,
-	pwm_info.channels[1].duty=6553,
-	pwm_info.channels[2].duty=6553,
-	pwm_info.channels[3].duty=6553,
-	pwm_info.channels[4].duty=6553,
-	pwm_info.channels[5].duty=6553,
-	pwm_info.channels[6].duty=6553,
-	pwm_info.channels[7].duty=6553,
+	pwm_info.frequency=20000;
+	pwm_info.channels[0].duty=0,
+	pwm_info.channels[1].duty=0,
+	pwm_info.channels[2].duty=0,
+	pwm_info.channels[3].duty=0,
+	pwm_info.channels[4].duty=1000,
+	pwm_info.channels[5].duty=1000,
+	pwm_info.channels[6].duty=1000,
+	pwm_info.channels[7].duty=1000,
 	pwm->ops->start(pwm,&pwm_info);
 
 	return channel_mask;

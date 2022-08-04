@@ -105,9 +105,9 @@
 #define PWM_MOTOR_OFF	0
 #define PWM_DEFAULT_MIN 20
 #define PWM_HIGHEST_MIN 0
-#define PWM_HIGHEST_MAX 255
-#define PWM_DEFAULT_MAX 255
-#define PWM_LOWEST_MAX 255
+#define PWM_HIGHEST_MAX 65535
+#define PWM_DEFAULT_MAX 65535
+#define PWM_LOWEST_MAX 65535
 #define PWM_DEFAULT_TRIM 1500
 
 
@@ -121,6 +121,10 @@
 // #define BOARD_ADC_USB_CONNECTED      (px4_arch_gpioread(GPIO_VDD_USB_VALID))
 // #define BOARD_ADC_BRICK_VALID        (px4_arch_gpioread(GPIO_VDD_BRICK_VALID))
 // #define BOARD_ADC_USB_VALID          (px4_arch_gpioread(GPIO_VDD_USB_VALID))
+
+#define BOARD_ADC_USB_CONNECTED      (0)
+#define BOARD_ADC_BRICK_VALID        (1)
+#define BOARD_ADC_USB_VALID          (0)
 
 __BEGIN_DECLS
 

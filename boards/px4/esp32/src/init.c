@@ -296,8 +296,6 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	static struct hrt_call test_call;
 	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
 
-	up_pwm_servo_init(0xff);
-
 	return OK;
 }
 

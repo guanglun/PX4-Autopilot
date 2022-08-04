@@ -638,9 +638,9 @@ void PWMOut::update_params()
 				PX4_ERR("param %s not found", str);
 			}
 
-			if (_mixing_output.disarmedValue(i) > 0) {
+			//if (_mixing_output.disarmedValue(i) > 0) {
 				num_disarmed_set++;
-			}
+			//}
 		}
 
 		// PWM_MAIN_REVx

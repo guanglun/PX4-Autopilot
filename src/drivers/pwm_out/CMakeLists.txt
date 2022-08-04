@@ -42,6 +42,7 @@ px4_add_module(
 	MAIN pwm_out
 	COMPILE_FLAGS
 		-DPARAM_PREFIX="${PARAM_PREFIX}"
+		-Wno-type-limits
 	SRCS
 		PWMOut.cpp
 		PWMOut.hpp

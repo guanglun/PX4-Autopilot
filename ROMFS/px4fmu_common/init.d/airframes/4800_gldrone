@@ -14,20 +14,20 @@
 #
 . ${R}etc/init.d/rc.mc_defaults
 
-param set-default CBRK_SUPPLY_CHK 894281
-param set-default CBRK_USB_CHK 197848
+# param set-default CBRK_SUPPLY_CHK 894281
+# param set-default CBRK_USB_CHK 197848
 
-param set-default IMU_GYRO_CUTOFF 100
-param set-default IMU_ACCEL_CUTOFF 30
+# param set-default IMU_GYRO_CUTOFF 100
+# param set-default IMU_ACCEL_CUTOFF 30
 
 param set-default PWM_MAIN_DISARM 0
-param set-default PWM_MAIN_MIN 20
-param set-default PWM_MAIN_MAX 255
+param set-default PWM_MAIN_MIN 0
+param set-default PWM_MAIN_MAX 65535
 
-# Run the motors at 328.125 kHz (recommended)
-param set-default PWM_MAIN_RATE 3921
+# # Run the motors at 328.125 kHz (recommended)
+param set-default PWM_MAIN_RATE 20000
 
-set PWM_MAIN_DISARM none
-set PWM_MAIN_MAX none
-set PWM_MAIN_MIN none
+# set PWM_MAIN_DISARM none
+# set PWM_MAIN_MAX none
+# set PWM_MAIN_MIN none
 

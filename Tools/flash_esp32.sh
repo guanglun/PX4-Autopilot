@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BAUD=921600
-MINICOM="true"
+MINICOM="false"
 PORT="/dev/ttyACM0"
 FLASH_BOOT_FILE="false"
 
