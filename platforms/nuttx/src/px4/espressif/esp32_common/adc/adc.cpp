@@ -70,7 +70,14 @@ void px4_arch_adc_uninit(uint32_t base_address)
 
 uint32_t px4_arch_adc_sample(uint32_t base_address, unsigned channel)
 {
-	return analogRead(channel);
+	if(channel == ADC_BATTERY_VOLTAGE_CHANNEL)
+		return analogRead(channel);
+	else if(channel == ADC_BATTERY_CURRENT_CHANNEL)
+		return 0;
+	else if(channel == ADC_5V_RAIL_SENSE)
+		return 3100;//always 5V
+	else
+		return 0;
 }
 
 float px4_arch_adc_reference_v()
