@@ -454,11 +454,11 @@ else
 	#
 	# . ${R}etc/init.d/rc.serial
 
-	if [ $IO_PRESENT = no ]
-	then
-		# Must be started after the serial config is read
-		rc_input start $RC_INPUT_ARGS
-	fi
+	# if [ $IO_PRESENT = no ]
+	# then
+	# 	# Must be started after the serial config is read
+	# 	rc_input start $RC_INPUT_ARGS
+	# fi
 
 	# PPS capture driver (before pwm_out)
 	# if param greater -s PPS_CAP_ENABLE 0
