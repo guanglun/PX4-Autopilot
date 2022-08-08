@@ -573,10 +573,10 @@ else
 	# unset BOARD_BOOTLOADER_UPGRADE
 
 	# ifup wlan1
-	dhcpd_start wlan1
+	dhcpd_start wlan0
 	# ifdown wlan0
 	# ifconfig
-	mavlink start -x -u 14556 -p -r 100000 -n wlan1
+	mavlink start -x -u 14556 -p -r 100000 -n wlan0
 	# mavlink start -u 14556 -p -n wlan1
 	# sleep 1
 	# top

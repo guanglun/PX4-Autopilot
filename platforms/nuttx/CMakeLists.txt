@@ -259,6 +259,9 @@ else()
 	libespnow.a
 	libphy.a
 	libwpa_supplicant.a
+	libcore.a
+	libwapi.a
+
 	)
 
 	execute_process(COMMAND touch ${NUTTX_STARTUP_OBJS}
@@ -278,7 +281,7 @@ else()
 			arch_hrt
 			arch_board_reset
 			-Wl,--start-group
-			# ${NUTTX_NETWORK_LIB}
+			${NUTTX_NETWORK_LIB}
 			-Wl,--end-group
 
 
@@ -317,7 +320,7 @@ else()
 		-Wl,--start-group
 			${nuttx_libs}
 			${NUTTX_STARTUP_OBJS}
-			# ${NUTTX_NETWORK_LIB}
+			${NUTTX_NETWORK_LIB}
 
 		-Wl,--end-group
 		m

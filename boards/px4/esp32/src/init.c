@@ -330,7 +330,7 @@ static void esp32_wifi_init(void)
     }
 #endif
 
-#ifdef CONFIG_ESP32_WIRELESS
+#ifdef CONFIG_ESP32_WIFI
   ret = board_wlan_init();
   if (ret < 0)
     {

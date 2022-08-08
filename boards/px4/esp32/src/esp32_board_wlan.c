@@ -85,8 +85,8 @@ int board_wlan_init(void)
     }
 #endif
 
-  netlib_ifup("wlan1");
-  dhcpd_start("wlan1");
+  netlib_ifup("wlan0");
+  dhcpd_start("wlan0");
 
   return ret;
 }
