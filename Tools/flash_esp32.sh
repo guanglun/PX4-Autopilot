@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 BAUD=921600
-MINICOM="false"
-PORT="/dev/ttyACM0"
+MINICOM="true"
+PORT="/dev/ttyUSB0"
 FLASH_BOOT_FILE="false"
 
 BIN_FILE_PATH=build/px4_esp32_default
