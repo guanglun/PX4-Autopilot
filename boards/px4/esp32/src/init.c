@@ -207,10 +207,13 @@ void test_poll(void)
 	static uint8_t cnt = 0;
 
 	if (cnt % 2 == 0) {
-	led_off(LED_GREEN);
-
+	//led_off(LED_GREEN);
+	esp32_gpiowrite(21, false);
+	esp32_gpiowrite(22, true);
 	} else {
-	led_on(LED_GREEN);
+	//led_on(LED_GREEN);
+	esp32_gpiowrite(21, true);
+	esp32_gpiowrite(22, false);
 	}
 
 	cnt++;
@@ -237,8 +240,11 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	// led_off(LED_BLUE);
 
 
-	// px4_esp32_configgpio(GPIO_OUTPUT | 14);  //TEST PIN
-	// esp32_gpiowrite(14, false);
+	px4_esp32_configgpio(GPIO_OUTPUT | 21);  //TEST PIN
+	esp32_gpiowrite(21, false);
+
+	px4_esp32_configgpio(GPIO_OUTPUT | 22);  //TEST PIN
+	esp32_gpiowrite(22, false);
 
 	// Configure SPI-based devices.
 #ifdef CONFIG_ESP32_SPI2
@@ -293,8 +299,8 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	esp32_wifi_init();
 
-	//static struct hrt_call test_call;
-	//hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
+	static struct hrt_call test_call;
+	hrt_call_every(&test_call, 1000000, 1000000, (hrt_callout)test_poll, NULL);
 
 	return OK;
 }
