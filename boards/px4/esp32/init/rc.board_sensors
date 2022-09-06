@@ -5,7 +5,7 @@
 
 board_adc start
 
-mpu6500 -s -R 2 start
+mpu6500 -s -R 12 start
 # icm20602 -s -R 2 start
 # icm20689 -s -R 2 start
 # hmc5883 -I -R 0 start

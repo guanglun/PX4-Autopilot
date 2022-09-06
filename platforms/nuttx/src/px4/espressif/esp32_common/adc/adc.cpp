@@ -75,7 +75,7 @@ uint32_t px4_arch_adc_sample(uint32_t base_address, unsigned channel)
 	else if(channel == ADC_BATTERY_CURRENT_CHANNEL)
 		return 0;
 	else if(channel == ADC_5V_RAIL_SENSE)
-		return 3100;//always 5V
+		return 2800;//always 5V
 	else
 		return 0;
 }
