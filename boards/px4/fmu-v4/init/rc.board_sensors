@@ -8,6 +8,7 @@ board_adc start
 # Internal SPI
 ms5611 -s start
 icm20602 -s -R 0 start
+icm20689 -s -R 0 start
 ist8310 -I -R 6 start
 
 if param greater -s SENS_EN_PMW3901 0

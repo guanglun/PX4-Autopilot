@@ -113,10 +113,10 @@ __EXPORT void board_peripheral_reset(int ms)
 {
 	// Set the peripheral rails off.
 	stm32_configgpio(GPIO_PERIPH_3V3_EN);
-	//stm32_configgpio(GPIO_PERIPH_WIFI_EN);
+	stm32_configgpio(GPIO_PERIPH_WIFI_EN);
 
 	stm32_gpiowrite(GPIO_PERIPH_3V3_EN, 0);
-	//stm32_gpiowrite(GPIO_PERIPH_WIFI_EN, 0);
+	stm32_gpiowrite(GPIO_PERIPH_WIFI_EN, 0);
 
 	bool last = stm32_gpioread(GPIO_SPEKTRUM_PWR_EN);
 	// Keep Spektum on to discharge rail.
@@ -130,6 +130,7 @@ __EXPORT void board_peripheral_reset(int ms)
 	// Switch the peripheral rail back on.
 	stm32_gpiowrite(GPIO_SPEKTRUM_PWR_EN, last);
 	stm32_gpiowrite(GPIO_PERIPH_3V3_EN, 1);
+	stm32_gpiowrite(GPIO_PERIPH_WIFI_EN, 1);
 
 }
 
@@ -193,6 +194,7 @@ stm32_boardinitialize(void)
 
 	// Configure power supply control/sense pins.
 	stm32_configgpio(GPIO_PERIPH_3V3_EN);
+	stm32_configgpio(GPIO_PERIPH_WIFI_EN);
 	stm32_configgpio(GPIO_VDD_BRICK_VALID);
 	stm32_configgpio(GPIO_VDD_USB_VALID);
 
