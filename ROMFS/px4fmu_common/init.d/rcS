@@ -572,6 +572,9 @@ else
 	# fi
 	# unset BOARD_BOOTLOADER_UPGRADE
 
+	rc_input start /dev/ttyS2
+	#mavlink start -d /dev/ttyS1 -b 57600
+
 	# ifup wlan1
 	dhcpd_start wlan0
 	# ifdown wlan0

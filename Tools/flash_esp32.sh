@@ -2,7 +2,7 @@
 
 BAUD=921600
 MINICOM="true"
-PORT="/dev/ttyUSB0"
+PORT="/dev/ttyACM0"
 FLASH_BOOT_FILE="false"
 
 BIN_FILE_PATH=build/px4_esp32_default

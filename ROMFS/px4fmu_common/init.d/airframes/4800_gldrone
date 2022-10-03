@@ -27,5 +27,5 @@ param set-default EKF2_MAG_TYPE 5
 param set-default PWM_MAIN_DISARM 0
 param set-default PWM_MAIN_MIN 5000
 param set-default PWM_MAIN_MAX 65535
-param set-default PWM_MAIN_RATE 20000
+param set-default PWM_MAIN_RATE 80000
 
