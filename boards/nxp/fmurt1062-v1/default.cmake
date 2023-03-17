@@ -7,6 +7,7 @@ px4_add_board(
 	TOOLCHAIN arm-none-eabi
 	ARCHITECTURE cortex-m7
 	ROMFSROOT px4fmu_common
+	LINKER_PREFIX ocram
 #	UAVCAN_INTERFACES 2
 	SERIAL_PORTS
 		GPS1:/dev/ttyS1

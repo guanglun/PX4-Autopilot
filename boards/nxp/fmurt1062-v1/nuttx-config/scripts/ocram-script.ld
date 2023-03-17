@@ -35,7 +35,7 @@
  ****************************************************************************/
 
 /* The FMURT1062 has 8MiB of QSPI FLASH beginning at address,
- * 0x0060:0000, Upto 512Kb of DTCM RAM beginning at 0x2000:0000, and 1MiB OCRAM
+ * 0x0060:0000, Up to 512Kb of DTCM RAM beginning at 0x2000:0000, and 1MiB OCRAM
  * beginning at 0x2020:0000.  Neither DTCM or SDRAM are used in this
  * configuration.
  *
@@ -43,7 +43,7 @@
  * 256Kib to OCRRAM, 128Kib ITCM and 128Kib DTCM.
  * This can be changed by using a dcd by minipulating
  * IOMUX GPR16 and GPR17.
- * The configuartion we will use is 384Kib to OCRRAM, 0Kib ITCM and
+ * The configuration we will use is 384Kib to OCRRAM, 0Kib ITCM and
  * 128Kib DTCM.
  *
  * This is the OCRAM inker script.
@@ -101,6 +101,7 @@ SECTIONS
     } > flash
 
 	/* Catch all the section we want not in OCRAM so that the *(.text .text.*) in flash does not */
+	/* Sift and sort with arm-none-eabi-nm -C  -S -n  build/nxp_fmurt1062-v1_default/nxp_fmurt1062-v1_default.elf > list.txt */
 
     .flashxip : ALIGN(4)
 	{
@@ -108,8 +109,82 @@ SECTIONS
 		/* Order matters */
 		*(.text.__start)
 		*(.text.imxrt_ocram_initialize)
-
 		*(.slow_memory)
+		*(.text.romfs*)
+		*(.text.cromfs*)
+		*(.text.mpu*)
+		*(.text.arm_memfault*)
+		*(.text.arm_hardfault*)
+		*(.text.up_assert*)
+		*(.text.up_stackdump*)
+		*(.text.up_taskdump*)
+		*(.text.up_mdelay*)
+		*(.text.up_udelay*)
+		*(.text.board_on_reset*)
+		*(.text.board_spi_reset*)
+		*(.text.board_query_manifest*)
+		*(.text.board_reset*)
+		*(.text.board_get*)
+		*(.text.board_mcu*)
+		*(.text.imxrt_xbar_connect*)
+		*(.text.bson*)
+		*(.text.*print_load*)
+		*(.text.*px4_mft*)
+		*(.text.*px4_mtd*)
+		*(.text.syslog*)
+		*(.text.register_driver*)
+		*(.text.nx_start*)
+		*(.text.nx_bringup*)
+		*(.text.irq_unexpected_isr*)
+		*(.text.group*)
+		*(.text.*setenv*)
+		*(.text.*env*)
+		*(.text.cmd*)
+		*(.text.readline*)
+		*(.text.mkfatfs*)
+		*(.text.builtin*)
+		*(.text.basename*)
+		*(.text.dirname*)
+		*(.text.gmtime_r*)
+		*(.text.chdir*)
+		*(.text.devnull*)
+		*(.text.ramdisk*)
+		*(.text.files*)
+		*(.text.unregister_driver*)
+		*(.text.register_blockdriver*)
+		*(.text.bchdev_register*)
+		*(.text.part*)
+		*(.text.ftl*)
+		*(.text.*I2CBusIterator*)
+		*(.text.*SPIBusIterator*)
+		*(.text.*BusCLIArguments*)
+		*(.text.*WorkQueueManager*)
+		*(.text.*param_export*)
+		*(.text.*param_import*)
+		*(.text.*param_load*)
+		*(.text.*BusInstanceIterator*)
+		*(.text.*PRINT_MODULE_USAGE*)
+		*(.text.*px4_getopt*)
+		*(.text.*main*)
+		*(.text.*instantiate*)
+		*(.text.*ADC*)
+		*(.text.*MS5611*)
+		*(.text.*I2CSPIDriver*)
+		*(.text.*CameraCapture*)
+		*(.text.*i2cdetect*)
+		*(.text.*usage*)
+/*		*(.text.*Bosch*) 2% CPU .5% RAM */
+		*(.text.*Tunes*)
+		*(.text.*printStatistics*)
+		*(.text.*init*)
+		*(.text.*test*)
+		*(.text.*task_spawn*)
+		*(.text.*custom_command*)
+		*(.text.*print_usage*)
+		*(.text.*print_status*)
+		*(.text.*status*)
+		*(.text.*CameraInterface*)
+		*(.text.*CameraTrigger*)
 		*(.text.*ModuleBase*)
 		*(.text.*print_message*)
 		*(.text._ZN4Ekf2C2Eb)
@@ -127,6 +202,8 @@ SECTIONS
 		*(.text.*configure_streams_to_default*)
 		*(.text.*_main)
 		*(.text.*GPSDriverAshtech*)
+		*(.text.*GPSDriver*)
+		*(.text.*Mavlink*)
 		*(.rodata .rodata.*)
 		*(.fixup)
 		*(.gnu.warning)
