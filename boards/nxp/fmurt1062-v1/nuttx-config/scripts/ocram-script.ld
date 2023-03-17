@@ -64,8 +64,8 @@
 
 MEMORY
 {
-  flash    (rx)  : ORIGIN = 0x60000000, LENGTH = 7M
-  flashxip (rx)  : ORIGIN = 0x60700000, LENGTH = 1M
+  flash    (rx)  : ORIGIN = 0x70000000, LENGTH = 3M
+  flashxip (rx)  : ORIGIN = 0x70300000, LENGTH = 1M
   /*                     Vectors @ boot+ivt   OCRAM2   Flex RAM     Boot  IVT */
   sram     (rwx) : ORIGIN = 0x2020A000, LENGTH = 512K + 256K + 128K - (32K + 8K)
   itcm     (rwx) : ORIGIN = 0x00000000, LENGTH = 0K
