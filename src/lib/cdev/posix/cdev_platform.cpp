@@ -218,11 +218,11 @@ extern "C" {
 
 				PX4_WARN("%s: exceeded maximum number of file descriptors, accessing %s", thread_name, path);
 #ifndef __PX4_QURT
-				int nret = pthread_getname_np(pthread_self(), thread_name, NAMELEN);
+				// int nret = pthread_getname_np(pthread_self(), thread_name, NAMELEN);
 
-				if (nret || thread_name[0] == 0) {
-					PX4_WARN("failed getting thread name");
-				}
+				// if (nret || thread_name[0] == 0) {
+				// 	PX4_WARN("failed getting thread name");
+				// }
 
 #endif
 
@@ -342,11 +342,11 @@ extern "C" {
 		char thread_name[NAMELEN] {};
 
 #ifndef __PX4_QURT
-		int nret = pthread_getname_np(pthread_self(), thread_name, NAMELEN);
+		// int nret = pthread_getname_np(pthread_self(), thread_name, NAMELEN);
 
-		if (nret || thread_name[0] == 0) {
-			PX4_WARN("failed getting thread name");
-		}
+		// if (nret || thread_name[0] == 0) {
+		// 	PX4_WARN("failed getting thread name");
+		// }
 
 #endif
 

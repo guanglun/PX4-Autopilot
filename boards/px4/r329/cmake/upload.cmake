@@ -34,13 +34,13 @@
 if(DEFINED ENV{AUTOPILOT_HOST})
 	set(AUTOPILOT_HOST $ENV{AUTOPILOT_HOST})
 else()
-	set(AUTOPILOT_HOST "R329")
+	set(AUTOPILOT_HOST "10.10.10.21")
 endif()
 
 add_custom_target(upload
 	COMMAND rsync -arh --progress
 			${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PX4_BOARD_DIR}/init/* ${PX4_SOURCE_DIR}/posix-configs/r329/*.config ${PX4_BINARY_DIR}/etc # source
-			root@${AUTOPILOT_HOST}:/root/px4 # destination
+			guanglun@${AUTOPILOT_HOST}:/home/guanglun/workspace/px4 # destination
 	DEPENDS px4
 	COMMENT "uploading px4"
 	USES_TERMINAL
