@@ -34,13 +34,15 @@
 if(DEFINED ENV{AUTOPILOT_HOST})
 	set(AUTOPILOT_HOST $ENV{AUTOPILOT_HOST})
 else()
-	set(AUTOPILOT_HOST "10.10.10.21")
+	set(AUTOPILOT_HOST "10.10.10.170")
 endif()
 
 add_custom_target(upload
 	COMMAND rsync -arh --progress
 			${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PX4_BOARD_DIR}/init/* ${PX4_SOURCE_DIR}/posix-configs/r329/*.config ${PX4_BINARY_DIR}/etc # source
-			guanglun@${AUTOPILOT_HOST}:/home/guanglun/workspace/px4 # destination
+			root@${AUTOPILOT_HOST}:/root/px4/ # destination
+	# COMMAND cp 	${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PX4_BOARD_DIR}/init/* ${PX4_SOURCE_DIR}/posix-configs/r329/*.config ${PX4_BINARY_DIR}/etc
+	# 		/home/guanglun/workspace/t113-5/Tina-t113-pro/package/add-rootfs-demo/px4/ -rf
 	DEPENDS px4
 	COMMENT "uploading px4"
 	USES_TERMINAL

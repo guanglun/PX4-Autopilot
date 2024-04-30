@@ -45,7 +45,7 @@
 
 // I2C
 #define CONFIG_I2C 1
-#define PX4_NUMBER_I2C_BUSES    2
+#define PX4_NUMBER_I2C_BUSES    4
 
 
 // SPI

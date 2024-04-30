@@ -4,7 +4,7 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_SYSTEM_VERSION 1)
 
-set(triple arm-openwrt-linux)
+set(triple arm-none-linux-gnueabihf)
 set(CMAKE_LIBRARY_ARCHITECTURE ${triple})
 set(TOOLCHAIN_PREFIX ${triple})
 
