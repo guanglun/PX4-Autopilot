@@ -67,6 +67,9 @@
 
 using namespace time_literals;
 
+#define GPADC_SAMPLE_FREQUENCY_HZ            10
+#define GPADC_SAMPLE_INTERVAL_US             (1_s / GPADC_SAMPLE_FREQUENCY_HZ)
+
 /**
  * The channel definitions (e.g., ADC_BATTERY_VOLTAGE_CHANNEL, ADC_BATTERY_CURRENT_CHANNEL, and ADC_AIRSPEED_VOLTAGE_CHANNEL) are defined in board_config.h
  */
@@ -99,12 +102,14 @@ public:
 private:
 	void Run() override;
 
+	Battery 		  _battery;
 	uORB::SubscriptionInterval	_parameter_update_sub{ORB_ID(parameter_update), 1_s};				/**< notification of parameter updates */
 	uORB::SubscriptionCallbackWorkItem _adc_report_sub{this, ORB_ID(adc_report)};
 
 	static constexpr uint32_t SAMPLE_FREQUENCY_HZ = 100;
 	static constexpr uint32_t SAMPLE_INTERVAL_US  = 1_s / SAMPLE_FREQUENCY_HZ;
 
+	FILE *in0_raw_file;
 	AnalogBattery _battery1;
 
 #if BOARD_NUMBER_BRICKS > 1
@@ -137,9 +142,10 @@ private:
 BatteryStatus::BatteryStatus() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::hp_default),
-	_battery1(1, this, SAMPLE_INTERVAL_US, battery_status_s::BATTERY_SOURCE_POWER_MODULE, 0),
+	_battery(1, this, GPADC_SAMPLE_INTERVAL_US, battery_status_s::BATTERY_SOURCE_POWER_MODULE),
+	_battery1(2, this, SAMPLE_INTERVAL_US, battery_status_s::BATTERY_SOURCE_POWER_MODULE, 0),
 #if BOARD_NUMBER_BRICKS > 1
-	_battery2(2, this, SAMPLE_INTERVAL_US, battery_status_s::BATTERY_SOURCE_POWER_MODULE, 1),
+	_battery2(3, this, SAMPLE_INTERVAL_US, battery_status_s::BATTERY_SOURCE_POWER_MODULE, 1),
 #endif
 	_loop_perf(perf_alloc(PC_ELAPSED, MODULE_NAME))
 {
@@ -168,69 +174,31 @@ BatteryStatus::parameter_update_poll(bool forced)
 void
 BatteryStatus::adc_poll()
 {
-	/* For legacy support we publish the battery_status for the Battery that is
-	* associated with the Brick that is the selected source for VDD_5V_IN
-	* Selection is done in HW ala a LTC4417 or similar, or maybe hard coded
-	* Like in the FMUv4
-	*/
 
-	/* Per Brick readings with default unread channels at 0 */
-	float bat_current_adc_readings[BOARD_NUMBER_BRICKS] {};
-	float bat_voltage_adc_readings[BOARD_NUMBER_BRICKS] {};
-	bool has_bat_voltage_adc_channel[BOARD_NUMBER_BRICKS] {};
+	char buffer[80];
+	float in0_voltage = 0;
+	int in0_raw_value;
+	FILE *fp;
 
-	int selected_source = -1;
+	fp = popen("cat /sys/bus/iio/devices/iio:device0/in_voltage0_raw", "r");
 
-	adc_report_s adc_report;
+	fgets(buffer,sizeof(buffer),fp);
 
-	if (_adc_report_sub.update(&adc_report)) {
+	in0_raw_value = atoi(buffer);
+	in0_voltage = in0_raw_value*1.8f/4096/22*222;
+	//PX4_INFO("%d %0.2f",in0_raw_value,(double)in0_voltage);
 
-		/* Read add channels we got */
-		for (unsigned i = 0; i < PX4_MAX_ADC_CHANNELS; ++i) {
-			for (int b = 0; b < BOARD_NUMBER_BRICKS; b++) {
+	if(in0_voltage > 7.0f)
+	{
+		_battery.setConnected(true);
 
-				/* Once we have subscriptions, Do this once for the lowest (highest priority
-				 * supply on power controller) that is valid.
-				 */
-				if (selected_source < 0 && _analogBatteries[b]->is_valid()) {
-					/* Indicate the lowest brick (highest priority supply on power controller)
-					 * that is valid as the one that is the selected source for the
-					 * VDD_5V_IN
-					 */
-					selected_source = b;
-				}
-
-				/* look for specific channels and process the raw voltage to measurement data */
-
-				if (adc_report.channel_id[i] >= 0) {
-					if (adc_report.channel_id[i] == _analogBatteries[b]->get_voltage_channel()) {
-						/* Voltage in volts */
-						bat_voltage_adc_readings[b] = adc_report.raw_data[i] *
-									      adc_report.v_ref /
-									      adc_report.resolution;
-						has_bat_voltage_adc_channel[b] = true;
-
-					} else if (adc_report.channel_id[i] == _analogBatteries[b]->get_current_channel()) {
-						bat_current_adc_readings[b] = adc_report.raw_data[i] *
-									      adc_report.v_ref /
-									      adc_report.resolution;
-					}
-				}
-
-			}
-		}
-
-		for (int b = 0; b < BOARD_NUMBER_BRICKS; b++) {
-
-			if (has_bat_voltage_adc_channel[b]) { // Do not publish if no voltage channel configured
-				_analogBatteries[b]->updateBatteryStatusADC(
-					hrt_absolute_time(),
-					bat_voltage_adc_readings[b],
-					bat_current_adc_readings[b]
-				);
-			}
-		}
+	}else{
+		_battery.setConnected(false);
 	}
+
+	_battery.updateVoltage(in0_voltage);
+	_battery.updateCurrent(0);
+	_battery.updateAndPublishBatteryStatus(hrt_absolute_time());
 }
 
 void
@@ -279,7 +247,10 @@ BatteryStatus::task_spawn(int argc, char *argv[])
 bool
 BatteryStatus::init()
 {
-	return _adc_report_sub.registerCallback();
+
+	ScheduleOnInterval(300_ms);
+	return 1;
+
 }
 
 int BatteryStatus::custom_command(int argc, char *argv[])

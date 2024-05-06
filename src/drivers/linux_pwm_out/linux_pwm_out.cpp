@@ -309,14 +309,14 @@ int LinuxPWMOut::ioctl(device::file_t *filp, int cmd, unsigned long arg)
 
 	switch (cmd) {
 	case MIXERIOCRESET:
-		_mixing_output.resetMixerThreadSafe();
+		//_mixing_output.resetMixerThreadSafe();
 		break;
 
 	case MIXERIOCLOADBUF: {
-			const char *buf = (const char *)arg;
-			unsigned buflen = strlen(buf);
-			ret = _mixing_output.loadMixerThreadSafe(buf, buflen);
-			update_params();
+			// const char *buf = (const char *)arg;
+			// unsigned buflen = strlen(buf);
+			// ret = _mixing_output.loadMixerThreadSafe(buf, buflen);
+			// update_params();
 			break;
 		}
 	case PWM_SERVO_SET_ARM_OK:
@@ -325,6 +325,9 @@ int LinuxPWMOut::ioctl(device::file_t *filp, int cmd, unsigned long arg)
 	case PWM_SERVO_SET_FORCE_SAFETY_ON:
 	case PWM_SERVO_ARM:
 	case PWM_SERVO_DISARM:
+		break;
+	case PWM_SERVO_GET_COUNT:
+		*(unsigned *)arg = 4;
 		break;
 	default:
 		ret = -ENOTTY;
