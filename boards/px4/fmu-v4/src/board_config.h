@@ -54,8 +54,8 @@
 
 /* PX4FMU GPIOs ***********************************************************************************/
 /* LEDs */
-#define GPIO_LED1                    (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN11)
-#define GPIO_LED2                    (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN1)
+#define GPIO_LED1                    (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTD|GPIO_PIN7)
+#define GPIO_LED2                    (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTE|GPIO_PIN0)
 #define GPIO_LED3                    (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTB|GPIO_PIN3)
 
 #define GPIO_LED_RED                 GPIO_LED1
@@ -70,6 +70,7 @@
 #ifdef CONFIG_STM32_SPI4
 #  define BOARD_HAS_BUS_MANIFEST 1 // We support a bus manifest because spi 4 is optional
 #endif /* CONFIG_STM32_SPI4 */
+
 
 /**
  * ADC channels:
@@ -111,8 +112,7 @@
 #define HRT_TIMER_CHANNEL            4  /* use capture/compare channel 4 */
 
 #define HRT_PPM_CHANNEL              3  /* use capture/compare channel 3 */
-#define GPIO_PPM_IN                  (GPIO_ALT|GPIO_AF2|GPIO_PULLUP|GPIO_PORTB|GPIO_PIN0)
-
+#define GPIO_PPM_IN                  0
 /* RC Serial port */
 
 #define RC_SERIAL_PORT               "/dev/ttyS4"
@@ -122,30 +122,30 @@
 #define PWMIN_TIMER_CHANNEL          2
 #define GPIO_PWM_IN                  GPIO_TIM4_CH2IN_2
 
-#define GPIO_RSSI_IN                 (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTC|GPIO_PIN1)
-#define GPIO_LED_SAFETY              (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTC|GPIO_PIN3)
-#define GPIO_BTN_SAFETY              (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTC|GPIO_PIN4)
-#define GPIO_PERIPH_3V3_EN           (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTC|GPIO_PIN5)
+#define GPIO_RSSI_IN                 0
+#define GPIO_LED_SAFETY              0
+#define GPIO_BTN_SAFETY              0
+#define GPIO_PERIPH_3V3_EN           0
 
 /* For R12, this signal is active high. */
 #define GPIO_SBUS_INV                (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTC|GPIO_PIN13)
 #define RC_INVERT_INPUT(_invert_true) px4_arch_gpiowrite(GPIO_SBUS_INV, _invert_true)
 
-#define GPIO_SPEKTRUM_PWR_EN         (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTE|GPIO_PIN4)
+#define GPIO_SPEKTRUM_PWR_EN         0
 
-#define GPIO_8266_GPIO0              (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTE|GPIO_PIN2)
-#define GPIO_8266_GPIO2              (GPIO_INPUT|GPIO_PULLUP|GPIO_PORTB|GPIO_PIN4)
-#define GPIO_8266_PD                 (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTE|GPIO_PIN5)
-#define GPIO_8266_RST                (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTE|GPIO_PIN6)
+#define GPIO_8266_GPIO0              0
+#define GPIO_8266_GPIO2              0
+#define GPIO_8266_PD                 0
+#define GPIO_8266_RST                0
 
 /* Heater pins */
-#define GPIO_HEATER_INPUT            (GPIO_INPUT|GPIO_PULLDOWN|GPIO_PORTC|GPIO_PIN6)
-#define GPIO_HEATER_OUTPUT           (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_CLEAR|GPIO_PORTC|GPIO_PIN6)
+#define GPIO_HEATER_INPUT            0
+#define GPIO_HEATER_OUTPUT           0
 #define HEATER_OUTPUT_EN(on_true)    px4_arch_gpiowrite(GPIO_HEATER_OUTPUT, (on_true))
 
 /* Power switch controls */
 
-#define SPEKTRUM_POWER(_on_true)     px4_arch_gpiowrite(GPIO_SPEKTRUM_PWR_EN, (!_on_true))
+// #define SPEKTRUM_POWER(_on_true)     px4_arch_gpiowrite(GPIO_SPEKTRUM_PWR_EN, (!_on_true))
 
 /**
  * FMUv4 has separate RC_IN
@@ -156,10 +156,10 @@
  * The FMU can drive  GPIO PPM_IN as an output
  */
 
-#define GPIO_PPM_IN_AS_OUT           (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN0)
-#define SPEKTRUM_RX_AS_GPIO_OUTPUT() px4_arch_configgpio(GPIO_PPM_IN_AS_OUT)
-#define SPEKTRUM_RX_AS_UART()       /* Can be left as uart */
-#define SPEKTRUM_OUT(_one_true)      px4_arch_gpiowrite(GPIO_PPM_IN_AS_OUT, (_one_true))
+// #define GPIO_PPM_IN_AS_OUT           (GPIO_OUTPUT|GPIO_PUSHPULL|GPIO_SPEED_2MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN0)
+// #define SPEKTRUM_RX_AS_GPIO_OUTPUT() px4_arch_configgpio(GPIO_PPM_IN_AS_OUT)
+// #define SPEKTRUM_RX_AS_UART()       /* Can be left as uart */
+// #define SPEKTRUM_OUT(_one_true)      px4_arch_gpiowrite(GPIO_PPM_IN_AS_OUT, (_one_true))
 
 /**
  * By Providing BOARD_ADC_USB_CONNECTED (using the px4_arch abstraction)

@@ -104,7 +104,7 @@ int do_esc_calibration(orb_advert_t *mavlink_log_pub)
 	uORB::SubscriptionData<battery_status_s> battery_status_sub{ORB_ID(battery_status)};
 	battery_status_sub.update();
 	const bool battery_connected_before_calibration = battery_status_sub.get().connected;
-	const float current_before_calibration = battery_status_sub.get().current_a;
+	// const float current_before_calibration = battery_status_sub.get().current_a;
 
 	calibration_log_info(mavlink_log_pub, CAL_QGC_STARTED_MSG, "esc");
 
@@ -121,11 +121,11 @@ int do_esc_calibration(orb_advert_t *mavlink_log_pub)
 		hrt_abstime now = hrt_absolute_time();
 		battery_status_sub.update();
 
-		if (now > (timeout_start + 1_s) && (battery_status_sub.get().current_a > current_before_calibration + 1.f)) {
-			// Safety termination, current rises immediately, user didn't unplug power before
-			calibration_failed = true;
-			break;
-		}
+		// if (now > (timeout_start + 1_s) && (battery_status_sub.get().current_a > current_before_calibration + 1.f)) {
+		// 	// Safety termination, current rises immediately, user didn't unplug power before
+		// 	calibration_failed = true;
+		// 	break;
+		// }
 
 		if (!battery_connected_before_calibration && battery_status_sub.get().connected) {
 			// Battery connection detected we can go to the next step immediately
