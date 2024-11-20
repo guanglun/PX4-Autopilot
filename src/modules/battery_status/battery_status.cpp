@@ -184,6 +184,8 @@ BatteryStatus::adc_poll()
 
 	fgets(buffer,sizeof(buffer),fp);
 
+	fclose(fp);
+
 	in0_raw_value = atoi(buffer);
 	in0_voltage = in0_raw_value*1.8f/4096/22*222;
 	//PX4_INFO("%d %0.2f",in0_raw_value,(double)in0_voltage);
