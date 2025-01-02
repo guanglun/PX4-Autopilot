@@ -124,7 +124,7 @@ bool is_ground_vehicle(const vehicle_status_s &current_status)
 
 // End time for currently blinking LED message, 0 if no blink message
 static hrt_abstime blink_msg_end = 0;
-static int fd_leds{-1};
+// static int fd_leds{-1};
 
 static led_control_s led_control {};
 static orb_advert_t led_control_pub = nullptr;
@@ -333,28 +333,28 @@ int led_init()
 	led_control_pub = orb_advertise_queue(ORB_ID(led_control), &led_control, led_control_s::ORB_QUEUE_LENGTH);
 
 	/* first open normal LEDs */
-	fd_leds = px4_open(LED0_DEVICE_PATH, O_RDWR);
+	// fd_leds = px4_open(LED0_DEVICE_PATH, O_RDWR);
 
-	if (fd_leds < 0) {
-		// there might not be an LED available, so don't make this an error
-		PX4_INFO("LED: open %s failed (%i)", LED0_DEVICE_PATH, errno);
-		return -errno;
-	}
+	// if (fd_leds < 0) {
+	// 	// there might not be an LED available, so don't make this an error
+	// 	PX4_INFO("LED: open %s failed (%i)", LED0_DEVICE_PATH, errno);
+	// 	return -errno;
+	// }
 
-	/* the green LED is only available on FMUv5 */
-	px4_ioctl(fd_leds, LED_ON, LED_GREEN);
+	// /* the green LED is only available on FMUv5 */
+	// px4_ioctl(fd_leds, LED_ON, LED_GREEN);
 
-	/* the blue LED is only available on AeroCore but not FMUv2 */
-	px4_ioctl(fd_leds, LED_ON, LED_BLUE);
+	// /* the blue LED is only available on AeroCore but not FMUv2 */
+	// px4_ioctl(fd_leds, LED_ON, LED_BLUE);
 
-	/* switch blue off */
-	led_off(LED_BLUE);
+	// /* switch blue off */
+	// led_off(LED_BLUE);
 
-	/* we consider the amber led mandatory */
-	if (px4_ioctl(fd_leds, LED_ON, LED_AMBER)) {
-		PX4_WARN("Amber LED: ioctl fail");
-		return PX4_ERROR;
-	}
+	// /* we consider the amber led mandatory */
+	// if (px4_ioctl(fd_leds, LED_ON, LED_AMBER)) {
+	// 	PX4_WARN("Amber LED: ioctl fail");
+	// 	return PX4_ERROR;
+	// }
 
 	/* switch amber off */
 	led_off(LED_AMBER);
@@ -365,22 +365,67 @@ int led_init()
 void led_deinit()
 {
 	orb_unadvertise(led_control_pub);
-	px4_close(fd_leds);
+	// px4_close(fd_leds);
 }
 
 int led_toggle(int led)
 {
-	return px4_ioctl(fd_leds, LED_TOGGLE, led);
+	char buffer[128];
+	FILE *fp = nullptr;
+
+	if(led ==LED_RED)//1
+	{
+		fp = popen("gpioget gpiochip0 116", "r");
+		fgets(buffer,sizeof(buffer),fp);
+		fclose(fp);
+		if(buffer[0]=='0')
+		{
+			system("gpioset gpiochip0 116=1");
+		}else{
+			system("gpioset gpiochip0 116=0");
+		}
+	}else if(led ==LED_GREEN)//0
+	{
+		fp = popen("gpioget gpiochip0 117", "r");
+		fgets(buffer,sizeof(buffer),fp);
+		fclose(fp);
+		if(buffer[0]=='0')
+		{
+			system("gpioset gpiochip0 117=1");
+		}else{
+			system("gpioset gpiochip0 117=0");
+		}
+	}
+
+	return 0;
+
 }
 
 int led_on(int led)
 {
-	return px4_ioctl(fd_leds, LED_ON, led);
+
+	if(led ==LED_RED)//1
+	{
+		system("gpioset gpiochip0 116=1");
+	}else if(led ==LED_GREEN)//0
+	{
+		system("gpioset gpiochip0 117=1");
+	}
+	return 0;
 }
 
 int led_off(int led)
 {
-	return px4_ioctl(fd_leds, LED_OFF, led);
+
+	if(led ==LED_RED)//1
+	{
+		system("gpioset gpiochip0 116=0");
+	}else if(led ==LED_GREEN)//0
+	{
+		system("gpioset gpiochip0 117=0");
+	}
+
+	return 0;
 }
 
 void rgbled_set_color_and_mode(uint8_t color, uint8_t mode, uint8_t blinks, uint8_t prio)

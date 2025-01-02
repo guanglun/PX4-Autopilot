@@ -62,7 +62,8 @@
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/adc_report.h>
 #include <px4_platform_common/px4_work_queue/ScheduledWorkItem.hpp>
-
+#include <sys/mman.h>
+#include <sys/ioctl.h>
 #include "analog_battery.h"
 
 using namespace time_literals;
@@ -171,24 +172,28 @@ BatteryStatus::parameter_update_poll(bool forced)
 	}
 }
 
+volatile unsigned int *GPADC_BASE_MAP;
+
+#define GPADC_CH0_DATA  (GPADC_BASE_MAP + 0x80/4)
+#define GPADC_CTRL      (GPADC_BASE_MAP + 0x04/4)
+#define GPADC_CS_EN     (GPADC_BASE_MAP + 0x08/4)
+#define GPADC_DATA_INTC (GPADC_BASE_MAP + 0x28/4)
+#define GPADC_DATA_INTS (GPADC_BASE_MAP + 0x38/4)
+
+#define GPADC_BASE 0x02009000
+
 void
 BatteryStatus::adc_poll()
 {
 
-	char buffer[80];
 	float in0_voltage = 0;
 	int in0_raw_value;
-	FILE *fp;
 
-	fp = popen("cat /sys/bus/iio/devices/iio:device0/in_voltage0_raw", "r");
-
-	fgets(buffer,sizeof(buffer),fp);
-
-	fclose(fp);
-
-	in0_raw_value = atoi(buffer);
+	in0_raw_value = *GPADC_CH0_DATA;
 	in0_voltage = in0_raw_value*1.8f/4096/22*222;
-	//PX4_INFO("%d %0.2f",in0_raw_value,(double)in0_voltage);
+	in0_voltage *= 1.03f;
+
+	// PX4_INFO("%d %0.2f",in0_raw_value,(double)in0_voltage);
 
 	if(in0_voltage > 7.0f)
 	{
@@ -249,6 +254,24 @@ BatteryStatus::task_spawn(int argc, char *argv[])
 bool
 BatteryStatus::init()
 {
+
+	int mm_fd = open("/dev/mem", O_RDWR | O_SYNC);
+	if (mm_fd < 0)
+	{
+		PX4_ERR("GPADC open(/dev/mem) failed.");
+		return -1;
+	}
+
+	GPADC_BASE_MAP = (volatile unsigned int *)mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, mm_fd, GPADC_BASE);
+
+	if (GPADC_BASE_MAP == MAP_FAILED)
+	{
+		PX4_ERR("GPADC_BASE_MAP mmap fail.");
+		return -1;
+	}
+
+	*GPADC_CS_EN = 1;
+        *GPADC_CTRL = __uint32_t((1<<16)|(1<<19));
 
 	ScheduleOnInterval(300_ms);
 	return 1;

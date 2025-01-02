@@ -110,7 +110,7 @@ int NavioSysfsPWMOut::init()
 	for (i = 0; i < _pwm_num; ++i) {
 		::snprintf(path, sizeof(path), "%s/pwm%u/period", _device, pwm_pin_map[i]);
 
-		if (pwm_write_sysfs(path, (int)2500000)) { //400Hz
+		if (pwm_write_sysfs(path, (int)17500000)) { //50Hz
 			PX4_ERR("PWM set period failed");
 		}
 
@@ -128,7 +128,7 @@ int NavioSysfsPWMOut::init()
 	for (i = 0; i < _pwm_num; ++i) {
 		::snprintf(path, sizeof(path), "%s/pwm%u/polarity", _device, pwm_pin_map[i]);
 
-		if (pwm_write_sysfs_string(path, (char *)"normal")) { //400Hz
+		if (pwm_write_sysfs_string(path, (char *)"normal")) {
 			PX4_ERR("PWM set polarity failed");
 		}
 
@@ -156,13 +156,15 @@ int NavioSysfsPWMOut::send_output_pwm(const uint16_t *pwm, int num_outputs)
 	__uint32_t ppr[4];
 	//convert this to duty_cycle in ns
 	for (int i = 0; i < num_outputs; ++i) {
-		ppr[i] = (__uint32_t)((60000<<16)|(60000*pwm[i]/2500));
+		ppr[i] = (__uint32_t)((60000<<16)|(60000*pwm[i]/20000));
 	}
 
 
 	for (int i = 0; i < num_outputs; ++i) {
 		*PPR(pwm_pin_map[i]) = ppr[i];
 	}
+
+	// PX4_INFO("PWM: %d %d %d %d", pwm[0], pwm[1], pwm[2], pwm[3]);
 
 	return ret;
 }
