@@ -1,0 +1,5 @@
+menuconfig DRIVERS_STM32G0_AUX_CONTROL
+	bool "stm32g0_aux_control"
+	default n
+	---help---
+		Enable support for stm32g0_aux_control

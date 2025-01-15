@@ -46,7 +46,6 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <termios.h>
 
 using namespace pwm_out;
 
@@ -57,8 +56,6 @@ volatile unsigned int *PWM_BASE_MAP;
 #define PPR(ch) (PWM_BASE_MAP + (0x0C00 + 0x0104 + 0x20 * ch) / 4)
 #define PWM_BASE_REL (0x02000C00)
 #define PWM_BASE     (PWM_BASE_REL/0x1000*0x1000)
-
-static int _uart_fd = 0;
 
 NavioSysfsPWMOut::NavioSysfsPWMOut(int max_num_outputs)
 {
@@ -145,46 +142,6 @@ int NavioSysfsPWMOut::init()
 		}
 	}
 
-	int speed = B115200;
-	_uart_fd = open("/dev/ttyS0", O_RDWR | O_NOCTTY);
-	if (_uart_fd < 0) {
-		PX4_ERR(">>>>> ERROR opening UART, aborting..\n");
-	}
-
-	/* Try to set baud rate */
-	struct termios uart_config;
-	int termios_state;
-
-	/* Initialize the uart config */
-	if ((termios_state = tcgetattr(_uart_fd, &uart_config)) < 0)
-	{
-		PX4_ERR("tcgetattr fail.");
-		return -1;
-	}
-	/* Clear ONLCR flag (which appends a CR for every LF) */
-	uart_config.c_oflag &= ~ONLCR;
-
-	/* Set baud rate */
-	if (cfsetispeed(&uart_config, speed) < 0 || cfsetospeed(&uart_config, speed) < 0)
-	{
-		PX4_ERR("cfsetispeed fail.");
-		return -1;
-	}
-
-#if defined(__PX4_LINUX) || defined(__PX4_DARWIN) || defined(__PX4_CYGWIN)
-	/* Put in raw mode */
-	cfmakeraw(&uart_config);
-#endif
-
-	if ((termios_state = tcsetattr(_uart_fd, TCSANOW, &uart_config)) < 0)
-	{
-		PX4_ERR("tcsetattr fail.");
-		return -1;
-	}
-	// /* setup hardware flow control */
-	// if (setup_flow_control(flow_control) && (flow_control != FLOW_CONTROL_AUTO)) {
-	// }
-
 	return 0;
 }
 
@@ -192,37 +149,22 @@ int NavioSysfsPWMOut::init()
 
 int NavioSysfsPWMOut::send_output_pwm(const uint16_t *pwm, int num_outputs)
 {
-	static char sdata[SDATA_SIZE]={0xAB,0xCD};
-	int cnt = 2;
 
-	for (int i = 0; i < 4; i++) {
-		uint16_t pout = pwm[i]-1000;
-		sdata[cnt++] = (char)(pout);
-		sdata[cnt++] = (char)(pout>>8);
+	if (num_outputs > _pwm_num) {
+		num_outputs = _pwm_num;
 	}
-
-	if(_uart_fd > 0)
-	{
-		write(_uart_fd, sdata, SDATA_SIZE);
-	}
-
-
-	// if (num_outputs > _pwm_num) {
-	// 	num_outputs = _pwm_num;
-	// }
 
 	int ret = 0;
-	// __uint32_t ppr[4];
-	// //convert this to duty_cycle in ns
-	// for (int i = 0; i < num_outputs; ++i) {
-	// 	ppr[i] = (__uint32_t)((60000<<16)|(60000*pwm[i]/2500));
-	// }
+	__uint32_t ppr[4];
+	//convert this to duty_cycle in ns
+	for (int i = 0; i < num_outputs; ++i) {
+		ppr[i] = (__uint32_t)((60000<<16)|(60000*pwm[i]/2500));
+	}
 
 
-	// for (int i = 0; i < num_outputs; ++i) {
-	// 	*PPR(pwm_pin_map[i]) = ppr[i];
-	// }
-
+	for (int i = 0; i < num_outputs; ++i) {
+		*PPR(pwm_pin_map[i]) = ppr[i];
+	}
 
 
 	// PX4_INFO("PWM: %d %d %d %d", pwm[0], pwm[1], pwm[2], pwm[3]);
