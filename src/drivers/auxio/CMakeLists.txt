@@ -32,11 +32,11 @@
 ############################################################################
 
 px4_add_module(
-	MODULE drivers__stm32g0_aux_control
-	MAIN stm32g0_aux_control
+	MODULE drivers__auxio
+	MAIN auxio
 	COMPILE_FLAGS
 	SRCS
-		stm32g0_aux_control.cpp
+		auxio.cpp
 	MODULE_CONFIG
 		module.yaml
 	DEPENDS

@@ -31,7 +31,7 @@
  *
  ****************************************************************************/
 
-#include "stm32g0_aux_control.hpp"
+#include "auxio.hpp"
 
 #include <drivers/drv_hrt.h>
 
@@ -442,17 +442,17 @@ int G0AUX::print_usage(const char *reason)
 	PRINT_MODULE_DESCRIPTION(
 		R"DESCR_STR(
 ### Description
-stm32g0 aux control.
+stm32g0 auxio control.
 )DESCR_STR");
 
-	PRINT_MODULE_USAGE_NAME("stm32g0_aux_control", "driver");
+	PRINT_MODULE_USAGE_NAME("auxio", "driver");
 	PRINT_MODULE_USAGE_COMMAND("start");
 	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
 
 	return 0;
 }
 
-extern "C" __EXPORT int stm32g0_aux_control_main(int argc, char *argv[])
+extern "C" __EXPORT int auxio_main(int argc, char *argv[])
 {
 	return G0AUX::main(argc, argv);
 }

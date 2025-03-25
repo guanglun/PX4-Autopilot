@@ -1,4 +1,4 @@
-module_name: STM32G0 AUX CONTROL
+module_name: STM32G0 AUXIO CONTROL
 actuator_output:
   output_groups:
     - param_prefix: PWM_MAIN

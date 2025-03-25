@@ -1,0 +1,5 @@
+menuconfig DRIVERS_AUXIO
+	bool "auxio"
+	default n
+	---help---
+		Enable support for auxio
