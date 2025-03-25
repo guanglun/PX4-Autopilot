@@ -33,6 +33,7 @@
 
 #pragma once
 
+#include <battery/battery.h>
 #include <drivers/device/device.h>
 #include <lib/mathlib/mathlib.h>
 #include <lib/mixer_module/mixer_module.hpp>
@@ -46,6 +47,7 @@
 #include <uORB/Subscription.hpp>
 #include <uORB/topics/parameter_update.h>
 #include <px4_platform/pwm_out_base.h>
+#include <uORB/topics/battery_status.h>
 
 using namespace time_literals;
 

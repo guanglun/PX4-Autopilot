@@ -47,6 +47,8 @@ int _uart_fd = 0;
 
 int task_main(int argc, char *argv[]);
 
+Battery _battery{1, nullptr, 100_ms, battery_status_s::BATTERY_SOURCE_POWER_MODULE};
+
 G0AUX::G0AUX() :
 	OutputModuleInterface(MODULE_NAME, px4::wq_configurations::hp_default),
 	_cycle_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")),
@@ -63,19 +65,24 @@ G0AUX::~G0AUX()
 
 #define RDATA_SIZE 30
 
+static uint16_t adc[4];
+static float adcf[4];
+static float vbat=0.0f;
+static uint16_t pwm[4];
+static uint16_t pwm_count_fps,loop_count,uart_callback_count;
+static uint16_t is_connect = 0,is_connect_last = 0;
+
 void parse_data(uint8_t *rdata)
 {
-	static uint16_t adc[4];
-	static uint16_t pwm[4];
-	static uint16_t pwm_count_fps,loop_count,uart_callback_count,is_connect;
-	static uint16_t is_connect_last = 0;
 
 	for(int i=0;i<4;i++)
 	{
 		adc[i] = (uint16_t)((rdata[i*2+1]<<8)|rdata[i*2]);
+		adcf[i] = adc[i] * 3.3f / 4095.0f;
 		pwm[i] = (uint16_t)((rdata[i*2+9]<<8)|rdata[i*2+8]);
 	}
 
+	vbat = adcf[0]*222.0f/22.0f;
 
 	pwm_count_fps = (uint16_t)((rdata[17]<<8)|rdata[16]);
 	loop_count = (uint16_t)((rdata[19]<<8)|rdata[18]);
@@ -87,15 +94,16 @@ void parse_data(uint8_t *rdata)
 		is_connect_last = is_connect;
 		if(is_connect)
 		{
-			PX4_INFO("G0 AUX Connect");
+			PX4_INFO("G0 AUX Connect %d %d",is_connect,is_connect_last);
 		}else{
-			PX4_ERR("G0 AUX Connect Error");
+			PX4_ERR("G0 AUX Connect Error %d %d",is_connect,is_connect_last);
 		}
 	}
-	// PX4_INFO("adc:%d %d %d %d pwm:%d %d %d %d fps:%d loop:%d urx:%d isconnect:%d",
-	// adc[0],adc[1],adc[2],adc[3],
-	// pwm[0],pwm[1],pwm[2],pwm[3],
-	// pwm_count_fps,loop_count,uart_callback_count,is_connect);
+
+	hrt_abstime t = hrt_absolute_time();
+	_battery.setConnected(true);
+	_battery.updateVoltage(vbat);
+	_battery.updateAndPublishBatteryStatus(t);
 }
 
 void uart_recv(uint8_t *data,int len)
@@ -154,17 +162,11 @@ int G0AUX::init()
 {
 
 	int speed = B115200;
-	_uart_fd = open("/dev/ttyS0", O_RDWR | O_NOCTTY);
+	_uart_fd = open("/dev/ttyS3", O_RDWR | O_NOCTTY);
 	if (_uart_fd < 0) {
 		PX4_ERR(">>>>> ERROR opening UART, aborting..\n");
 		return -1;
 	}
-
-	// system("stty -F /dev/ttyS0 speed 460800 min 1 time 1 ignbrk -brkint -icrnl -imaxbel -opost -onlcr
-	// 	-isig -icanon -iexten -echo -echoe -echok -echoctl -echoke");
-
-	// system("stty -F /dev/ttyS0 speed 460800 min 1 time 1 ignbrk -brkint -icrnl -imaxbel -opost -onlcr
-	// 	-isig -icanon -iexten -echo -echoe -echok -echoctl -echoke");
 
 	/* Try to set baud rate */
 	struct termios uart_config;
@@ -234,11 +236,136 @@ int G0AUX::task_spawn(int argc, char *argv[])
 	return PX4_ERROR;
 }
 
-#define SDATA_SIZE 10
+void parse_cmd_g0(uint8_t *data,uint16_t len)
+{
 
+}
+
+#define RHEAD0 0x11
+#define RHEAD1 0x22
+void unpack_data(uint8_t *data,uint16_t len)
+{
+	static uint8_t state = 0;
+	static uint8_t check_sum = 0,rcheck_sum = 0;
+	static uint8_t cmd = 0;
+	static uint16_t rlen = 0,rcount = 0;
+	static uint8_t rdata[1024];
+
+	for(int i=0;i<len;i++)
+	{
+		switch(state){
+			case 0:
+				if(data[i] == RHEAD0)
+				{
+					state = 1;
+				}
+			break;
+			case 1:
+				if(data[i] == RHEAD1)
+				{
+					state = 2;
+				}else if(data[i] == RHEAD0){
+					state = 1;
+				}else{
+					state = 0;
+				}
+			break;
+			case 2:
+				rcheck_sum = data[i];
+				check_sum = 0;
+				state = 3;
+			break;
+			case 3:
+				cmd = data[i];
+				check_sum += data[i];
+				state = 4;
+			break;
+			case 4:
+				rlen = (uint16_t)(data[i]<<8);
+				check_sum += data[i];
+				state = 5;
+			break;
+			case 5:
+				rlen |= data[i];
+				check_sum += data[i];
+				rcount = 0;
+				state = 6;
+			break;
+			case 6:
+				if(rcount < rlen)
+				{
+					rdata[rcount] = data[i];
+					check_sum += data[i];
+				}
+
+				rcount++;
+				if(rcount == rlen)
+				{
+					if(check_sum == rcheck_sum)
+					{
+						if(cmd == 0x01)
+							parse_cmd_g0(rdata,rlen);
+					}
+					state = 0;
+				}
+			break;
+			default:
+				if(data[i] == RHEAD0)
+				{
+					state = 1;
+				}else{
+					state = 0;
+				}
+			break;
+		}
+	}
+}
+
+#define SHEAD0 0xAA
+#define SHEAD1 0xBB
+int pack_data(uint8_t cmd,uint8_t *data,uint16_t len,uint8_t *output,uint8_t outlen)
+{
+	uint8_t check_sum = 0;
+	if(6 + len > outlen)
+		return -1;
+
+	output[0] = SHEAD0;
+	output[1] = SHEAD1;
+
+	output[3] = cmd;
+	output[4] = (uint8_t)(len>>8);
+	output[5] = (uint8_t)len;
+	memcpy(output+6,data,len);
+
+	for(int i=3;i<6+len;i++)
+	{
+		check_sum+=output[i];
+	}
+	output[2] = check_sum;
+	return (6 + len);
+}
+
+#define SDATA_SIZE 10
 bool G0AUX::updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
 				unsigned num_outputs, unsigned num_control_groups_updated)
 {
+	// static uint8_t pwm_data[8];
+	// uint8_t sdata[16];
+	// int cnt = 0;
+
+	// for (int i = 0; i < 4; i++) {
+	// 	uint16_t pout = outputs[i]-1000;
+	// 	pwm_data[cnt++] = (uint8_t) pout;
+	// 	pwm_data[cnt++] = (uint8_t)(pout>>8);
+	// }
+
+	// int slen = pack_data(0x01,pwm_data,8,sdata,16);
+
+	// if(_uart_fd > 0)
+	// {
+	// 	write(_uart_fd, sdata, slen);
+	// }
+
 	static char sdata[SDATA_SIZE]={0xAB,0xCD};
 	int cnt = 2;
 
@@ -295,6 +422,11 @@ int G0AUX::custom_command(int argc, char *argv[])
 
 int G0AUX::print_status()
 {
+	PX4_INFO_RAW("adc:%d %d %d %d pwm:%d %d %d %d fps:%d loop:%d urx:%d isconnect:%d vbat:%0.2f\n",
+	adc[0],adc[1],adc[2],adc[3],
+	pwm[0],pwm[1],pwm[2],pwm[3],
+	pwm_count_fps,loop_count,uart_callback_count,is_connect,(double)vbat);
+
 	perf_print_counter(_cycle_perf);
 	perf_print_counter(_interval_perf);
 	_mixing_output.printStatus();

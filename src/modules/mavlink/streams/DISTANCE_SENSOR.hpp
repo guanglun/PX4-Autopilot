@@ -61,8 +61,8 @@ private:
 	bool send() override
 	{
 		bool updated = false;
-
-		for (int i = 0; i < _distance_sensor_subs.size(); i++) {
+		// for (int i = 0; i < _distance_sensor_subs.size(); i++) {
+		for (int i = 0; i < 1; i++) {
 			distance_sensor_s dist_sensor;
 
 			if (_distance_sensor_subs[i].update(&dist_sensor)) {
@@ -88,12 +88,15 @@ private:
 					break;
 				}
 
+
 				msg.current_distance = dist_sensor.current_distance * 1e2f; // m to cm
 				msg.id               = i;
 				msg.max_distance     = dist_sensor.max_distance * 1e2f;     // m to cm
 				msg.min_distance     = dist_sensor.min_distance * 1e2f;     // m to cm
 				msg.orientation      = dist_sensor.orientation;
 				msg.covariance       = dist_sensor.variance * 1e4f;         // m^2 to cm^2
+
+				// PX4_INFO("%d: %d",msg.id,msg.current_distance);
 
 				mavlink_msg_distance_sensor_send_struct(_mavlink->get_channel(), &msg);
 
