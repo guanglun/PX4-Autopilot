@@ -67,14 +67,37 @@ G0AUX::~G0AUX()
 
 static uint16_t adc[4];
 static float adcf[4];
-static float vbat=0.0f;
+static float vbat=0.0f,curr=0.0f;
 static uint16_t pwm[4];
 static uint16_t pwm_count_fps,loop_count,uart_callback_count;
 static uint16_t is_connect = 0,is_connect_last = 0;
+static hrt_abstime aux_recv_update;
+
+void update_data(void)
+{
+	if(is_connect_last != is_connect)
+	{
+		is_connect_last = is_connect;
+		if(is_connect)
+		{
+			PX4_INFO("connected");
+			_battery.setConnected(true);
+		}else{
+			PX4_ERR("disconnect");
+			_battery.setConnected(false);
+		}
+	}
+
+	_battery.updateCurrent(curr);
+	_battery.updateVoltage(vbat);
+
+	hrt_abstime t = hrt_absolute_time();
+	_battery.updateAndPublishBatteryStatus(t);
+}
 
 void parse_data(uint8_t *rdata)
 {
-
+	aux_recv_update = hrt_absolute_time();
 	for(int i=0;i<4;i++)
 	{
 		adc[i] = (uint16_t)((rdata[i*2+1]<<8)|rdata[i*2]);
@@ -83,27 +106,14 @@ void parse_data(uint8_t *rdata)
 	}
 
 	vbat = adcf[0]*222.0f/22.0f;
+	curr = adcf[1]*222.0f/22.0f;
 
 	pwm_count_fps = (uint16_t)((rdata[17]<<8)|rdata[16]);
 	loop_count = (uint16_t)((rdata[19]<<8)|rdata[18]);
 	uart_callback_count = (uint16_t)((rdata[21]<<8)|rdata[20]);
 	is_connect = (uint16_t)((rdata[23]<<8)|rdata[22]);
 
-	if(is_connect_last != is_connect)
-	{
-		is_connect_last = is_connect;
-		if(is_connect)
-		{
-			PX4_INFO("G0 AUX Connect %d %d",is_connect,is_connect_last);
-		}else{
-			PX4_ERR("G0 AUX Connect Error %d %d",is_connect,is_connect_last);
-		}
-	}
-
-	hrt_abstime t = hrt_absolute_time();
-	_battery.setConnected(true);
-	_battery.updateVoltage(vbat);
-	_battery.updateAndPublishBatteryStatus(t);
+	update_data();
 }
 
 void uart_recv(uint8_t *data,int len)
@@ -143,16 +153,25 @@ int task_main(int argc, char *argv[])
 	static uint8_t rdata[RDATA_SIZE];
 	int rlen = 0;
 	while (true) {
+
 		if(_uart_fd > 0)
 		{
 			rlen = read(_uart_fd, rdata, RDATA_SIZE);
 			if(rlen > 0)
 			{
-				// PX4_INFO("recv: %d",rlen);
 				uart_recv(rdata,rlen);
 			}
-
 		}
+
+		if(is_connect == 1)
+		{
+			if(hrt_absolute_time() - aux_recv_update > 1000000)
+			{
+				is_connect = 0;
+				update_data();
+			}
+		}
+
 		px4_usleep(10000);
 	}
 	return 0;
@@ -162,7 +181,7 @@ int G0AUX::init()
 {
 
 	int speed = B115200;
-	_uart_fd = open("/dev/ttyS3", O_RDWR | O_NOCTTY);
+	_uart_fd = open("/dev/ttyS3", O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (_uart_fd < 0) {
 		PX4_ERR(">>>>> ERROR opening UART, aborting..\n");
 		return -1;
@@ -192,6 +211,9 @@ int G0AUX::init()
 	/* Put in raw mode */
 	cfmakeraw(&uart_config);
 #endif
+
+	uart_config.c_cc[VMIN]  = 0;
+	uart_config.c_cc[VTIME] = 1;
 
 	if ((termios_state = tcsetattr(_uart_fd, TCSANOW, &uart_config)) < 0)
 	{
@@ -422,14 +444,14 @@ int G0AUX::custom_command(int argc, char *argv[])
 
 int G0AUX::print_status()
 {
-	PX4_INFO_RAW("adc:%d %d %d %d pwm:%d %d %d %d fps:%d loop:%d urx:%d isconnect:%d vbat:%0.2f\n",
+	PX4_INFO_RAW("adc:%d %d %d %d pwm:%d %d %d %d update:%d loop:%d urx:%d isconnect:%d vbat:%0.2f\n",
 	adc[0],adc[1],adc[2],adc[3],
 	pwm[0],pwm[1],pwm[2],pwm[3],
 	pwm_count_fps,loop_count,uart_callback_count,is_connect,(double)vbat);
 
 	perf_print_counter(_cycle_perf);
 	perf_print_counter(_interval_perf);
-	_mixing_output.printStatus();
+	// _mixing_output.printStatus();
 	return 0;
 }
 
