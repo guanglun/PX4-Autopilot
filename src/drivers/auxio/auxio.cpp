@@ -106,7 +106,7 @@ void parse_data(uint8_t *rdata)
 	}
 
 	vbat = adcf[0]*222.0f/22.0f;
-	curr = adcf[1]*222.0f/22.0f;
+	curr = adcf[1]/0.01275f;
 
 	pwm_count_fps = (uint16_t)((rdata[17]<<8)|rdata[16]);
 	loop_count = (uint16_t)((rdata[19]<<8)|rdata[18]);
@@ -367,35 +367,43 @@ int pack_data(uint8_t cmd,uint8_t *data,uint16_t len,uint8_t *output,uint8_t out
 	return (6 + len);
 }
 
-#define SDATA_SIZE 10
+#define SDATA_SIZE 12
 bool G0AUX::updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
 				unsigned num_outputs, unsigned num_control_groups_updated)
 {
-	// static uint8_t pwm_data[8];
-	// uint8_t sdata[16];
-	// int cnt = 0;
+	uint16_t check_sum = 0;
+	// static uint16_t test_count_count = 0;
+	// static uint16_t test_count = 0;
 
-	// for (int i = 0; i < 4; i++) {
-	// 	uint16_t pout = outputs[i]-1000;
-	// 	pwm_data[cnt++] = (uint8_t) pout;
-	// 	pwm_data[cnt++] = (uint8_t)(pout>>8);
-	// }
-
-	// int slen = pack_data(0x01,pwm_data,8,sdata,16);
-
-	// if(_uart_fd > 0)
+	// test_count_count++;
+	// if(test_count_count % 2 == 0)
 	// {
-	// 	write(_uart_fd, sdata, slen);
+	// 	test_count = 0;
+	// }else{
+	// 	test_count = 1800;
 	// }
 
 	static char sdata[SDATA_SIZE]={0xAB,0xCD};
 	int cnt = 2;
 
 	for (int i = 0; i < 4; i++) {
-		uint16_t pout = outputs[i]-1000;
+
+		// uint16_t pout = test_count;
+		uint16_t pout = outputs[i] - 1000;
+
 		sdata[cnt++] = (char)(pout);
-		sdata[cnt++] = (char)(pout>>8);
+		sdata[cnt++] = (char)(pout >> 8);
+
+		// test_count++;
 	}
+
+	for(int i=2;i<SDATA_SIZE-2;i++)
+	{
+		check_sum += sdata[i];
+	}
+
+	sdata[cnt++] = (char)(check_sum);
+	sdata[cnt++] = (char)(check_sum >> 8);
 
 	if(_uart_fd > 0)
 	{
@@ -444,10 +452,10 @@ int G0AUX::custom_command(int argc, char *argv[])
 
 int G0AUX::print_status()
 {
-	PX4_INFO_RAW("adc:%d %d %d %d pwm:%d %d %d %d update:%d loop:%d urx:%d isconnect:%d vbat:%0.2f\n",
+	PX4_INFO_RAW("adc:%d %d %d %d pwm:%d %d %d %d update:%d loop:%d urx:%d isconnect:%d vbat:%0.2f curr:%0.4f\n",
 	adc[0],adc[1],adc[2],adc[3],
 	pwm[0],pwm[1],pwm[2],pwm[3],
-	pwm_count_fps,loop_count,uart_callback_count,is_connect,(double)vbat);
+	pwm_count_fps,loop_count,uart_callback_count,is_connect,(double)vbat,(double)curr);
 
 	perf_print_counter(_cycle_perf);
 	perf_print_counter(_interval_perf);
