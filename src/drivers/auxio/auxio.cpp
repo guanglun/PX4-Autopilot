@@ -47,7 +47,7 @@ int _uart_fd = 0;
 
 int task_main(int argc, char *argv[]);
 
-Battery _battery{1, nullptr, 100_ms, battery_status_s::BATTERY_SOURCE_POWER_MODULE};
+Battery *_battery = nullptr;
 
 G0AUX::G0AUX() :
 	OutputModuleInterface(MODULE_NAME, px4::wq_configurations::hp_default),
@@ -81,18 +81,18 @@ void update_data(void)
 		if(is_connect)
 		{
 			PX4_INFO("connected");
-			_battery.setConnected(true);
+			_battery->setConnected(true);
 		}else{
 			PX4_ERR("disconnect");
-			_battery.setConnected(false);
+			_battery->setConnected(false);
 		}
 	}
 
-	_battery.updateCurrent(curr);
-	_battery.updateVoltage(vbat);
+	_battery->updateCurrent(curr);
+	_battery->updateVoltage(vbat);
 
 	hrt_abstime t = hrt_absolute_time();
-	_battery.updateAndPublishBatteryStatus(t);
+	_battery->updateAndPublishBatteryStatus(t);
 }
 
 void parse_data(uint8_t *rdata)
@@ -179,7 +179,7 @@ int task_main(int argc, char *argv[])
 
 int G0AUX::init()
 {
-
+	_battery = new Battery(1, nullptr, 100_ms, battery_status_s::BATTERY_SOURCE_POWER_MODULE);
 	int speed = B115200;
 	_uart_fd = open("/dev/ttyS3", O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (_uart_fd < 0) {
